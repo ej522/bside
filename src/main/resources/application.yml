@@ -1,3 +1,5 @@
+server:
+  port: 80
 spring:
   datasource:
     url: jdbc:postgresql://110.8.21.243:25432/postgres

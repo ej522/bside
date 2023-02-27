@@ -12,7 +12,7 @@ public class WelcomeController {
     @ResponseBody
     public RedirectView hello() {
         RedirectView redirectView = new RedirectView();
-        redirectView.setUrl("http://localhost:8080/swagger-ui/index.html");
+        redirectView.setUrl("http://localhost/swagger-ui/index.html");
 
         return redirectView;
     }
