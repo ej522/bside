@@ -1,6 +1,7 @@
 package com.example.beside.domain;
 
 
+import com.example.beside.util.PasswordConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,7 @@ public class User {
     private Long id;
 
     @Column(nullable = false)
+    //@Convert(converter= PasswordConverter.class)
     private String password;
 
     private String email;
