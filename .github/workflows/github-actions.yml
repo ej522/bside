@@ -2,13 +2,19 @@ name: Spring Boot & Gradle CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main, dev ]
+    branches: [main, dev]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      SPRING_PROFILES_ACTIVE: production
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+      DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v2
@@ -16,7 +22,7 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
-          distribution: 'adopt'
+          distribution: 'adopt@1.17'
           java-version: '17'
 
       - name: Grant execute permission for gradlew
