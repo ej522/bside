@@ -3,8 +3,8 @@ server:
 spring:
   datasource:
     url: jdbc:postgresql://110.8.21.243:25432/postgres
-    username:
-    password:
+    username: bside
+    password: 1q2w3e4r
     driver-class-name: org.postgresql.Driver
 
   jpa:
