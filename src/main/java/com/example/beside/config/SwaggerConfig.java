@@ -13,6 +13,7 @@ import org.springdoc.core.customizers.OperationCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.method.HandlerMethod;
 
 import java.util.ArrayList;

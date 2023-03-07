@@ -7,6 +7,7 @@ import com.example.beside.service.UserService;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,10 @@ public class UserController {
 
     private final UserService userService;
 
+    @GetMapping("/hello")
+    public ResponseEntity<String> hello() {
+        return ResponseEntity.ok("hello");
+    }
 
     @PostMapping(value = "/v1/users")
     public void createUser(@RequestBody @Validated CreateUserRequest requset) {

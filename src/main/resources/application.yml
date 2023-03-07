@@ -3,8 +3,8 @@ server:
 spring:
   datasource:
     url: jdbc:postgresql://110.8.21.243:25432/postgres
-    username:
-    password:
+    username: bside
+    password: 1q2w3e4r
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -19,3 +19,9 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.type: trace
+
+jwt:
+  header: Authoriztion
+  #HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용해야 한다.
+  secret: YnNpZGUtbW9pbS1zcHJpbmctYm9vdC1qd3QtdGVzdC1zZWNyZXQtYnNpZGUtbW9pbS1zcHJpbmctYm9vdC1qd3Qtc2VjcmV0
+  token-validity-in-seconds: 86400
