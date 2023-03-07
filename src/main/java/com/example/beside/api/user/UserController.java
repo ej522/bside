@@ -21,11 +21,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/hello")
-    public ResponseEntity<String> hello() {
-        return ResponseEntity.ok("hello");
-    }
-
     @PostMapping(value = "/v1/users")
     public void createUser(@RequestBody @Validated CreateUserRequest requset) {
         User user = new User();
