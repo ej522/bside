@@ -20,16 +20,6 @@ public class UserController {
 
     private final UserService userService;
 
-
-    @PostMapping(value = "/v1/users")
-    public void createUser(@RequestBody @Validated CreateUserRequest requset) {
-        User user = new User();
-        user.setEmail(requset.email);
-        user.setPassword(requset.password);
-        
-        userService.saveUser(user);
-    }
-
     @GetMapping(value ="/v1/users")
     public List<UserDto> getAllUsers(){
         List<UserDto>UserDtoList = new ArrayList<>();
@@ -42,8 +32,34 @@ public class UserController {
         return UserDtoList;
     }
 
+    @PostMapping(value = "/v1/users")
+    public void createUser(@RequestBody @Validated CreateUserRequest requset) {
+        User user = new User();
+        user.setEmail(requset.email);
+        user.setPassword(requset.password);
+        
+        userService.saveUser(user);
+    }
+
+    @DeleteMapping(value ="/v1/users")
+    public void deleteUser(@RequestBody @Validated DeleteUserRequest request){
+
+        User user = new User();
+        user.setEmail(request.email);
+        user.setPassword(request.password);
+        userService.deleteUser(user);
+    }
+
     @Data
     static class CreateUserRequest{
+        @NotNull
+        private String email;
+        @NotNull
+        private String password;
+    }
+
+    @Data
+    static class DeleteUserRequest{
         @NotNull
         private String email;
         @NotNull

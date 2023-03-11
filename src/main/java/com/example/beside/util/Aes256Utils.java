@@ -21,7 +21,6 @@ public class Aes256Utils {
     public static String encrypt(String plainText) {
         try {
             Cipher cipher = getCipher(Cipher.ENCRYPT_MODE);
-            //실제로 암호화 하는 부분
             byte[] encrypted = cipher.doFinal(plainText.getBytes());
 
             return ENCODER.encodeToString(encrypted); //암호문을 base64로 인코딩하여 출력 해줌
@@ -34,7 +33,6 @@ public class Aes256Utils {
     public static String decrypt(String cipherText) {
         try {
             Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
-            //복호화
             byte[] decrypted = cipher.doFinal(DECODER.decode(cipherText)); //base64 to byte
 
             return new String(decrypted );
