@@ -8,7 +8,8 @@ public class PasswordConverter implements AttributeConverter<String, String> {
 
     @Override
     public String convertToDatabaseColumn(String attribute) {
-        if(attribute==null) return null;
+        if (attribute == null)
+            return null;
         try {
             return Aes256Utils.encrypt(attribute);
         } catch (Exception e) {
@@ -19,7 +20,8 @@ public class PasswordConverter implements AttributeConverter<String, String> {
     @Override
     public String convertToEntityAttribute(String dbData) {
         try {
-            return Aes256Utils.decrypt(dbData);
+            return dbData;
+            // return Aes256Utils.decrypt(dbData);
         } catch (Exception e) {
             return dbData;
         }
