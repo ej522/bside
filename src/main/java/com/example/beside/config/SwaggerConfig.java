@@ -28,8 +28,8 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .servers(Arrays.asList(
                         new Server().url("http://localhost:8081").description("local server"),
-                        new Server().url("http://101.101.210.125/").description("Staging server"),
-                        new Server().url("http://101.101.210.125/").description("Production server")
+                        new Server().url("http://115.85.182.170/").description("Staging server"),
+                        new Server().url("http://115.85.182.170/").description("Production server")
                 ))
                 .info(new Info().title("b-side")
                         .description("API documentation using springdoc-openapi and OpenAPI 3.0")
