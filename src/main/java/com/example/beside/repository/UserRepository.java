@@ -4,7 +4,6 @@ package com.example.beside.repository;
 import com.example.beside.domain.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
