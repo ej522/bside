@@ -1,7 +1,6 @@
 package com.example.beside.api.user;
 
 
-import com.example.beside.domain.TokenResponse;
 import com.example.beside.domain.User;
 import com.example.beside.dto.UserDto;
 import com.example.beside.service.UserService;
@@ -60,7 +59,7 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody User request) {
         String token = jwtProvider.createToken(request);
 
-        return ResponseEntity.ok().body(new TokenResponse(token, "bearer"));
+        return ResponseEntity.ok().body(token);
     }
 
     @Data
