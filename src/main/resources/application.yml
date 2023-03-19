@@ -9,7 +9,8 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+#      ddl-auto: validate # DB 에 DDL 무시
+      ddl-auto: update  # DB 에 DDL 적용
     properties:
       hibernate:
         show_sql: true
