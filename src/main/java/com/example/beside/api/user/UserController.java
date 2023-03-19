@@ -55,8 +55,8 @@ public class UserController {
         userService.deleteUser(user);
     }
 
-    @PostMapping("/v1/login")
-    public ResponseEntity<?> login(@RequestBody User request) {
+    @PostMapping("/v1/createToken")
+    public ResponseEntity<?> createToken(@RequestBody User request) {
         String token = jwtProvider.createToken(request);
 
         return ResponseEntity.ok().body(token);
