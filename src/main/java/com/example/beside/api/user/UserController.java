@@ -148,10 +148,16 @@ public class UserController {
         return Response.success(200, "유저가 삭제되었습니다.", null);
     }
 
+<<<<<<< HEAD
     private String generateVerificationCode() {
         String numbers = "";
         Random random = new Random();
         int bound = 9; // 1부터 9까지의 숫자 중에서 랜덤으로 추출
+=======
+    @PostMapping("/v1/createToken")
+    public ResponseEntity<?> createToken(@RequestBody User request) {
+        String token = jwtProvider.createToken(request);
+>>>>>>> ca038a6 (카카오로그인구현, JWT적용x)
 
         while (numbers.length() < 6) {
             String randomNumber = String.valueOf(random.nextInt(bound));

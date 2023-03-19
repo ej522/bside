@@ -52,6 +52,8 @@ dependencies {
 	//log4j2
 	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
+	//gson 추가
+	implementation 'com.google.code.gson:gson:2.10.1'
 
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'org.postgresql:postgresql'
