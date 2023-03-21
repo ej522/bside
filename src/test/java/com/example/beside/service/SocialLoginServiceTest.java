@@ -30,8 +30,7 @@ class SocialLoginServiceTest {
         // assertTrue(kakaoAcountInfo.length()>1);
 =======
         //given
-        //카카오에서 받은 토큰
-        String token = "";
+        String token = "카카오 access token";
 
         //when
         HashMap<String, Object> userInfo = SocialLoginService.getKaKaoUserInfo(token);
