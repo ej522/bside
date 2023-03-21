@@ -30,8 +30,6 @@ public class SocialLoginController {
 
     @GetMapping(value = "/v1/kakaoLogin")
     public ResponseEntity kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) {
-//        String access_token = socialLoginService.getKakaoAccessToken(code);
-//        System.out.printf("ctr access_token="+access_token);
         HashMap<String, Object> userInfo = socialLoginService.getUserInfo(code);
 
         User user = (User) userInfo.get("user");
