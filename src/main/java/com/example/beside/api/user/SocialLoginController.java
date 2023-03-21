@@ -1,6 +1,5 @@
 package com.example.beside.api.user;
 
-import com.example.beside.domain.User;
 import com.example.beside.service.SocialLoginService;
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -17,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 >>>>>>> 17ac0eb (카카오로그인)
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+<<<<<<< HEAD
 import org.springframework.beans.factory.annotation.Autowired;
 <<<<<<< HEAD
 >>>>>>> ca038a6 (카카오로그인구현, JWT적용x)
@@ -26,6 +26,8 @@ import org.springframework.http.ResponseEntity;
 <<<<<<< HEAD
 >>>>>>> 17ac0eb (카카오로그인)
 =======
+=======
+>>>>>>> f0cc91b (카카오로그인 수정, 테스트코드 추가)
 import org.springframework.web.bind.annotation.GetMapping;
 >>>>>>> 0b323c6 (카카오로그인수정)
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,9 +72,10 @@ public class SocialLoginController {
 
 
     @GetMapping(value = "/v1/kakaoLogin")
-    public ResponseEntity kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) {
-        HashMap<String, Object> userInfo = socialLoginService.getUserInfo(code);
+    public String kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) {
+        HashMap<String, Object> userInfo = socialLoginService.getKaKaoUserInfo(code);
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         //세션에 유저 이메일과 토큰 담기
         session.setAttribute("userEmail", userInfo.get("email"));
@@ -89,5 +92,10 @@ public class SocialLoginController {
 
         return new ResponseEntity(HttpStatus.OK);
 >>>>>>> 17ac0eb (카카오로그인)
+=======
+        //jwt 토큰발급 추가예정
+
+        return userInfo.get("kakaoAccount").toString();
+>>>>>>> f0cc91b (카카오로그인 수정, 테스트코드 추가)
     }
 }

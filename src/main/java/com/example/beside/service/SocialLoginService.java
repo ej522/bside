@@ -2,6 +2,7 @@ package com.example.beside.service;
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +15,20 @@ import java.io.InputStreamReader;
 import com.example.beside.domain.User;
 >>>>>>> 17ac0eb (카카오로그인)
 import com.google.gson.JsonElement;
+=======
+>>>>>>> f0cc91b (카카오로그인 수정, 테스트코드 추가)
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.InputStreamReader;
+<<<<<<< HEAD
 import java.io.OutputStreamWriter;
 >>>>>>> ca038a6 (카카오로그인구현, JWT적용x)
+=======
+>>>>>>> f0cc91b (카카오로그인 수정, 테스트코드 추가)
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -35,6 +40,7 @@ public class SocialLoginService {
     @Autowired
     private UserService userService;
 
+<<<<<<< HEAD
     // 카카오 유저 정보 얻기
     public static HashMap<String, Object> getKaKaoUserInfo(String access_token) {
 =======
@@ -100,6 +106,10 @@ public class SocialLoginService {
     //카카오 유저 정보 얻기
     public HashMap<String, Object> getUserInfo (String access_token) {
 >>>>>>> ca038a6 (카카오로그인구현, JWT적용x)
+=======
+    //카카오 유저 정보 얻기
+    public static HashMap<String, Object> getKaKaoUserInfo (String access_token) {
+>>>>>>> f0cc91b (카카오로그인 수정, 테스트코드 추가)
         HashMap<String, Object> userInfo = new HashMap<>();
         String reqUrl = "https://kapi.kakao.com/v2/user/me";
 
@@ -118,8 +128,11 @@ public class SocialLoginService {
             conn.setRequestProperty("Authorization", "Bearer " + access_token);
 
             int responseCode = conn.getResponseCode();
+<<<<<<< HEAD
             System.out.printf("responseCode: " + responseCode);
 >>>>>>> ca038a6 (카카오로그인구현, JWT적용x)
+=======
+>>>>>>> f0cc91b (카카오로그인 수정, 테스트코드 추가)
 
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
@@ -129,6 +142,7 @@ public class SocialLoginService {
             while ((line = br.readLine()) != null) {
                 result += line;
             }
+<<<<<<< HEAD
 <<<<<<< HEAD
 
             JsonParser parser = new JsonParser();
@@ -145,27 +159,26 @@ public class SocialLoginService {
             System.out.println(e.getMessage());
 =======
             System.out.printf("response body: " + result);
+=======
+>>>>>>> f0cc91b (카카오로그인 수정, 테스트코드 추가)
 
             JsonParser parser = new JsonParser();
-            JsonElement element = parser.parse(result);
+            JsonObject obj = (JsonObject) parser.parse(result);
 
-            JsonObject properties = element.getAsJsonObject().get("properties").getAsJsonObject();
-            JsonObject kakao_account = element.getAsJsonObject().get("kakao_account").getAsJsonObject();
+            JsonObject kakao_account = (JsonObject) obj.get("kakao_account");
+            JsonObject properties = (JsonObject) obj.get("properties");
 
-            String email = kakao_account.getAsJsonObject().get("email").getAsString();
+            userInfo.put("kakaoAccount", kakao_account);
 
-            User user = new User();
-            user.setEmail(email);
+            //정보받아와서 db등록 여부 확인 후 DB추가할 곳
 
-            //이메일 없으면 회원가입
-            if(userService.findUserByEmail(email)==null) {
-                userService.saveUser(user);
-            }
-
-            userInfo.put("user", user);
         } catch (Exception e) {
+<<<<<<< HEAD
             e.getMessage();
 >>>>>>> ca038a6 (카카오로그인구현, JWT적용x)
+=======
+            System.out.println(e.getMessage());
+>>>>>>> f0cc91b (카카오로그인 수정, 테스트코드 추가)
         }
 
         return userInfo;
