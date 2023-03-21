@@ -1,6 +1,7 @@
 package com.example.beside.service;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,13 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 =======
+=======
+import com.example.beside.domain.User;
+>>>>>>> 17ac0eb (카카오로그인)
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -26,12 +31,17 @@ import java.util.HashMap;
 @Service
 public class SocialLoginService {
 <<<<<<< HEAD
+<<<<<<< HEAD
     @Autowired
     private UserService userService;
 
     // 카카오 유저 정보 얻기
     public static HashMap<String, Object> getKaKaoUserInfo(String access_token) {
 =======
+=======
+    @Autowired
+    private UserService userService;
+>>>>>>> 17ac0eb (카카오로그인)
 
     //카카오 accesstoken 발급
     public String getKakaoAccessToken (String code) {
@@ -52,7 +62,7 @@ public class SocialLoginService {
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
             sb.append("&client_id=e0e9bb8073cb2394e6b373ed610a0635");
-            sb.append("redirect_uri=http://localhost:8081/v1/createToken");
+            sb.append("redirect_uri=http://localhost:8081/v1/kakaoLogin");
             sb.append("&code=" + code);
             bw.write(sb.toString());
             bw.flush();
@@ -144,7 +154,15 @@ public class SocialLoginService {
 
             String email = kakao_account.getAsJsonObject().get("email").getAsString();
 
-            userInfo.put("email", email);
+            User user = new User();
+            user.setEmail(email);
+
+            //이메일 없으면 회원가입
+            if(userService.findUserByEmail(email)==null) {
+                userService.saveUser(user);
+            }
+
+            userInfo.put("user", user);
         } catch (Exception e) {
             e.getMessage();
 >>>>>>> ca038a6 (카카오로그인구현, JWT적용x)
