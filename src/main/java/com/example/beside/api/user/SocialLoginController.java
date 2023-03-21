@@ -23,7 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 =======
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+<<<<<<< HEAD
 >>>>>>> 17ac0eb (카카오로그인)
+=======
+import org.springframework.web.bind.annotation.GetMapping;
+>>>>>>> 0b323c6 (카카오로그인수정)
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,6 +40,7 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
+<<<<<<< HEAD
 public class SocialLoginController {
 
     private final SocialLoginService socialLoginService;
@@ -55,6 +60,8 @@ public class SocialLoginController {
 @RequiredArgsConstructor
 >>>>>>> 17ac0eb (카카오로그인)
 @RestController
+=======
+>>>>>>> 0b323c6 (카카오로그인수정)
 public class SocialLoginController {
 
     private final SocialLoginService socialLoginService;
@@ -62,11 +69,11 @@ public class SocialLoginController {
     private final JwtProvider jwtProvider;
 
 
-    @RequestMapping(value = "/v1/kakaoLogin")
+    @GetMapping(value = "/v1/kakaoLogin")
     public ResponseEntity kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) {
-        String access_token = socialLoginService.getKakaoAccessToken(code);
-        System.out.printf("ctr access_token="+access_token);
-        HashMap<String, Object> userInfo = socialLoginService.getUserInfo(access_token);
+//        String access_token = socialLoginService.getKakaoAccessToken(code);
+//        System.out.printf("ctr access_token="+access_token);
+        HashMap<String, Object> userInfo = socialLoginService.getUserInfo(code);
 
 <<<<<<< HEAD
         //세션에 유저 이메일과 토큰 담기
