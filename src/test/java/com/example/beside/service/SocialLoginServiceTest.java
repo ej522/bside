@@ -13,8 +13,7 @@ class SocialLoginServiceTest {
     @DisplayName("카카오유저정보")
     void getKakaoUserInfo() {
         //given
-        //카카오에서 받은 토큰
-        String token = "";
+        String token = "카카오 access token";
 
         //when
         HashMap<String, Object> userInfo = SocialLoginService.getKaKaoUserInfo(token);
