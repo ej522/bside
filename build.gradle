@@ -45,6 +45,7 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
 	//gson 추가
@@ -59,6 +60,9 @@ dependencies {
 //	// javax.xml.bind
 //	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
 >>>>>>> 19c961d (jaxb제거)
+=======
+
+>>>>>>> 61c67c0 (주석제거)
 
 	//gson 추가
 	implementation 'com.google.code.gson:gson:2.10.1'
