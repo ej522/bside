@@ -1,6 +1,5 @@
 package com.example.beside.api.user;
 
-import com.example.beside.domain.User;
 import com.example.beside.service.SocialLoginService;
 import com.example.beside.service.UserService;
 import com.example.beside.util.JwtProvider;
@@ -22,14 +21,12 @@ public class SocialLoginController {
     private final UserService userService;
     private final JwtProvider jwtProvider;
 
-
     @GetMapping(value = "/v1/kakaoLogin")
     public String kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) {
         HashMap<String, Object> userInfo = socialLoginService.getKaKaoUserInfo(code);
 
-        //jwt 토큰발급 추가예정
+        // jwt 토큰발급 추가예정
 
         return userInfo.get("kakaoAccount").toString();
-
     }
 }
