@@ -16,8 +16,8 @@ public class SocialLoginService {
     @Autowired
     private UserService userService;
 
-    //카카오 유저 정보 얻기
-    public static HashMap<String, Object> getKaKaoUserInfo (String access_token) {
+    // 카카오 유저 정보 얻기
+    public static HashMap<String, Object> getKaKaoUserInfo(String access_token) {
         HashMap<String, Object> userInfo = new HashMap<>();
         String reqUrl = "https://kapi.kakao.com/v2/user/me";
 
@@ -26,7 +26,7 @@ public class SocialLoginService {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
 
-            //요청에 필요한 Header에 포함될 내용
+            // 요청에 필요한 Header에 포함될 내용
             conn.setRequestProperty("Authorization", "Bearer " + access_token);
 
             int responseCode = conn.getResponseCode();
@@ -48,7 +48,7 @@ public class SocialLoginService {
 
             userInfo.put("kakaoAccount", kakao_account);
 
-            //정보받아와서 db등록 여부 확인 후 DB추가할 곳
+            // 정보받아와서 db등록 여부 확인 후 DB추가할 곳
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
