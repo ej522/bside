@@ -1,17 +1,16 @@
 package com.example.beside.api.user;
 
+import com.example.beside.domain.User;
 import com.example.beside.service.SocialLoginService;
 import com.example.beside.service.UserService;
 import com.example.beside.util.JwtProvider;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.http.HttpResponse;
 import java.util.HashMap;
 
 @RequiredArgsConstructor
@@ -31,5 +30,6 @@ public class SocialLoginController {
         //jwt 토큰발급 추가예정
 
         return userInfo.get("kakaoAccount").toString();
+
     }
 }
