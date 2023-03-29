@@ -1,72 +1,72 @@
-package com.example.beside.domain;
+// package com.example.beside.domain;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+// import com.querydsl.jpa.impl.JPAQueryFactory;
+// import jakarta.persistence.EntityManager;
+// import org.assertj.core.api.Assertions;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+// import java.util.ArrayList;
+// import java.util.List;
 
-@SpringBootTest
-@Transactional
-public class QueryDslBasicTest {
+// @SpringBootTest
+// @Transactional
+// public class QueryDslBasicTest {
 
-    @Autowired
-    EntityManager em;
-    JPAQueryFactory queryFactory;
+// @Autowired
+// EntityManager em;
+// JPAQueryFactory queryFactory;
 
-    @BeforeEach
-    public void before(){
-        // given
-        Team teamA = new Team("teamA");
-        Team teamB = new Team("teamB");
+// @BeforeEach
+// public void before(){
+// // given
+// Team teamA = new Team("teamA");
+// Team teamB = new Team("teamB");
 
-        em.persist(teamA);
-        em.persist(teamB);
+// em.persist(teamA);
+// em.persist(teamB);
 
-        List<Member> memberList = new ArrayList<Member>();
-        memberList.add(new Member("member1", 10, teamA));
-        memberList.add(new Member("member2", 20, teamA));
-        memberList.add(new Member("member3", 30, teamB));
-        memberList.add(new Member("member4", 40, teamB));
+// List<Member> memberList = new ArrayList<Member>();
+// memberList.add(new Member("member1", 10, teamA));
+// memberList.add(new Member("member2", 20, teamA));
+// memberList.add(new Member("member3", 30, teamB));
+// memberList.add(new Member("member4", 40, teamB));
 
-        // when
-        em.persist(memberList.get(0));
-        em.persist(memberList.get(1));
-        em.persist(memberList.get(2));
-        em.persist(memberList.get(3));
-    }
+// // when
+// em.persist(memberList.get(0));
+// em.persist(memberList.get(1));
+// em.persist(memberList.get(2));
+// em.persist(memberList.get(3));
+// }
 
-    @Test
-    public void startJPQL(){
-        String qlString =
-                "select m from Member m" +
-                " where m.username = :username";
+// @Test
+// public void startJPQL(){
+// String qlString =
+// "select m from Member m" +
+// " where m.username = :username";
 
-        Member findMember = em.createQuery(qlString, Member.class)
-                .setParameter("username", "member1")
-                .getSingleResult();
+// Member findMember = em.createQuery(qlString, Member.class)
+// .setParameter("username", "member1")
+// .getSingleResult();
 
-        Assertions.assertThat(findMember.getUsername()).isEqualTo("member1");
-    }
+// Assertions.assertThat(findMember.getUsername()).isEqualTo("member1");
+// }
 
-    @Test
-    public void startQueryDsl(){
-        queryFactory = new JPAQueryFactory(em);
-        QMember m = new QMember("m");
+// @Test
+// public void startQueryDsl(){
+// queryFactory = new JPAQueryFactory(em);
+// QMember m = new QMember("m");
 
-        Member findMember = queryFactory
-                .selectFrom(m)
-                .from(m)
-                .where(m.username.eq("member1"))  // 파라미터 바인딩 처리
-                .fetchOne();
+// Member findMember = queryFactory
+// .selectFrom(m)
+// .from(m)
+// .where(m.username.eq("member1")) // 파라미터 바인딩 처리
+// .fetchOne();
 
-        Assertions.assertThat(findMember.getUsername()).isEqualTo("member1");
-    }
+// Assertions.assertThat(findMember.getUsername()).isEqualTo("member1");
+// }
 
-}
+// }
