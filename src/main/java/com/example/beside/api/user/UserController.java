@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class UserController {
     }
 
     @DeleteMapping(value ="/v1/users")
-    public void deleteUser(@RequestBody @Validated DeleteUserRequest request){
+    public void deleteUser(@RequestBody @Validated DeleteUserRequest request) throws NoSuchAlgorithmException {
 
         User user = new User();
         user.setEmail(request.email);
