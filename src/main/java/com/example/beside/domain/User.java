@@ -34,7 +34,6 @@ public class User {
     @Column(length = 30)
     private String email;
 
-    @Convert(converter = PasswordConverter.class)
     private String password;
 
     private String profile_image;

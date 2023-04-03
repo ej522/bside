@@ -25,4 +25,14 @@ public class PasswordConverter implements AttributeConverter<String, String> {
             return dbData;
         }
     }
+
+    public static String hashPassword(String attribute) {
+        if (attribute == null)
+            return null;
+        try {
+            return Encrypt.getHashingPassword(attribute);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 }
