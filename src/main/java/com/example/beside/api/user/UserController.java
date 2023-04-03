@@ -58,15 +58,13 @@ public class UserController {
         userService.saveUser(user);
     }
 
-
     @Operation(tags = { "User" }, summary = "회원삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "유저가 삭제되었습니다."),
             @ApiResponse(responseCode = "400", description = "존재하지 않는 유저입니다")
     })
     @DeleteMapping(value = "/v1/delete")
-    public void deleteUser(@RequestBody @Validated DeleteUserRequest request) {
-
+    public void deleteUser(@RequestBody @Validated DeleteUserRequest request) throws NoSuchAlgorithmException {
 
         User user = new User();
         user.setEmail(request.email);

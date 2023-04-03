@@ -23,7 +23,7 @@ public class SocialLoginController {
 
     @GetMapping(value = "/v1/kakaoLogin")
     public String kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) {
-        HashMap<String, Object> userInfo = socialLoginService.getKaKaoUserInfo(code);
+        HashMap<String, Object> userInfo = SocialLoginService.getKaKaoUserInfo(code);
 
         // jwt 토큰발급 추가예정
 
