@@ -26,20 +26,21 @@ public class UserRepositoryTest {
     @BeforeEach
     @DisplayName("각각의 Test 함수 실행 전 실행되는 함수")
     void settingEntity() {
-        //유저1 세팅
+        // 유저1 세팅
         user = new User();
+        user.setName("부엉이");
         user.setEmail("test_user@google.com");
         user.setPassword("1234");
 
     }
-    
+
     @Test
     @DisplayName("유저를 id 로 삭제할 수 있는가")
     void testDeleteUser() {
         // given
         userRepository.saveUser(user);
 
-        // when 
+        // when
         userRepository.deleteUser(user);
         User userInfo = userRepository.findUserById(user.getId());
 
@@ -50,50 +51,50 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("유저를 전체 조회할 수 있는가?")
     void testFindUserAll() {
-        // given 
+        // given
         userRepository.saveUser(user);
 
-        // when 
+        // when
         List<User> findUserAll = userRepository.findUserAll();
 
         // then
-        assertTrue(findUserAll.size() >1);
+        assertTrue(findUserAll.size() > 0);
     }
 
     @Test
     void testFindUserByEmail() {
-        // given 
+        // given
         userRepository.saveUser(user);
 
-        // when 
+        // when
         User findUserByEmail = userRepository.findUserByEmail(user.getEmail());
 
         // then
-        assertEquals(findUserByEmail,user);
+        assertEquals(findUserByEmail, user);
     }
 
     @Test
     void testFindUserById() {
-        // given 
+        // given
         userRepository.saveUser(user);
 
-        // when 
+        // when
         User findUserByEmail = userRepository.findUserByEmail(user.getEmail());
 
         // then
-        assertEquals(findUserByEmail,user);
+        assertEquals(findUserByEmail, user);
 
     }
 
     @Test
     @DisplayName("유저를 저장할 수 있는가?")
     void testSaveUser() {
-        // when 
+        // when
         userRepository.saveUser(user);
         User findedUser = userRepository.findUserById(user.getId());
 
         // then
-        assertEquals(findedUser.getId(), user.getId()); 
-        assertEquals(findedUser.getEmail(), user.getEmail()); 
+        assertEquals(findedUser.getId(), user.getId());
+        assertEquals(findedUser.getEmail(), user.getEmail());
     }
 }
