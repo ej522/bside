@@ -1,7 +1,9 @@
 package com.example.beside.service;
 
+import com.example.beside.common.Exception.PasswordException;
 import com.example.beside.domain.User;
 import com.example.beside.repository.UserRepository;
+import com.example.beside.util.Common;
 import com.example.beside.util.Encrypt;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +22,10 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Long saveUser(User user) {
+    public Long saveUser(User user) throws PasswordException {
+        // 패스워드 검증
+        Common.PasswordValidate(user.getPassword());
+
         userRepository.saveUser(user);
         return user.getId();
     }

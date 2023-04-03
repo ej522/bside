@@ -1,10 +1,13 @@
 package com.example.beside.api.user;
 
+import com.example.beside.common.Exception.PasswordException;
+import com.example.beside.common.response.Response;
 import com.example.beside.domain.User;
 import com.example.beside.dto.UserDto;
 import com.example.beside.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -33,7 +36,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "존재하지 않는 사용자입니다.")
     })
     @GetMapping(value = "/v1/users")
-    public List<UserDto> getAllUsers() {
+    public Response<List<UserDto>> getAllUsers() {
         List<UserDto> UserDtoList = new ArrayList<>();
 
         List<User> userAll = userService.findUserAll();
@@ -41,21 +44,24 @@ public class UserController {
             UserDto userDto = new UserDto(s.getId(), s.getPassword(), s.getEmail());
             UserDtoList.add(userDto);
         });
-        return UserDtoList;
+
+        return Response.success(200, "유저 목록 조회를 완료했습니다", UserDtoList);
     }
 
     @Operation(tags = { "User" }, summary = "회원가입")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "회원가입이 완료되었습니다."),
-            @ApiResponse(responseCode = "400", description = "올바른 형식의 이메일 주소여야 합니다")
+            @ApiResponse(responseCode = "400", description = "올바른 형식의 이메일, 패스워드야 합니다")
     })
     @PostMapping(value = "/v1/signup")
-    public void createUser(@RequestBody @Validated CreateUserRequest requset) {
+    public Response<Void> createUser(@RequestBody @Validated CreateUserRequest requset) throws PasswordException {
         User user = new User();
         user.setEmail(requset.email);
         user.setPassword(requset.password);
 
         userService.saveUser(user);
+
+        return Response.success(201, "회원가입이 완료되었습니다.", null);
     }
 
     @Operation(tags = { "User" }, summary = "회원삭제")
@@ -64,12 +70,15 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "존재하지 않는 유저입니다")
     })
     @DeleteMapping(value = "/v1/delete")
-    public void deleteUser(@RequestBody @Validated DeleteUserRequest request) throws NoSuchAlgorithmException {
+    public Response<Void> deleteUser(@RequestBody @Validated DeleteUserRequest request)
+            throws NoSuchAlgorithmException {
 
         User user = new User();
         user.setEmail(request.email);
         user.setPassword(request.password);
         userService.deleteUser(user);
+
+        return Response.success(200, "유저가 삭제되었습니다.", null);
     }
 
     @Data
