@@ -55,13 +55,6 @@ public class UserController {
         userService.deleteUser(user);
     }
 
-    @PostMapping("/v1/createToken")
-    public ResponseEntity<?> createToken(@RequestBody User request) {
-        String token = jwtProvider.createToken(request);
-
-        return ResponseEntity.ok().body(token);
-    }
-
     @Data
     static class CreateUserRequest{
         @NotNull

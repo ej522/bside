@@ -1,5 +1,7 @@
 package com.example.beside.service;
 
+import com.example.beside.domain.User;
+import com.example.beside.repository.UserRepository;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +16,10 @@ import java.util.HashMap;
 @Service
 public class SocialLoginService {
     @Autowired
-    private UserService userService;
+    private static UserService userService;
 
     // 카카오 유저 정보 얻기
-    public static HashMap<String, Object> getKaKaoUserInfo(String access_token) {
+    public static HashMap getKaKaoUserInfo(String access_token) {
         HashMap<String, Object> userInfo = new HashMap<>();
         String reqUrl = "https://kapi.kakao.com/v2/user/me";
 
@@ -49,6 +51,19 @@ public class SocialLoginService {
             userInfo.put("kakaoAccount", kakao_account);
 
             // 정보받아와서 db등록 여부 확인 후 DB추가할 곳
+
+            String id = properties.get("id").toString();
+            String imgUrl = properties.get("profile_image").toString();
+
+            User user = new User();
+            user.setEmail(id);
+
+            if(userService.findUserByEmail(id)==null) {
+                userService.saveUser(user);
+            }
+
+            userInfo.put("user", user);
+
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
