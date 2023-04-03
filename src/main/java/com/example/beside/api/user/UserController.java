@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +58,7 @@ public class UserController {
         userService.saveUser(user);
     }
 
+
     @Operation(tags = { "User" }, summary = "회원삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "유저가 삭제되었습니다."),
@@ -64,6 +66,7 @@ public class UserController {
     })
     @DeleteMapping(value = "/v1/delete")
     public void deleteUser(@RequestBody @Validated DeleteUserRequest request) {
+
 
         User user = new User();
         user.setEmail(request.email);

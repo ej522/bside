@@ -2,12 +2,14 @@ package com.example.beside.service;
 
 import com.example.beside.domain.User;
 import com.example.beside.repository.UserRepository;
-import com.example.beside.util.Aes256Utils;
+import com.example.beside.util.Encrypt;
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 import java.util.List;
 
@@ -25,14 +27,14 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(User user){
+    public void deleteUser(User user) throws NoSuchAlgorithmException {
         User findUserByEmail = findUserByEmail(user.getEmail());
         Optional<User> optionalUser = Optional.of(findUserByEmail);
 
         if (!optionalUser.isPresent()) 
-            throw new IllegalStateException("이미 존재하는 회원입니다");    
+            throw new IllegalStateException("이미 존재하는 회원입니다");
 
-        if (!Aes256Utils.decrypt(optionalUser.get().getPassword()).equals(user.getPassword()))
+        if (!optionalUser.get().getPassword().toString().equals(Encrypt.getHashingPassword(user.getPassword())))
             throw new IllegalStateException("비밀번호가 동일하지 않습니다");    
         
         userRepository.deleteUser(findUserByEmail);
