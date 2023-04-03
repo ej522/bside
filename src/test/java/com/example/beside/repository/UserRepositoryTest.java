@@ -29,8 +29,8 @@ public class UserRepositoryTest {
         // 유저1 세팅
         user = new User();
         user.setName("부엉이");
-        user.setEmail("test_user@google.com");
-        user.setPassword("1234");
+        user.setEmail("test-user@google.com");
+        user.setPassword("Moim@0303");
 
     }
 
