@@ -81,6 +81,24 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("틀린 패스워드로 유저 삭제")
+    void testDeleteUserWithWrongPassword() throws NoSuchAlgorithmException, PasswordException {
+        // given
+        userService.saveUser(user1);
+        user1.setPassword("test");
+
+        // when, then
+        assertThrows(IllegalStateException.class, () -> userService.deleteUser(user1));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 유저 삭제")
+    void testDeleteUserWithNotExist() throws NoSuchAlgorithmException, PasswordException {
+        // when, then
+        assertThrows(NullPointerException.class, () -> userService.deleteUser(user1));
+    }
+
+    @Test
     @DisplayName("유저 전체 조회")
     void testFindUserAll() throws PasswordException {
         // given
@@ -105,6 +123,25 @@ public class UserServiceTest {
         // then
         // TODO 토큰 복호화 검증 필요
         Assertions.assertThat(token).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("틀린 패스워드로 로그인")
+    void testLoginUserWithWrongPassword() throws PasswordException, UserNotExistException {
+        // given
+        userService.saveUser(user1);
+        user1.setPassword("test");
+
+        // when, then
+        assertThrows(PasswordException.class, () -> userService.loginUser(user1));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 이메일로 로그인")
+    void testLoginUserWithNotExist() throws PasswordException, UserNotExistException {
+        // given
+        // when, then
+        assertThrows(NullPointerException.class, () -> userService.loginUser(user1));
     }
 
     @Test
