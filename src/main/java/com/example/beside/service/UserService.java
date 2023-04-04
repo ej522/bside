@@ -34,7 +34,10 @@ public class UserService {
         user.setPassword(hashPassword);
         user.setSocial_type(LoginType.MOIM.name());
 
+        String hashPassword = PasswordConverter.hashPassword(password);
+        user.setPassword(hashPassword);
         userRepository.saveUser(user);
+
         return user.getId();
     }
 

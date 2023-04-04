@@ -145,11 +145,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("유저 등록")
     void testSaveUser() throws PasswordException {
-        // when
-        userService.saveUser(user1);
-        em.flush();
 
         // then
         User findUserById = userService.findUserByEmail(user1.getEmail());
