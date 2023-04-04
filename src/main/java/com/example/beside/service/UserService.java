@@ -29,8 +29,8 @@ public class UserService {
         String password = user.getPassword();
         // 패스워드 검증
         Common.PasswordValidate(password);
-        String hashPassword = PasswordConverter.hashPassword(password);
 
+        String hashPassword = PasswordConverter.hashPassword(password);
         user.setPassword(hashPassword);
         userRepository.saveUser(user);
 

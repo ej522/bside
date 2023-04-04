@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.DisplayName;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -34,14 +36,22 @@ public class UserServiceTest {
 
     private User user1 = new User();
     private User user2 = new User();
+    private User user3 = new User();
+    private User user4 = new User();
 
     @BeforeEach
     public void setUp() throws PasswordException {
         user1.setEmail("test_1234@naver.com");
         user1.setPassword("wd!2awQWDas!@");
 
-        user2.setEmail("test_4321@naver.com");
-        user2.setPassword("dw2dscaAD!@");
+        user2.setEmail("test_2345@naver.com");
+        user2.setPassword("12345");
+
+        user3.setEmail("test_3456@naver.com");
+        user3.setPassword("abcdefghi");
+
+        user4.setEmail("test_4567@naver.com");
+        user4.setPassword("1a!vD");
     }
 
     @AfterEach
@@ -75,12 +85,10 @@ public class UserServiceTest {
     void testFindUserAll() throws PasswordException {
         // given
         userService.saveUser(user1);
-        userService.saveUser(user2);
-        em.flush();
         // when
         List<User> findUserAll = userService.findUserAll();
         // then
-        Assertions.assertThat(findUserAll.size()).isGreaterThan(2);
+        Assertions.assertThat(findUserAll.size()).isGreaterThan(1);
     }
 
     @Test
@@ -110,5 +118,26 @@ public class UserServiceTest {
         User findUserById = userService.findUserByEmail(user1.getEmail());
 
         Assertions.assertThat(user1.getEmail()).isEqualTo(findUserById.getEmail());
+    }
+
+    @Test
+    @DisplayName("숫자로만 이루어진 패스워드로 유저 등록")
+    void testSaveUserWithOnlyNumberPassword() throws PasswordException {
+        // when, then
+        assertThrows(PasswordException.class, () -> userService.saveUser(user2));
+    }
+
+    @Test
+    @DisplayName("영어로만 이루어진 패스워드로 유저 등록")
+    void testSaveUserWithOnlyEnglish() throws PasswordException {
+        // when, then
+        assertThrows(PasswordException.class, () -> userService.saveUser(user3));
+    }
+
+    @Test
+    @DisplayName("8자 이하로 이루어진 패스워드로 유저 등록")
+    void testSaveUserWithless8letter() throws PasswordException {
+        // when, then
+        assertThrows(PasswordException.class, () -> userService.saveUser(user4));
     }
 }

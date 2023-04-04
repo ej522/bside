@@ -25,22 +25,24 @@ public class UserRepository {
         queryFactory = new JPAQueryFactory(em);
 
         QUser qUser = new QUser("u");
-        long result = queryFactory.insert(qUser)
+        queryFactory.insert(qUser)
                 .columns(qUser.social_type, qUser.name, qUser.email, qUser.password, qUser.profile_image)
                 .values(user.getSocial_type(), user.getName(), user.getEmail(), user.getPassword(),
                         user.getProfile_image())
                 .execute();
 
-        return result;
+        return queryFactory.select(qUser.id)
+                .from(qUser).where(qUser.email.eq(user.getEmail())).fetchOne();
     }
 
     public void deleteUser(User user) {
-        User userInfo = em.find(User.class, user.getId());
-        if (userInfo == null)
-            throw new RuntimeException("해당 유저가 없습니다");
+        queryFactory = new JPAQueryFactory(em);
+        QUser qUser = new QUser("u");
 
-        em.remove(userInfo);
-        em.flush();
+        queryFactory.delete(qUser)
+                .where(qUser.email.eq(user.getEmail())
+                        .and(qUser.password.eq(user.getPassword())))
+                .execute();
     }
 
     public Optional<User> findUserByEmailAndPassword(String email, String password) {
