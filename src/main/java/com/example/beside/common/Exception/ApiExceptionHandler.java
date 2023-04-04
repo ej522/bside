@@ -26,11 +26,20 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(PasswordException.class)
-    public ResponseEntity<?> handleMyException(PasswordException ex) {
+    public ResponseEntity<?> handlePsswordException(PasswordException ex) {
         List<String> errors = new ArrayList<>();
         errors.add(ex.getMessage());
 
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "Password Validation failed", errors);
+        return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
+
+    @ExceptionHandler(UserNotExistException.class)
+    public ResponseEntity<?> handleUserNotExistException(UserNotExistException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add(ex.getMessage());
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "User Not Exist", errors);
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
 }

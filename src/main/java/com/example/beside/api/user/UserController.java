@@ -1,13 +1,14 @@
 package com.example.beside.api.user;
 
 import com.example.beside.common.Exception.PasswordException;
+import com.example.beside.common.Exception.UserNotExistException;
 import com.example.beside.common.response.Response;
 import com.example.beside.domain.User;
 import com.example.beside.dto.UserDto;
+import com.example.beside.dto.UserTokenDto;
 import com.example.beside.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -46,6 +47,24 @@ public class UserController {
         });
 
         return Response.success(200, "유저 목록 조회를 완료했습니다", UserDtoList);
+    }
+
+    @Operation(tags = { "User" }, summary = "로그인")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다."),
+            @ApiResponse(responseCode = "400", description = "해당 계정이 존재하지 않습니다.")
+    })
+    @PostMapping(value = "/v1/login")
+    public Response<UserTokenDto> login(@RequestBody @Validated CreateUserRequest requset)
+            throws PasswordException, UserNotExistException {
+        User user = new User();
+        user.setEmail(requset.email);
+        user.setPassword(requset.password);
+
+        String result = userService.loginUser(user);
+        UserTokenDto token = new UserTokenDto(result);
+
+        return Response.success(200, "정상 로그인 되었습니다.", token);
     }
 
     @Operation(tags = { "User" }, summary = "회원가입")
