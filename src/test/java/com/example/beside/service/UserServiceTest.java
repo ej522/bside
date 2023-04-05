@@ -141,7 +141,7 @@ public class UserServiceTest {
     void testLoginUserWithNotExist() throws PasswordException, UserNotExistException {
         // given
         // when, then
-        assertThrows(NullPointerException.class, () -> userService.loginUser(user1));
+        assertThrows(UserNotExistException.class, () -> userService.loginUser(user1));
     }
 
     @Test

@@ -24,8 +24,10 @@ public class JwtInterceptor implements HandlerInterceptor {
         String token = request.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer ")) {
             String jwtToken = token.substring(7);
-            Claims claims = jwtProvider.validJwtT
+            Claims claims = jwtProvider.validJwtToken(jwtToken);
 
+            // Claim 값 복호화
+            int user_id = (int) claims.get("user_id");
             String social_type = (String) claims.get("social_type");
             String subject = (String) claims.get("sub");
 
