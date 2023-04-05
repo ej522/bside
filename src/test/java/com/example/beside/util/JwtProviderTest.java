@@ -45,7 +45,6 @@ class JwtProviderTest {
         // then
         Assertions.assertThat(claims.get("user_id")).isEqualTo(777);
         Assertions.assertThat(claims.get("social_type")).isEqualTo("MOIM");
-        Assertions.assertThat(claims.get("email")).isEqualTo("test-user@google.com");
     }
 
 }

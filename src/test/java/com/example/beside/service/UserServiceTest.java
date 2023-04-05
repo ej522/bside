@@ -145,8 +145,10 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("유저 등록")
     void testSaveUser() throws PasswordException {
-
+        // given
+        userService.saveUser(user1);
         // then
         User findUserById = userService.findUserByEmail(user1.getEmail());
 
