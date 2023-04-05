@@ -6,10 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class UserTokenDto {
 
     @NotEmpty
     private String token;
+    private UserDto user;
+
+    public UserTokenDto(String token, UserDto user) {
+        this.token = token;
+        this.user = user;
+    }
 }

@@ -2,11 +2,11 @@ package com.example.beside.service;
 
 import com.example.beside.common.Exception.PasswordException;
 import com.example.beside.common.Exception.UserNotExistException;
+import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.repository.UserRepository;
 import com.example.beside.util.Common;
 import com.example.beside.util.Encrypt;
-import com.example.beside.util.JwtProvider;
 import com.example.beside.util.PasswordConverter;
 
 import lombok.RequiredArgsConstructor;
@@ -29,15 +29,16 @@ public class UserService {
         String password = user.getPassword();
         // 패스워드 검증
         Common.PasswordValidate(password);
-
         String hashPassword = PasswordConverter.hashPassword(password);
-        user.setPassword(hashPassword);
-        userRepository.saveUser(user);
 
+        user.setPassword(hashPassword);
+        user.setSocial_type(LoginType.MOIM.name());
+
+        userRepository.saveUser(user);
         return user.getId();
     }
 
-    public String loginUser(User user) throws PasswordException, UserNotExistException {
+    public User loginUser(User user) throws PasswordException, UserNotExistException {
         String password = user.getPassword();
         // 패스워드 검증
         Common.PasswordValidate(password);
@@ -48,9 +49,7 @@ public class UserService {
 
         OptionalUser.orElseThrow(() -> new UserNotExistException("해당 계정이 존재하지 않습니다"));
 
-        User result = OptionalUser.get();
-        return JwtProvider.createToken(result);
-
+        return OptionalUser.get();
     }
 
     @Transactional
