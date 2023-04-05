@@ -42,12 +42,4 @@ public class ApiExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "User Not Exist", errors);
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<?> handleRuntimeException(RuntimeException ex) {
-        List<String> errors = new ArrayList<>();
-        errors.add(ex.getMessage());
-        ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Runtime Error", errors);
-        return new ResponseEntity<>(apiError, apiError.getStatus());
-    }
 }

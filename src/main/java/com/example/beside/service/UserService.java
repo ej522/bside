@@ -1,8 +1,6 @@
 package com.example.beside.service;
 
 import com.example.beside.common.Exception.PasswordException;
-import com.example.beside.common.Exception.UserNotExistException;
-import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.repository.UserRepository;
 import com.example.beside.util.Common;
@@ -28,29 +26,11 @@ public class UserService {
     public Long saveUser(User user) throws PasswordException {
         String password = user.getPassword();
         // 패스워드 검증
-        Common.PasswordValidate(password);
-        String hashPassword = PasswordConverter.hashPassword(password);
-
-        user.setPassword(hashPassword);
-        user.setSocial_type(LoginType.MOIM.name());
+        Common.PasswordValidate(user.getPassword());
 
         userRepository.saveUser(user);
 
         return user.getId();
-    }
-
-    public User loginUser(User user) throws PasswordException, UserNotExistException {
-        String password = user.getPassword();
-        // 패스워드 검증
-        Common.PasswordValidate(password);
-
-        String hashPassword = PasswordConverter.hashPassword(password);
-        Optional<User> OptionalUser = userRepository
-                .findUserByEmailAndPassword(user.getEmail(), hashPassword);
-
-        OptionalUser.orElseThrow(() -> new UserNotExistException("해당 계정이 존재하지 않습니다"));
-
-        return OptionalUser.get();
     }
 
     @Transactional

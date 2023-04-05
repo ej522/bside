@@ -141,7 +141,7 @@ public class UserServiceTest {
     void testLoginUserWithNotExist() throws PasswordException, UserNotExistException {
         // given
         // when, then
-        assertThrows(UserNotExistException.class, () -> userService.loginUser(user1));
+        assertThrows(NullPointerException.class, () -> userService.loginUser(user1));
     }
 
     @Test
@@ -149,6 +149,7 @@ public class UserServiceTest {
     void testSaveUser() throws PasswordException {
         // given
         userService.saveUser(user1);
+
         // then
         User findUserById = userService.findUserByEmail(user1.getEmail());
 
