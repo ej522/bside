@@ -118,11 +118,11 @@ public class UserServiceTest {
         user1.setPassword(password);
 
         // when
-        String token = userService.loginUser(user1);
+        User loginUser = userService.loginUser(user1);
 
         // then
-        // TODO 토큰 복호화 검증 필요
-        Assertions.assertThat(token).isNotEmpty();
+        Assertions.assertThat(loginUser.getId()).isNotNull();
+        Assertions.assertThat(loginUser.getEmail()).isNotNull();
     }
 
     @Test

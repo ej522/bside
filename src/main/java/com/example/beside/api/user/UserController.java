@@ -7,6 +7,7 @@ import com.example.beside.domain.User;
 import com.example.beside.dto.UserDto;
 import com.example.beside.dto.UserTokenDto;
 import com.example.beside.service.UserService;
+import com.example.beside.util.JwtProvider;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,7 +43,8 @@ public class UserController {
 
         List<User> userAll = userService.findUserAll();
         userAll.forEach(s -> {
-            UserDto userDto = new UserDto(s.getId(), s.getPassword(), s.getEmail());
+            UserDto userDto = new UserDto(s.getId(), s.getPassword(), s.getEmail(), s.getName(), s.getProfile_image(),
+                    s.getSocial_type());
             UserDtoList.add(userDto);
         });
 
@@ -61,10 +63,11 @@ public class UserController {
         user.setEmail(requset.email);
         user.setPassword(requset.password);
 
-        String result = userService.loginUser(user);
-        UserTokenDto token = new UserTokenDto(result);
+        User userInfo = userService.loginUser(user);
+        String userToken = JwtProvider.createToken(userInfo);
 
-        return Response.success(200, "정상 로그인 되었습니다.", token);
+        UserTokenDto result = new UserTokenDto(userToken, new UserDto(userInfo));
+        return Response.success(200, "정상 로그인 되었습니다.", result);
     }
 
     @Operation(tags = { "User" }, summary = "회원가입")

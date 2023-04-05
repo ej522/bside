@@ -1,13 +1,10 @@
 package com.example.beside.repository;
 
-import com.example.beside.domain.QMoimMember;
 import com.example.beside.domain.QUser;
 import com.example.beside.domain.User;
-import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Repository;
@@ -33,6 +30,7 @@ public class UserRepository {
 
         return queryFactory.select(qUser.id)
                 .from(qUser).where(qUser.email.eq(user.getEmail())).fetchOne();
+
     }
 
     public void deleteUser(User user) {
@@ -53,6 +51,9 @@ public class UserRepository {
                 .from(qUser)
                 .where(qUser.email.eq(email))
                 .fetchOne();
+
+        if (result == null)
+            return Optional.empty();
 
         if (result.getPassword().equals(password)) {
             return Optional.ofNullable(result);
