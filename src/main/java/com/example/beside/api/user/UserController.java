@@ -11,6 +11,7 @@ import com.example.beside.util.JwtProvider;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -38,8 +39,9 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "존재하지 않는 사용자입니다.")
     })
     @GetMapping(value = "/v1/users")
-    public Response<List<UserDto>> getAllUsers() {
+    public Response<List<UserDto>> getAllUsers(HttpServletRequest request) {
         List<UserDto> UserDtoList = new ArrayList<>();
+        User user_ = (User) request.getAttribute("user");
 
         List<User> userAll = userService.findUserAll();
         userAll.forEach(s -> {

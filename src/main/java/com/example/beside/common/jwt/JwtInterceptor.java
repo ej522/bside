@@ -1,20 +1,26 @@
 package com.example.beside.common.jwt;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import com.example.beside.domain.User;
+import com.example.beside.service.UserService;
 import com.example.beside.util.JwtProvider;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@Component
 public class JwtInterceptor implements HandlerInterceptor {
+
+    private UserService userService;
 
     @Autowired
     private JwtProvider jwtProvider = new JwtProvider();
+
+    public JwtInterceptor(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -27,14 +33,20 @@ public class JwtInterceptor implements HandlerInterceptor {
             Claims claims = jwtProvider.validJwtToken(jwtToken);
 
             // Claim 값 복호화
-            int user_id = (int) claims.get("user_id");
-            String social_type = (String) claims.get("social_type");
-            String subject = (String) claims.get("sub");
+            String user_id = String.valueOf(claims.get("user_id"));
+            String social_type = String.valueOf(claims.get("social_type"));
+            String subject = String.valueOf(claims.get("sub"));
 
-            if (!subject.equals("bside_moim") || social_type.isEmpty() || user_id == 0) {
+            // token user_id 로 User 조회
+            User user = userService.findUserById(Long.parseLong(user_id));
+
+            if (!subject.equals("bside_moim") || !social_type.equals(user.getSocial_type())) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return false;
             }
+
+            // 컨트롤러에서 사용할 변수를 request 객체에 저장
+            request.setAttribute("user", user);
 
             return true;
         } else {
