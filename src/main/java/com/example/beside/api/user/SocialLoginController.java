@@ -27,6 +27,7 @@ public class SocialLoginController {
 
         // jwt 토큰발급 추가예정
 
-        return userInfo.get("kakaoAccount").toString();
+        //return userInfo.get("kakaoAccount").toString();
+        return "jwt토큰";
     }
 }
