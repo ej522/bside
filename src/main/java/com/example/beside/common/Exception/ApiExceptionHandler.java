@@ -17,16 +17,6 @@ import jakarta.mail.MessagingException;
 @ControllerAdvice
 public class ApiExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        List<String> errors = new ArrayList<>();
-        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errors.add(error.getDefaultMessage());
-        }
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "Validation failed", errors);
-        return new ResponseEntity<>(apiError, apiError.getStatus());
-    }
-
     @ExceptionHandler(PasswordException.class)
     public ResponseEntity<?> handlePsswordException(PasswordException ex) {
         List<String> errors = new ArrayList<>();
@@ -51,6 +41,15 @@ public class ApiExceptionHandler {
         errors.add(ex.getMessage());
 
         ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Email send error", errors);
+        return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
+
+    @ExceptionHandler(EmailValidateException.class)
+    public ResponseEntity<?> handleEmailValidateException(EmailValidateException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add(ex.getMessage());
+
+        ApiError apiError = new ApiError(HttpStatus.ACCEPTED, "Email Validation error", errors);
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
 

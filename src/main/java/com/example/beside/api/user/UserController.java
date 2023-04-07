@@ -1,6 +1,8 @@
 package com.example.beside.api.user;
 
+import com.example.beside.common.Exception.EmailValidateException;
 import com.example.beside.common.Exception.PasswordException;
+import com.example.beside.common.Exception.PasswordNotCorrectException;
 import com.example.beside.common.Exception.UserNotExistException;
 import com.example.beside.common.response.Response;
 import com.example.beside.domain.User;
@@ -62,11 +64,12 @@ public class UserController {
     @Operation(tags = { "User" }, summary = "로그인")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다."),
-            @ApiResponse(responseCode = "400", description = "해당 계정이 존재하지 않습니다.")
+            @ApiResponse(responseCode = "400", description = "해당 계정이 존재하지 않습니다."),
+            @ApiResponse(responseCode = "401", description = "비밀번호가 일치하지 않습니다.")
     })
     @PostMapping(value = "/v1/login")
     public Response<UserTokenDto> login(@RequestBody @Validated CreateUserRequest requset)
-            throws PasswordException, UserNotExistException {
+            throws PasswordException, UserNotExistException, PasswordNotCorrectException {
         User user = new User();
         user.setEmail(requset.email);
         user.setPassword(requset.password);
@@ -94,6 +97,40 @@ public class UserController {
         return Response.success(201, "회원가입이 완료되었습니다.", null);
     }
 
+    @Operation(tags = { "User" }, summary = "이메일 인증번호 전송")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이메일 인증 코드가 발송되었습니다."),
+            @ApiResponse(responseCode = "500", description = "이메일 전송이 실패했습니다.")
+    })
+    @PostMapping(value = "/v1/signup/email-validate")
+    public Response<String> sendVerificationEmail(@RequestBody @Validated EmailRequest request) {
+        try {
+            String verificationCode = generateVerificationCode();
+
+            emailService.sendVerificationEmail(request.getEmail(), verificationCode);
+            return Response.success(200, "이메일 인증 번호를 발송했습니다.", null);
+
+        } catch (MessagingException ex) {
+            return Response.fail(500, ex.getMessage());
+        }
+    }
+
+    @Operation(tags = { "User" }, summary = "이메일 인증 코드 확인")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이메일 인증 코드가 발송되었습니다."),
+            @ApiResponse(responseCode = "500", description = "이메일 전송이 실패했습니다.")
+    })
+    @PostMapping(value = "/v1/signup/verify-code")
+    public Response<Boolean> checkVerificationCode(@RequestBody @Validated EmailValidateRequest request)
+            throws EmailValidateException {
+
+        Boolean isValid = emailService.checkEmailValidate(request.getEmail(), request.getValidateCode());
+        if (isValid)
+            return Response.success(200, "이메일 인증이 완료 되었습니다.", isValid);
+        else
+            return Response.success(202, "이메일 인증이 실패 했습니다", isValid);
+    }
+
     @Operation(tags = { "User" }, summary = "회원삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "유저가 삭제되었습니다."),
@@ -109,23 +146,6 @@ public class UserController {
         userService.deleteUser(user);
 
         return Response.success(200, "유저가 삭제되었습니다.", null);
-    }
-
-    @Operation(tags = { "User" }, summary = "이메일 인증")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이메일 인증 코드가 발송되었습니다."),
-            @ApiResponse(responseCode = "500", description = "이메일 전송이 실패했습니다.")
-    })
-    @PostMapping(value = "/v1/email/verification")
-    public Response<String> sendVerificationEmail(@RequestBody @Validated EmailRequest email) {
-        try {
-            String verificationCode = generateVerificationCode();
-            emailService.sendVerificationEmail(email.getEmail(), verificationCode);
-            return Response.success(200, "이메일 인증 코드를 발송했습니다.", null);
-
-        } catch (MessagingException ex) {
-            return Response.fail(500, ex.getMessage());
-        }
     }
 
     private String generateVerificationCode() {
@@ -147,6 +167,18 @@ public class UserController {
         @Email
         @Schema(description = "email", example = "test@email.com", type = "String")
         private String email;
+    }
+
+    @Data
+    static class EmailValidateRequest {
+        @NotNull
+        @Email
+        @Schema(description = "email", example = "test@email.com", type = "String")
+        private String email;
+
+        @NotNull
+        @Schema(description = "인증번호", example = "321219", type = "String")
+        private String validateCode;
     }
 
     @Data

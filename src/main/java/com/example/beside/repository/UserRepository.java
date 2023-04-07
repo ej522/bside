@@ -43,7 +43,7 @@ public class UserRepository {
                 .execute();
     }
 
-    public Optional<User> findUserByEmailAndPassword(String email, String password) {
+    public Optional<User> findUserByEmailAndPassword(String email) {
         queryFactory = new JPAQueryFactory(em);
         QUser qUser = new QUser("u");
 
@@ -55,11 +55,7 @@ public class UserRepository {
         if (result == null)
             return Optional.empty();
 
-        if (result.getPassword().equals(password)) {
-            return Optional.ofNullable(result);
-        }
-
-        return Optional.empty();
+        return Optional.ofNullable(result);
     }
 
     public User findUserById(Long id) {
