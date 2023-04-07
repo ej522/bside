@@ -11,6 +11,7 @@ import com.example.beside.service.UserService;
 import com.example.beside.util.JwtProvider;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Email;
@@ -144,6 +145,7 @@ public class UserController {
     static class EmailRequest {
         @NotNull
         @Email
+        @Schema(description = "email", example = "test@email.com", type = "String")
         private String email;
     }
 
@@ -151,8 +153,11 @@ public class UserController {
     static class CreateUserRequest {
         @NotNull
         @Email
+        @Schema(description = "email", example = "test@email.com", type = "String")
         private String email;
+
         @NotNull
+        @Schema(description = "password", example = "password", type = "String")
         private String password;
     }
 
@@ -160,8 +165,11 @@ public class UserController {
     static class DeleteUserRequest {
         @NotNull
         @Email
+        @Schema(description = "email", example = "test@email.com", type = "String")
         private String email;
+
         @NotNull
+        @Schema(description = "password", example = "password", type = "String")
         private String password;
     }
 }
