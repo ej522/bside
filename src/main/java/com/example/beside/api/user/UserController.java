@@ -6,6 +6,7 @@ import com.example.beside.common.response.Response;
 import com.example.beside.domain.User;
 import com.example.beside.dto.UserDto;
 import com.example.beside.dto.UserTokenDto;
+import com.example.beside.service.EmailService;
 import com.example.beside.service.UserService;
 import com.example.beside.util.JwtProvider;
 
@@ -21,15 +22,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Tag(name = "User", description = "유저 API")
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 @RestController
 public class UserController {
+
+    private final EmailService emailService;
 
     private final UserService userService;
 
@@ -103,6 +108,43 @@ public class UserController {
         userService.deleteUser(user);
 
         return Response.success(200, "유저가 삭제되었습니다.", null);
+    }
+
+    @Operation(tags = { "User" }, summary = "이메일 인증")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이메일 인증 코드가 발송되었습니다."),
+            @ApiResponse(responseCode = "500", description = "이메일 전송이 실패했습니다.")
+    })
+    @PostMapping(value = "/v1/email/verification")
+    public Response<String> sendVerificationEmail(@RequestBody @Validated EmailRequest email) {
+        try {
+            String verificationCode = generateVerificationCode();
+            emailService.sendVerificationEmail(email.getEmail(), verificationCode);
+            return Response.success(200, "이메일 인증 코드를 발송했습니다.", null);
+
+        } catch (MessagingException ex) {
+            return Response.fail(500, ex.getMessage());
+        }
+    }
+
+    private String generateVerificationCode() {
+        String numbers = "";
+        Random random = new Random();
+        int bound = 9; // 1부터 9까지의 숫자 중에서 랜덤으로 추출
+
+        while (numbers.length() < 6) {
+            String randomNumber = String.valueOf(random.nextInt(bound));
+            numbers += randomNumber;
+        }
+
+        return numbers;
+    }
+
+    @Data
+    static class EmailRequest {
+        @NotNull
+        @Email
+        private String email;
     }
 
     @Data

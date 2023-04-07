@@ -10,6 +10,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import jakarta.mail.MessagingException;
+
 // 전역 Exception Handler
 
 @ControllerAdvice
@@ -40,6 +42,15 @@ public class ApiExceptionHandler {
         errors.add(ex.getMessage());
 
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "User Not Exist", errors);
+        return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
+
+    @ExceptionHandler(MessagingException.class)
+    public ResponseEntity<?> handleMessagingException(MessagingException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add(ex.getMessage());
+
+        ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Email send error", errors);
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
 
