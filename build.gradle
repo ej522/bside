@@ -47,6 +47,7 @@ dependencies {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
 	//gson 추가
@@ -72,8 +73,11 @@ dependencies {
 	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
 >>>>>>> f0cc91b (카카오로그인 수정, 테스트코드 추가)
 
+=======
+>>>>>>> 5b5fe49 (카카오 로그인 은지님 최종 커밋)
 	//gson 추가
 	implementation 'com.google.code.gson:gson:2.10.1'
+
 
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'org.postgresql:postgresql'

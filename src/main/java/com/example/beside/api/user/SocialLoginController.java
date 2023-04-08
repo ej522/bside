@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.http.HttpResponse;
 import java.util.HashMap;
 
 <<<<<<< HEAD
@@ -70,11 +69,11 @@ public class SocialLoginController {
     private final UserService userService;
     private final JwtProvider jwtProvider;
 
-
     @GetMapping(value = "/v1/kakaoLogin")
     public String kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) {
         HashMap<String, Object> userInfo = socialLoginService.getKaKaoUserInfo(code);
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         //세션에 유저 이메일과 토큰 담기
@@ -94,6 +93,9 @@ public class SocialLoginController {
 >>>>>>> 17ac0eb (카카오로그인)
 =======
         //jwt 토큰발급 추가예정
+=======
+        // jwt 토큰발급 추가예정
+>>>>>>> 5b5fe49 (카카오 로그인 은지님 최종 커밋)
 
         return userInfo.get("kakaoAccount").toString();
 >>>>>>> f0cc91b (카카오로그인 수정, 테스트코드 추가)

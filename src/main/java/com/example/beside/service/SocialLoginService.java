@@ -41,6 +41,7 @@ public class SocialLoginService {
     private UserService userService;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     // 카카오 유저 정보 얻기
     public static HashMap<String, Object> getKaKaoUserInfo(String access_token) {
 =======
@@ -110,6 +111,10 @@ public class SocialLoginService {
     //카카오 유저 정보 얻기
     public static HashMap<String, Object> getKaKaoUserInfo (String access_token) {
 >>>>>>> f0cc91b (카카오로그인 수정, 테스트코드 추가)
+=======
+    // 카카오 유저 정보 얻기
+    public static HashMap<String, Object> getKaKaoUserInfo(String access_token) {
+>>>>>>> 5b5fe49 (카카오 로그인 은지님 최종 커밋)
         HashMap<String, Object> userInfo = new HashMap<>();
         String reqUrl = "https://kapi.kakao.com/v2/user/me";
 
@@ -119,12 +124,16 @@ public class SocialLoginService {
             conn.setRequestMethod("POST");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             // 요청에 필요한 Header에 포함될 내용
             conn.setRequestProperty("Authorization", "Bearer " + access_token);
 
             int responseCode = conn.getResponseCode();
 =======
             //요청에 필요한 Header에 포함될 내용
+=======
+            // 요청에 필요한 Header에 포함될 내용
+>>>>>>> 5b5fe49 (카카오 로그인 은지님 최종 커밋)
             conn.setRequestProperty("Authorization", "Bearer " + access_token);
 
             int responseCode = conn.getResponseCode();
@@ -170,7 +179,7 @@ public class SocialLoginService {
 
             userInfo.put("kakaoAccount", kakao_account);
 
-            //정보받아와서 db등록 여부 확인 후 DB추가할 곳
+            // 정보받아와서 db등록 여부 확인 후 DB추가할 곳
 
         } catch (Exception e) {
 <<<<<<< HEAD
