@@ -31,4 +31,5 @@ jobs:
         run: ./gradlew clean build
 
       - name: Web Hook Deploy
-        run: http://moim.life:5000
+        run: |
+          curl http://moim.life:5000/
