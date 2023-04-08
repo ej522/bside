@@ -24,13 +24,14 @@ public class SocialLoginController {
 
     @GetMapping(value = "/v1/kakaoLogin")
     public String kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) {
-        HashMap<String, Object> userInfo = socialLoginService.getKaKaoUserInfo(code);
+        HashMap<String, Object> userInfo = SocialLoginService.getKaKaoUserInfo(code);
 
         User user = (User) userInfo.get("user");
 
         // jwt 토큰발급 추가예정
         jwtProvider.createToken(user);
 
-        return userInfo.get("kakaoAccount").toString();
+        //return userInfo.get("kakaoAccount").toString();
+        return "jwt토큰";
     }
 }

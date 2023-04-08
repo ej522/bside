@@ -11,7 +11,7 @@ public class PasswordConverter implements AttributeConverter<String, String> {
         if (attribute == null)
             return null;
         try {
-            return Aes256Utils.encrypt(attribute);
+            return Encrypt.getHashingPassword(attribute);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -21,9 +21,18 @@ public class PasswordConverter implements AttributeConverter<String, String> {
     public String convertToEntityAttribute(String dbData) {
         try {
             return dbData;
-            // return Aes256Utils.decrypt(dbData);
         } catch (Exception e) {
             return dbData;
+        }
+    }
+
+    public static String hashPassword(String attribute) {
+        if (attribute == null)
+            return null;
+        try {
+            return Encrypt.getHashingPassword(attribute);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

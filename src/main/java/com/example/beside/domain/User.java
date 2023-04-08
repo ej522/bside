@@ -3,7 +3,6 @@ package com.example.beside.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.beside.util.PasswordConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.*;
@@ -34,7 +33,6 @@ public class User {
     @Column(length = 30)
     private String email;
 
-    @Convert(converter = PasswordConverter.class)
     private String password;
 
     private String profile_image;
