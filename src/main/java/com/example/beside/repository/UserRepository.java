@@ -78,6 +78,22 @@ public class UserRepository {
         return result;
     }
 
+    public Optional<User> findUserByEmailAndSocialType(String email, String social_type) {
+        queryFactory = new JPAQueryFactory(em);
+        QUser qUser = new QUser("u");
+
+        User result = queryFactory.selectFrom(qUser)
+                .from(qUser)
+                .where(qUser.email.eq(email)
+                        .and(qUser.social_type.eq(social_type)))
+                .fetchOne();
+        if (result == null) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(result);
+    }
+
     public List<User> findUserAll() {
         return em.createQuery("SELECT u FROM User u", User.class).getResultList();
     }
