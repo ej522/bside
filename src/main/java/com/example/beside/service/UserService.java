@@ -1,6 +1,7 @@
 package com.example.beside.service;
 
 import com.example.beside.common.Exception.PasswordException;
+import com.example.beside.common.Exception.PasswordNotCorrectException;
 import com.example.beside.common.Exception.UserNotExistException;
 import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
@@ -38,16 +39,20 @@ public class UserService {
         return user.getId();
     }
 
-    public User loginUser(User user) throws PasswordException, UserNotExistException {
+    public User loginUser(User user) throws PasswordException, UserNotExistException, PasswordNotCorrectException {
         String password = user.getPassword();
         // 패스워드 검증
         Common.PasswordValidate(password);
 
-        String hashPassword = PasswordConverter.hashPassword(password);
         Optional<User> OptionalUser = userRepository
-                .findUserByEmailAndPassword(user.getEmail(), hashPassword);
+                .findUserByEmailAndPassword(user.getEmail());
 
         OptionalUser.orElseThrow(() -> new UserNotExistException("해당 계정이 존재하지 않습니다"));
+        User userInfo = OptionalUser.get();
+        String hashPassword = PasswordConverter.hashPassword(password);
+
+        if (!userInfo.getPassword().equals(hashPassword))
+            throw new PasswordNotCorrectException("비밀번호가 일치하지 않습니다");
 
         return OptionalUser.get();
     }

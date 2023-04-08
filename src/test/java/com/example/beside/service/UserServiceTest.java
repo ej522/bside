@@ -15,6 +15,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import com.example.beside.common.Exception.PasswordException;
+import com.example.beside.common.Exception.PasswordNotCorrectException;
 import com.example.beside.common.Exception.UserNotExistException;
 import com.example.beside.domain.QUser;
 import com.example.beside.domain.User;
@@ -111,7 +112,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("유저 로그인")
-    void testLoginUser() throws PasswordException, UserNotExistException {
+    void testLoginUser() throws PasswordException, UserNotExistException, PasswordNotCorrectException {
         // given
         String password = user1.getPassword();
         userService.saveUser(user1);
@@ -130,10 +131,10 @@ public class UserServiceTest {
     void testLoginUserWithWrongPassword() throws PasswordException, UserNotExistException {
         // given
         userService.saveUser(user1);
-        user1.setPassword("test");
+        user1.setPassword("wd!2awQWDas!");
 
         // when, then
-        assertThrows(PasswordException.class, () -> userService.loginUser(user1));
+        assertThrows(PasswordNotCorrectException.class, () -> userService.loginUser(user1));
     }
 
     @Test
