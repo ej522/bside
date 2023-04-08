@@ -1,11 +1,12 @@
 package com.example.beside.service;
 
+import com.example.beside.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-
 class SocialLoginServiceTest {
+
+    SocialLoginService socialLoginService;
 
     @Test
     @DisplayName("카카오유저정보")
@@ -14,14 +15,14 @@ class SocialLoginServiceTest {
         String token = "카카오 access token";
 
         // when
-        HashMap<String, Object> userInfo = SocialLoginService.getKaKaoUserInfo(token);
-        String kakaoAcountInfo = "";
-        if (userInfo.get("kakaoAccount") != null) {
-            kakaoAcountInfo = userInfo.get("kakaoAccount").toString();
+        User userInfo = socialLoginService.getKaKaoUserInfo(token);
+        String kakao_id = "";
+        if (userInfo != null) {
+            kakao_id = userInfo.getEmail();
         }
 
         // then
-        // assertTrue(kakaoAcountInfo.length()>1);
+        // assertTrue(kakao_id.length()>1);
 
     }
 

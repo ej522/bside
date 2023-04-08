@@ -1,26 +1,30 @@
 package com.example.beside.service;
 
+import com.example.beside.common.Exception.UserAlreadyExistException;
+import com.example.beside.common.Exception.UserNotExistException;
+import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.repository.UserRepository;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
 
 @Service
+@RequiredArgsConstructor
 public class SocialLoginService {
-    @Autowired
-    private static UserService userService;
+    private static UserRepository userRepository;
 
-    // 카카오 유저 정보 얻기
-    public static HashMap getKaKaoUserInfo(String access_token) {
-        HashMap<String, Object> userInfo = new HashMap<>();
+    // 카카오 유저 정보
+    public User getKaKaoUserInfo(String access_token) {
+        User userInfo = new User();
+        //HashMap<String, Object> userInfo = new HashMap<>();
         String reqUrl = "https://kapi.kakao.com/v2/user/me";
 
         try {
@@ -45,30 +49,46 @@ public class SocialLoginService {
             JsonParser parser = new JsonParser();
             JsonObject obj = (JsonObject) parser.parse(result);
 
+            JsonObject id = (JsonObject) obj.get("id");
             JsonObject kakao_account = (JsonObject) obj.get("kakao_account");
+            JsonObject profile = (JsonObject) kakao_account.get("profile");
             JsonObject properties = (JsonObject) obj.get("properties");
 
-            userInfo.put("kakaoAccount", kakao_account);
-
             // 정보받아와서 db등록 여부 확인 후 DB추가할 곳
+            String kakao_id = id.toString();
+            String nickname = profile.get("nickname").toString();
+            String imgUrl = profile.get("profile_image").toString();
 
-            String id = properties.get("id").toString();
-            String imgUrl = properties.get("profile_image").toString();
-
-            User user = new User();
-            user.setEmail(id);
-
-            if(userService.findUserByEmail(id)==null) {
-                userService.saveUser(user);
-            }
-
-            userInfo.put("user", user);
-
+            userInfo.setEmail(kakao_id);
+            userInfo.setName(nickname);
+            userInfo.setProfile_image(imgUrl);
+            userInfo.setSocial_type(LoginType.KAKAO.name());
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
         return userInfo;
+    }
+
+    //로그인
+    public User loginKakao(User user) throws UserNotExistException {
+        User result = userRepository.findUserByEmailAndSocialType(user.getEmail(), user.getSocial_type());
+        if(result == null) {
+            throw new UserNotExistException("해당 계정이 존재하지 않습니다.");
+        }
+
+        return result;
+    }
+
+    //가입
+    @Transactional
+    public Long signupKakao(User user) throws UserAlreadyExistException {
+        if(userRepository.findUserByEmailAndSocialType(user.getEmail(), user.getSocial_type()) != null) {
+            throw new UserAlreadyExistException("이미 존재하는 회원 입니다.");
+        }
+        else {
+            return userRepository.saveUser(user);
+        }
     }
 }
