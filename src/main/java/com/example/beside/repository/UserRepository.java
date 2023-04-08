@@ -78,7 +78,7 @@ public class UserRepository {
         return result;
     }
 
-    public User findUserByEmailAndSocialType(String email, String social_type) {
+    public Optional<User> findUserByEmailAndSocialType(String email, String social_type) {
         queryFactory = new JPAQueryFactory(em);
         QUser qUser = new QUser("u");
 
@@ -88,10 +88,10 @@ public class UserRepository {
                         .and(qUser.social_type.eq(social_type)))
                 .fetchOne();
         if(result == null) {
-            return null;
+            return Optional.empty();
         }
 
-        return result;
+        return Optional.ofNullable(result);
     }
 
     public List<User> findUserAll() {

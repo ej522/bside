@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -73,12 +74,11 @@ public class SocialLoginService {
 
     //로그인
     public User loginKakao(User user) throws UserNotExistException {
-        User result = userRepository.findUserByEmailAndSocialType(user.getEmail(), user.getSocial_type());
-        if(result == null) {
-            throw new UserNotExistException("해당 계정이 존재하지 않습니다.");
-        }
+        Optional<User> optionalUser = userRepository.findUserByEmailAndSocialType(user.getEmail(), user.getSocial_type());
 
-        return result;
+        optionalUser.orElseThrow(() -> new UserNotExistException("해당 계정이 존재하지 않습니다."));
+
+        return optionalUser.get();
     }
 
     //가입

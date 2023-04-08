@@ -83,8 +83,4 @@ public class UserService {
         return userRepository.findUserByEmail(email);
     }
 
-    public User findUserByEmailAndSocialType(String email, String socialType) {
-        return userRepository.findUserByEmailAndSocialType(email, socialType);
-    }
-
 }
