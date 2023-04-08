@@ -50,8 +50,7 @@ public class SocialLoginController {
 
     @Operation(tags = { "social" }, summary = "카카오 회원가입")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "회원가입이 완료 되었습니다."),
-            @ApiResponse(responseCode = "400", description = "이미 존재하는 회원입니다.")
+            @ApiResponse(responseCode = "201", description = "회원가입이 완료 되었습니다.")
     })
     @PostMapping(value = "v1/signup/Kakao")
     public Response<Void> kakaoSinup(@RequestBody @Valid SocialUserRequest request) throws UserAlreadyExistException {

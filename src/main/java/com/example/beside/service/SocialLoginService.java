@@ -84,11 +84,6 @@ public class SocialLoginService {
     //가입
     @Transactional
     public Long signupKakao(User user) throws UserAlreadyExistException {
-        if(userRepository.findUserByEmailAndSocialType(user.getEmail(), user.getSocial_type()) != null) {
-            throw new UserAlreadyExistException("이미 존재하는 회원 입니다.");
-        }
-        else {
-            return userRepository.saveUser(user);
-        }
+         return userRepository.saveUser(user);
     }
 }
