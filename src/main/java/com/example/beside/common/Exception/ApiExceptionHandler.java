@@ -68,4 +68,14 @@ public class ApiExceptionHandler {
 
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
+
+    @ExceptionHandler(UserValidateNickName.class)
+    public ResponseEntity<?> handleUserValidateNickName(UserValidateNickName ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add(ex.getMessage());
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "Nickname validation failed", errors);
+
+        return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
 }

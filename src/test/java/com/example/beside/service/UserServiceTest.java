@@ -1,10 +1,12 @@
 package com.example.beside.service;
 
+import com.example.beside.common.Exception.UserValidateNickName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.DisplayName;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.security.NoSuchAlgorithmException;
@@ -39,6 +41,9 @@ public class UserServiceTest {
     private User user2 = new User();
     private User user3 = new User();
     private User user4 = new User();
+    private User user5 = new User();
+    private User user6 = new User();
+    private User user7 = new User();
 
     @BeforeEach
     public void setUp() throws PasswordException {
@@ -53,6 +58,15 @@ public class UserServiceTest {
 
         user4.setEmail("test_4567@naver.com");
         user4.setPassword("1a!vD");
+
+        user5.setId(52L);
+        user5.setName("8자이상이상이상");
+
+        user6.setId(52L);
+        user6.setName("특수문자!");
+
+        user7.setId(52L);
+        user7.setName("은지");
     }
 
     @AfterEach
@@ -177,5 +191,26 @@ public class UserServiceTest {
     void testSaveUserWithless8letter() throws PasswordException {
         // when, then
         assertThrows(PasswordException.class, () -> userService.saveUser(user4));
+    }
+
+    @Test
+    @DisplayName("8자 이상 닉네임 변경")
+    void testUpdateNickNameWithMore8letter() {
+        //when, then
+        assertThrows(UserValidateNickName.class, () -> userService.updateNickname(user5));
+    }
+
+    @Test
+    @DisplayName("특수 문자가 포함된 닉네임 변경")
+    void testUpdateNickNameIncludeExclamationMark() {
+        //when, then
+        assertThrows(UserValidateNickName.class, () -> userService.updateNickname(user6));
+    }
+
+    @Test
+    @DisplayName("중복 닉네임")
+    void testUpdateNickNameDuplication() {
+        //when, then
+        assertThrows(IllegalStateException.class, () -> userService.updateNickname(user7));
     }
 }

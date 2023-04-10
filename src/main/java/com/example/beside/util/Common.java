@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.example.beside.common.Exception.PasswordException;
+import com.example.beside.common.Exception.UserValidateNickName;
 
 public class Common {
 
@@ -34,6 +35,15 @@ public class Common {
             throw new PasswordException("!@#$%^&*()-_+ 등의 특수문자가 포함되어야 합니다");
         }
 
+        return true;
+    }
+
+    public static Boolean NicknameValidate(String nickname) throws UserValidateNickName {
+        Pattern pattern = Pattern.compile("^[a-zA-Zㄱ-ㅎ가-힣0-9]{1,8}$");
+        Matcher matcher = pattern.matcher(nickname);
+        if(!matcher.find()) {
+            throw new UserValidateNickName("한글, 영문, 숫자 조합 8자 이내");
+        }
         return true;
     }
 }

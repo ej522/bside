@@ -98,4 +98,22 @@ public class UserRepository {
         return em.createQuery("SELECT u FROM User u", User.class).getResultList();
     }
 
+    public User updateNickname(User user) {
+        queryFactory = new JPAQueryFactory(em);
+        QUser qUser = new QUser("u");
+
+        queryFactory.update(qUser).set(qUser.name, user.getName()).where(qUser.id.eq(user.getId())).execute();
+
+        return queryFactory.selectFrom(qUser).where(qUser.id.eq(user.getId())).fetchOne();
+    }
+
+    public Optional<User> findUserNickname(String nickname) {
+        queryFactory = new JPAQueryFactory(em);
+        QUser qUser = new QUser("u");
+
+        User result = queryFactory.selectFrom(qUser).where(qUser.name.eq(nickname)).fetchOne();
+
+        return Optional.ofNullable(result);
+    }
+
 }

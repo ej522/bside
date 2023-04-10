@@ -3,6 +3,7 @@ package com.example.beside.service;
 import com.example.beside.common.Exception.PasswordException;
 import com.example.beside.common.Exception.PasswordNotCorrectException;
 import com.example.beside.common.Exception.UserNotExistException;
+import com.example.beside.common.Exception.UserValidateNickName;
 import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.repository.UserRepository;
@@ -81,6 +82,17 @@ public class UserService {
 
     public User findUserByEmail(String email) {
         return userRepository.findUserByEmail(email);
+    }
+
+    @Transactional
+    public User updateNickname(User user) throws UserValidateNickName {
+        String nickname = user.getName();
+        Optional<User> optionalUser = userRepository.findUserNickname(nickname);
+        if(optionalUser.isPresent()) {
+            throw new IllegalStateException("중복된 닉네임입니다.");
+        }
+        Common.NicknameValidate(nickname);
+        return userRepository.updateNickname(user);
     }
 
 }
