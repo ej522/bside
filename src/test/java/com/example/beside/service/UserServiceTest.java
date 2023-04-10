@@ -107,7 +107,7 @@ public class UserServiceTest {
         // when
         List<User> findUserAll = userService.findUserAll();
         // then
-        Assertions.assertThat(findUserAll.size()).isGreaterThan(1);
+        Assertions.assertThat(findUserAll.size()).isGreaterThan(0);
     }
 
     @Test

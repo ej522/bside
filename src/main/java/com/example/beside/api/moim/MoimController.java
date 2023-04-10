@@ -36,7 +36,8 @@ public class MoimController {
     private final MoimService moimService;
 
     @PostMapping(value = "/v1/make")
-    public Response<String> createMoim(HttpServletRequest token, @RequestBody @Validated CreateMoimRequest request) {
+    public Response<String> createMoim(HttpServletRequest token, @RequestBody @Validated CreateMoimRequest request)
+            throws Exception {
         User user_ = (User) token.getAttribute("user");
 
         // 모임 정보
@@ -45,7 +46,7 @@ public class MoimController {
         newMoim.setMoim_name(request.getMoimName());
         newMoim.setDead_line_hour(request.deadLineHour);
 
-        // 모임 날짜 정보
+        // 모임 일정 정보
         List<MoimDate> moimDates = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         for (MoimDateInfo moimDate : request.moim_time_list) {
@@ -63,14 +64,21 @@ public class MoimController {
             moimDates.add(temp);
         }
 
-        Long moimId = moimService.makeMoim(user_, newMoim, moimDates);
-        return Response.success(200, "모임 생성을 완료했습니다", moimId.toString());
+        String moimId = moimService.makeMoim(user_, newMoim, moimDates);
+        return Response.success(200, "모임 생성을 완료했습니다", moimId);
     }
 
     private Boolean checkSelectedTime(boolean morning, boolean afternoon, boolean evening) {
         if ((morning && afternoon && evening) || (!morning && !afternoon && !evening))
             return false;
         return true;
+    }
+
+    @Data
+    static class ParticipateMoimRequest {
+        @NotNull
+        @Schema(description = "모임방 정보", example = "4mwSYbnvxv01MUQyQGEsOA=2", type = "String")
+        private String encrptedInfo;
     }
 
     @Data
