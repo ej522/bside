@@ -60,7 +60,7 @@ public class UserServiceTest {
         user4.setPassword("1a!vD");
 
         user5.setId(52L);
-        user5.setName("8자이상이상이상");
+        user5.setName("8자이상이상이상이상");
 
         user6.setId(52L);
         user6.setName("특수문자!");
