@@ -1,6 +1,8 @@
 package com.example.beside.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -21,10 +23,11 @@ public class Moim {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToMany(mappedBy = "moim", cascade = CascadeType.ALL)
+    private List<MoimMember> moim_member = new ArrayList<>();
+
     @Column(length = 20)
     private String moim_name;
-
-    private String[] selected_date;
 
     @Column(length = 15)
     private String fixed_date;
