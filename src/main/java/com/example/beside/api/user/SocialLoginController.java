@@ -32,7 +32,7 @@ public class SocialLoginController {
 
     @Operation(tags = { "Social" }, summary = "카카오 로그인")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다."),
+            @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다.")
     })
     @PostMapping(value = "/v1/login/Kakao")
     public Response<UserTokenDto> kakaoLogin(@RequestBody @Valid SocialUserRequest request) throws UserNotExistException {
