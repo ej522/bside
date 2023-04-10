@@ -39,7 +39,7 @@ public class Common {
     }
 
     public static Boolean NicknameValidate(String nickname) throws UserValidateNickName {
-        Pattern pattern = Pattern.compile("^[a-zA-Zㄱ-ㅎ가-힣0-9]{1,8}$");
+        Pattern pattern = Pattern.compile("^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣0-9]{1,8}$");
         Matcher matcher = pattern.matcher(nickname);
         if(!matcher.find()) {
             throw new UserValidateNickName("한글, 영문, 숫자 조합 8자 이내");
