@@ -76,14 +76,12 @@ public class SocialLoginService {
     public User loginKakao(User user) throws UserNotExistException {
         Optional<User> optionalUser = userRepository.findUserByEmailAndSocialType(user.getEmail(), user.getSocial_type());
 
-        optionalUser.orElseThrow(() -> new UserNotExistException("해당 계정이 존재하지 않습니다."));
-
-        return optionalUser.get();
-    }
-
-    //가입
-    @Transactional
-    public Long signupKakao(User user) throws UserAlreadyExistException {
-         return userRepository.saveUser(user);
+        if(optionalUser.isPresent()) {
+            return optionalUser.get();
+        } else {
+            Long id = userRepository.saveUser(user);
+            user.setId(id);
+            return user;
+        }
     }
 }
