@@ -37,9 +37,7 @@ public class MoimService {
 
         moimMakeValida(moim_date_list);
 
-        // moidId 암호화
-        String result = encrypt.encrypt(String.valueOf(moimId));
-        return result;
+        return encrypt.encrypt(String.valueOf(moimId));
     }
 
     private void moimMakeValida(List<MoimDate> moim_date_list) throws MoimParticipateException {
@@ -79,7 +77,7 @@ public class MoimService {
     }
 
     private void moimValidate(User user, Long moimId, Moim moim) throws MoimParticipateException {
-        if (moimRepository.getMoimMembers(moimId).size() > 10)
+        if (moimRepository.getMoimMembers(moimId).size() >= 10)
             throw new MoimParticipateException("모임은 최대 10명 까지 가능합니다.");
 
         if (user.getId().equals(moim.getUser().getId()))
