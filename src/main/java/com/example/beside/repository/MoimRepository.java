@@ -88,8 +88,10 @@ public class MoimRepository {
     }
 
     public long makeMoim(User user, Moim moim, List<MoimDate> moim_date_list) {
-        // // 모임 생성
+        // 모임 생성
+        moim.setCreated_time(LocalDateTime.now());
         em.persist(moim);
+
         em.flush();
         // 모임 일정 정보 생성
         for (var moim_date : moim_date_list) {

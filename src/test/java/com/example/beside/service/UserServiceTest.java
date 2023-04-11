@@ -59,14 +59,17 @@ public class UserServiceTest {
         user4.setEmail("test_4567@naver.com");
         user4.setPassword("1a!vD");
 
-        user5.setId(52L);
-        user5.setName("8자이상이상이상이상");
+        user5.setEmail("test_5678@naver.com");
+        user5.setName("은지");
+        user5.setPassword("wd!2awQWDas!@");
 
-        user6.setId(52L);
-        user6.setName("특수문자!");
+        user6.setEmail("test_6789@naver.com");
+        user6.setName("은지");
+        user6.setPassword("wd!2awQWDas!@");
 
-        user7.setId(52L);
+        user7.setEmail("test_678@naver.com");
         user7.setName("은지");
+        user7.setPassword("wd!2awQWDas!@");
     }
 
     @AfterEach
@@ -195,22 +198,31 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("8자 이상 닉네임 변경")
-    void testUpdateNickNameWithMore8letter() {
-        //when, then
+    void testUpdateNickNameWithMore8letter() throws PasswordException {
+        // given
+        userService.saveUser(user5);
+        user5.setName("은지은지은지은지123");
+
+        // when, then
         assertThrows(UserValidateNickName.class, () -> userService.updateNickname(user5));
     }
 
     @Test
     @DisplayName("특수 문자가 포함된 닉네임 변경")
-    void testUpdateNickNameIncludeExclamationMark() {
-        //when, then
+    void testUpdateNickNameIncludeExclamationMark() throws PasswordException {
+        // given
+        userService.saveUser(user6);
+        user6.setName("!@#은지");
+        // when, then
         assertThrows(UserValidateNickName.class, () -> userService.updateNickname(user6));
     }
 
     @Test
     @DisplayName("중복 닉네임")
-    void testUpdateNickNameDuplication() {
-        //when, then
+    void testUpdateNickNameDuplication() throws PasswordException {
+        // given
+        userService.saveUser(user7);
+        // when, then
         assertThrows(IllegalStateException.class, () -> userService.updateNickname(user7));
     }
 }
