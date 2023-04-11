@@ -22,7 +22,7 @@ public class MoimMember {
     @JoinColumn(name = "moim_id")
     private Moim moim;
 
-    private String member_id;
+    private Long member_id;
 
     @Column(length = 20)
     private String member_name;
