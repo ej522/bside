@@ -185,7 +185,7 @@ public class UserController {
     static class CreateUserRequest {
         @NotNull
         @Email
-        @Schema(description = "email", example = "test@email.com", type = "String")
+        @Schema(description = "email", example = "test@naver.com", type = "String")
         private String email;
 
         @NotNull
