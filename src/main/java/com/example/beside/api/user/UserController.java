@@ -1,9 +1,6 @@
 package com.example.beside.api.user;
 
-import com.example.beside.common.Exception.EmailValidateException;
-import com.example.beside.common.Exception.PasswordException;
-import com.example.beside.common.Exception.PasswordNotCorrectException;
-import com.example.beside.common.Exception.UserNotExistException;
+import com.example.beside.common.Exception.*;
 import com.example.beside.common.response.Response;
 import com.example.beside.domain.User;
 import com.example.beside.dto.UserDto;
@@ -148,6 +145,22 @@ public class UserController {
         return Response.success(200, "유저가 삭제되었습니다.", null);
     }
 
+    @Operation(tags = { "User" }, summary = "닉네임변경")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "닉네임이 변경 되었습니다."),
+            @ApiResponse(responseCode = "400", description = "한글, 영문, 숫자 조합 8자 이내"),
+            @ApiResponse(responseCode = "500", description = "중복된 닉네임 입니다.")})
+    @PutMapping(value = "/v1/update/nickname")
+    public Response<User> updateNickname(@RequestBody @Validated UpdateUserNicknameRequest request) throws UserValidateNickName {
+        User user = new User();
+        user.setId(request.id);
+        user.setName(request.name);
+
+        user = userService.updateNickname(user);
+
+        return Response.success(200, "닉네임이 변경 되었습니다.", user);
+    }
+
     private String generateVerificationCode() {
         String numbers = "";
         Random random = new Random();
@@ -203,5 +216,16 @@ public class UserController {
         @NotNull
         @Schema(description = "password", example = "password", type = "String")
         private String password;
+    }
+
+    @Data
+    static class UpdateUserNicknameRequest {
+        @NotNull
+        @Schema(description = "nickname", example = "닉네임", type = "String")
+        private String name;
+
+        @NotNull
+        @Schema(description = "회원번호", example = "1", type = "Long")
+        private Long id;
     }
 }
