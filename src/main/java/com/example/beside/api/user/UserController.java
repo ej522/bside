@@ -36,7 +36,6 @@ import java.util.Random;
 @RequestMapping("/api/users")
 @RestController
 public class UserController {
-
     private final EmailService emailService;
 
     private final UserService userService;
