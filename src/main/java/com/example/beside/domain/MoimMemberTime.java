@@ -9,31 +9,31 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "moim_date", schema = "bside")
-public class MoimDate {
-
+public class MoimMemberTime {
     @Id
     @GeneratedValue
-    @Column(name = "moim_date_id")
+    @Column(name = "moim_member_time_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "moim_id")
-    private Moim moim;
+    @JoinColumn(name = "moim_member_id")
+    private MoimMember moimMember;
 
     private LocalDateTime selected_date;
 
-    private Boolean morning;
-
-    private Boolean afternoon;
-
-    private Boolean evening;
-
+    private Boolean am_nine;
+    private Boolean am_ten;
+    private Boolean am_eleven;
+    private Boolean pm_four;
+    private Boolean pm_five;
+    private Boolean pm_six;
+    private Boolean pm_seven;
+    private Boolean pm_eigth;
+    private Boolean pm_niBoolean;
 }

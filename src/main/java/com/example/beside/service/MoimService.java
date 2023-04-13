@@ -86,6 +86,10 @@ public class MoimService {
         if (moimRepository.alreadyJoinedMoim(moimId, user.getId()))
             throw new MoimParticipateException("해당 모임에 이미 참여하고 있습니다.");
 
+        if (moim.getCreated_time().plusHours(moim.getDead_line_hour()).isBefore(LocalDateTime.now())) {
+            throw new MoimParticipateException("데드라인 시간이 지난 모임입니다.");
+        }
+
     }
 
     public Moim getMoimInfo(Long moimId) {
