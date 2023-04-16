@@ -15,19 +15,17 @@ public class MoimMember {
 
     @Id
     @GeneratedValue
-    @Column(name = "mm_id")
+    @Column(name = "moim_member_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "moim_id")
-    private Moim moims;
+    private Moim moim;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    private Long member_id;
 
     @Column(length = 20)
-    private String user_name;
+    private String member_name;
 
     private LocalDateTime selected_date;
 

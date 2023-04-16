@@ -18,7 +18,9 @@ public class InterCeptorConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // JWT 토큰 검증을 적용할 URL 패턴 지정
         registry.addInterceptor(new JwtInterceptor(userService))
-                .addPathPatterns("/api/users/v1/users");
+                .addPathPatterns("/api/users/v1/users")
+                .addPathPatterns("/api/moim/v1/make")
+                .addPathPatterns("/api/moim/v1/participate");
     }
 
 }

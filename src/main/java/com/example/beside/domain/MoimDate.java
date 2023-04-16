@@ -16,21 +16,24 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "friend", schema = "bside")
-public class Friend {
+@Table(name = "moim_date", schema = "bside")
+public class MoimDate {
 
     @Id
     @GeneratedValue
-    @Column(name = "friend_id")
-    private long id;
+    @Column(name = "moim_date_id")
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "moim_id")
+    private Moim moim;
 
-    private long member_id;
+    private LocalDateTime selected_date;
 
-    private Long first_moim_id;
+    private boolean morning;
 
-    private LocalDateTime create_time;
+    private boolean afternoon;
+
+    private boolean evening;
+
 }

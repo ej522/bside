@@ -14,7 +14,7 @@ public class JwtProvider {
 
     private static String key = "098765432123456789";
 
-    private static long tokenValidTime = 30 * 60 * 1000L;
+    private static long tokenValidTime = 8 * 60 * 60 * 1000L;
 
     public static String createToken(User user) {
         Date now = new Date();

@@ -149,9 +149,10 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "닉네임이 변경 되었습니다."),
             @ApiResponse(responseCode = "400", description = "한글, 영문, 숫자 조합 8자 이내"),
-            @ApiResponse(responseCode = "500", description = "중복된 닉네임 입니다.")})
+            @ApiResponse(responseCode = "500", description = "중복된 닉네임 입니다.") })
     @PutMapping(value = "/v1/update/nickname")
-    public Response<User> updateNickname(@RequestBody @Validated UpdateUserNicknameRequest request) throws UserValidateNickName {
+    public Response<User> updateNickname(@RequestBody @Validated UpdateUserNicknameRequest request)
+            throws UserValidateNickName {
         User user = new User();
         user.setId(request.id);
         user.setName(request.name);
@@ -198,7 +199,7 @@ public class UserController {
     static class CreateUserRequest {
         @NotNull
         @Email
-        @Schema(description = "email", example = "test@email.com", type = "String")
+        @Schema(description = "email", example = "test@naver.com", type = "String")
         private String email;
 
         @NotNull
@@ -210,7 +211,7 @@ public class UserController {
     static class DeleteUserRequest {
         @NotNull
         @Email
-        @Schema(description = "email", example = "test@email.com", type = "String")
+        @Schema(description = "email", example = "test@naver.com", type = "String")
         private String email;
 
         @NotNull

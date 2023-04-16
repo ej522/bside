@@ -32,8 +32,7 @@ public class SocialLoginController {
 
     @Operation(tags = { "Social" }, summary = "카카오 로그인")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다."),
-            @ApiResponse(responseCode = "400", description = "해당 계정이 존재하지 않습니다.")
+            @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다.")
     })
     @PostMapping(value = "/v1/login/Kakao")
     public Response<UserTokenDto> kakaoLogin(@RequestBody @Valid SocialUserRequest request) throws UserNotExistException {
@@ -46,18 +45,6 @@ public class SocialLoginController {
         UserTokenDto result = new UserTokenDto(userToken, new UserDto(user));
 
         return Response.success(200, "정상 로그인 되었습니다.", result);
-    }
-
-    @Operation(tags = { "social" }, summary = "카카오 회원가입")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "회원가입이 완료 되었습니다.")
-    })
-    @PostMapping(value = "v1/signup/Kakao")
-    public Response<Void> kakaoSinup(@RequestBody @Valid SocialUserRequest request) throws UserAlreadyExistException {
-        User user = socialLoginService.getKaKaoUserInfo(request.access_token);
-        socialLoginService.signupKakao(user);
-
-        return Response.success(201, "회원가입이 완료 되었습니다.", null);
     }
 
     @Data

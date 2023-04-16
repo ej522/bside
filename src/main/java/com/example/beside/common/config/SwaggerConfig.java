@@ -26,11 +26,8 @@ public class SwaggerConfig {
         public OpenAPI customOpenAPI() {
                 return new OpenAPI()
                                 .servers(Arrays.asList(
-                                                new Server().url("http://localhost:8081").description("local server"),
-                                                new Server().url("http://115.85.182.170/")
-                                                                .description("Staging server"),
-                                                new Server().url("http://moim.life/")
-                                                                .description("Production server")))
+                                                new Server().url("https://moim.life/").description("Production server"),
+                                                new Server().url("http://localhost:8081").description("local server")))
                                 .info(new Info().title("b-side")
                                                 .description("API documentation using springdoc-openapi and OpenAPI 3.0")
                                                 .version("1.0.0")
