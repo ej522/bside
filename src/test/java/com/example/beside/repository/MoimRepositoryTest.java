@@ -15,7 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.User;
-import com.example.beside.dto.MoimOveralDto;
+import com.example.beside.dto.MoimOveralDateDto;
 
 import jakarta.transaction.Transactional;
 
@@ -59,7 +59,7 @@ public class MoimRepositoryTest {
 
     @Test
     @DisplayName("모임을 등록할 수 있는가?")
-    void testMakeMoim() {
+    void testMakeMoim() throws Exception {
         // given
         long userId = userRepository.saveUser(user);
         User findUser = userRepository.findUserById(userId);
@@ -73,7 +73,7 @@ public class MoimRepositoryTest {
 
     @Test
     @DisplayName("모임 정보를 가져올 수 있는가?")
-    void testGetMoimInfo() {
+    void testGetMoimInfo() throws Exception {
         // given
         long userId = userRepository.saveUser(user);
         User findUser = userRepository.findUserById(userId);
@@ -91,7 +91,7 @@ public class MoimRepositoryTest {
 
     @Test
     @DisplayName("만들어진 모임에 참여할수 있는가?")
-    void testMakeMoimMember() {
+    void testMakeMoimMember() throws Exception {
         // given
         long userId = userRepository.saveUser(user);
         User findUser = userRepository.findUserById(userId);
@@ -106,7 +106,7 @@ public class MoimRepositoryTest {
 
     @Test
     @DisplayName("이미 참여한 모임인가?")
-    void testAlreadyJoinedMoim() {
+    void testAlreadyJoinedMoim() throws Exception {
         // given
         long userId = userRepository.saveUser(user);
         User findUser = userRepository.findUserById(userId);
@@ -122,7 +122,7 @@ public class MoimRepositoryTest {
 
     @Test
     @DisplayName("해당 모임의 정보를 보여줄 수 있는가?")
-    void testGetMoimOveralInfo() {
+    void testGetMoimOveralInfo() throws Exception {
         // given
         long userId = userRepository.saveUser(user);
         User findUser = userRepository.findUserById(userId);
@@ -130,7 +130,7 @@ public class MoimRepositoryTest {
         moimRepository.makeMoimMember(findUser, newMoim);
 
         // when
-        List<MoimOveralDto> moimOveralInfo = moimRepository.getMoimOveralInfo(moimId);
+        List<MoimOveralDateDto> moimOveralInfo = moimRepository.getMoimOveralInfo(moimId);
 
         // then
         Assertions.assertThat(moimOveralInfo.get(0).getId()).isEqualTo(moimId);
@@ -144,7 +144,7 @@ public class MoimRepositoryTest {
 
     @Test
     @DisplayName("친구를 등록할 수 있는가?")
-    void testMakeFriend() {
+    void testMakeFriend() throws Exception {
         // given
         long userId = userRepository.saveUser(user);
         User findUser = userRepository.findUserById(userId);

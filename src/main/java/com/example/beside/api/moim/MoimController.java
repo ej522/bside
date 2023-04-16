@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.beside.common.response.Response;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
+import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
 import com.example.beside.service.MoimService;
 
@@ -48,7 +49,7 @@ public class MoimController {
     })
     @PostMapping(value = "/v1/participate")
     public Response<Map<String, Object>> participateMoim(HttpServletRequest token,
-            @RequestBody @Validated ParticipateMoimRequest request) throws Exception {
+            @RequestBody @Validated MoimParticipateRequest request) throws Exception {
         User user_ = (User) token.getAttribute("user");
         String encrptedInfo = request.getEncrptedInfo();
 
@@ -77,12 +78,9 @@ public class MoimController {
         // 모임 일정 정보
         List<MoimDate> moimDates = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        for (MoimDateInfo moimDate : request.moim_time_list) {
+        for (MoimDateInfo moimDate : request.moim_date_list) {
             MoimDate temp = new MoimDate();
             LocalDateTime selectedDate = LocalDate.parse(moimDate.selectedDate, formatter).atStartOfDay();
-
-            if (!checkSelectedTime(moimDate.morning, moimDate.afternoon, moimDate.evening))
-                return Response.fail(400, "날짜별 가능한 시간대는 최소 1개 ~ 2개만 선택 가능합니다.");
 
             temp.setSelected_date(selectedDate);
             temp.setMorning(moimDate.morning);
@@ -96,14 +94,52 @@ public class MoimController {
         return Response.success(200, "모임 생성을 완료했습니다", moimId);
     }
 
-    private Boolean checkSelectedTime(boolean morning, boolean afternoon, boolean evening) {
-        if ((morning && afternoon && evening) || (!morning && !afternoon && !evening))
-            return false;
-        return true;
+    @Operation(tags = { "Moim" }, summary = "참여 모임 일정 정하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임 스케줄을 등록 했습니다."),
+            @ApiResponse(responseCode = "400_1", description = "해당 모임에 참여되지 않았습니다"),
+            @ApiResponse(responseCode = "400_2", description = "불가능한 일자를 선택했습니다"),
+            @ApiResponse(responseCode = "400_3", description = "일자 별 오전 오후 각 2개씩만 선택 가능 합니다."),
+    })
+    @PostMapping(value = "/v1/adjust-schedule")
+    public Response<Map<String, Object>> adjustSchedule(HttpServletRequest token,
+            @RequestBody @Validated AdjustScheduleRequest request) throws Exception {
+        User user_ = (User) token.getAttribute("user");
+        String encrptedInfo = request.getEncrptedInfo();
+
+        // 선택 시간 정보
+        List<MoimTimeInfo> moimTimeList = request.getMoim_time_list();
+        var moimMemberTimeList = new ArrayList<MoimMemberTime>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        for (MoimTimeInfo moimTime : moimTimeList) {
+            var temp = new MoimMemberTime();
+            LocalDateTime selectedDate = LocalDate.parse(moimTime.selectedDate, formatter).atStartOfDay();
+
+            temp.setSelected_date(selectedDate);
+            // 오전
+            temp.setAm_nine(moimTime.amNine);
+            temp.setAm_ten(moimTime.amTen);
+            temp.setAm_eleven(moimTime.amEleven);
+            temp.setNoon(moimTime.noon);
+            // 오후
+            temp.setPm_four(moimTime.pmFour);
+            temp.setPm_five(moimTime.pmFive);
+            temp.setPm_six(moimTime.pmSix);
+            temp.setPm_seven(moimTime.pmSeven);
+            temp.setPm_eigth(moimTime.pmEight);
+            temp.setPm_nine(moimTime.pmNine);
+
+            moimMemberTimeList.add(temp);
+        }
+
+        Map<String, Object> adjustSchedule = moimService.adjustSchedule(user_, encrptedInfo, moimMemberTimeList);
+
+        return Response.success(200, "모임 스케줄을 등록 했습니다.", adjustSchedule);
     }
 
     @Data
-    static class ParticipateMoimRequest {
+    static class MoimParticipateRequest {
         @NotNull
         @Schema(description = "모임방 정보", example = "CbXrx470K6OcAZWiy94SPw==", type = "String")
         private String encrptedInfo;
@@ -121,8 +157,8 @@ public class MoimController {
         private int deadLineHour;
 
         @NotNull
-        @Schema(description = "모임일 정보", type = "MoimTime")
-        private List<MoimDateInfo> moim_time_list;
+        @Schema(description = "모임일 정보", type = "MoimDateInfo")
+        private List<MoimDateInfo> moim_date_list;
     }
 
     @Data
@@ -140,4 +176,54 @@ public class MoimController {
         @Schema(description = "저녁", example = "true", type = "Boolean")
         private boolean evening;
     }
+
+    @Data
+    static class AdjustScheduleRequest {
+        @NotNull
+        @Schema(description = "모임방 정보", example = "CbXrx470K6OcAZWiy94SPw==", type = "String")
+        private String encrptedInfo;
+
+        @NotNull
+        @Schema(description = "모임시간 정보", type = "MoimTimeInfo")
+        private List<MoimTimeInfo> moim_time_list;
+
+    }
+
+    @Data
+    static class MoimTimeInfo {
+        @NonNull
+        @Schema(description = "선택일", example = "2023-03-10", type = "String")
+        private String selectedDate;
+
+        @Schema(description = "오전 9시", example = "true", type = "Boolean")
+        private boolean amNine;
+
+        @Schema(description = "오전 10시", example = "true", type = "Boolean")
+        private boolean amTen;
+
+        @Schema(description = "오전 11시", example = "true", type = "Boolean")
+        private boolean amEleven;
+
+        @Schema(description = "정오", example = "true", type = "Boolean")
+        private boolean noon;
+
+        @Schema(description = "오후 4시", example = "true", type = "Boolean")
+        private boolean pmFour;
+
+        @Schema(description = "오후 5시", example = "true", type = "Boolean")
+        private boolean pmFive;
+
+        @Schema(description = "오후 6시", example = "true", type = "Boolean")
+        private boolean pmSix;
+
+        @Schema(description = "오후 7시", example = "true", type = "Boolean")
+        private boolean pmSeven;
+
+        @Schema(description = "오후 8시", example = "true", type = "Boolean")
+        private boolean pmEight;
+
+        @Schema(description = "오후 9시", example = "true", type = "Boolean")
+        private boolean pmNine;
+    }
+
 }

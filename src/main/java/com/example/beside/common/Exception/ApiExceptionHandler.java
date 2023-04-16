@@ -107,4 +107,14 @@ public class ApiExceptionHandler {
 
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
+
+    @ExceptionHandler(AdjustScheduleException.class)
+    public ResponseEntity<?> handleAdjustScheduleException(AdjustScheduleException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add(ex.getMessage());
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "adjust moim schedule failed", errors);
+
+        return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
 }

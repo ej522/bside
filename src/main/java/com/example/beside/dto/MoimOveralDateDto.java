@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MoimOveralDto {
+public class MoimOveralDateDto {
     @NotEmpty
     private Long id;
     @NotEmpty
@@ -29,7 +29,7 @@ public class MoimOveralDto {
     private Boolean evening;
     private LocalDateTime selected_date;
 
-    public MoimOveralDto(Long id, Long user_id, String user_name, String moim_name, Integer dead_line_hour,
+    public MoimOveralDateDto(Long id, Long user_id, String user_name, String moim_name, Integer dead_line_hour,
             Boolean morning,
             Boolean afternoon,
             Boolean evening, LocalDateTime selected_date) {

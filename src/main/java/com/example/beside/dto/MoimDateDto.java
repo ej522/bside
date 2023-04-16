@@ -23,7 +23,7 @@ public class MoimDateDto {
     @NotEmpty
     private LocalDateTime selected_date;
 
-    public MoimDateDto(MoimOveralDto moimOveralDto) {
+    public MoimDateDto(MoimOveralDateDto moimOveralDto) {
         this.selected_date = moimOveralDto.getSelected_date();
         this.morning = moimOveralDto.getMorning();
         this.afternoon = moimOveralDto.getAfternoon();
