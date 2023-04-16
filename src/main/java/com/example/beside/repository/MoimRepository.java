@@ -9,6 +9,7 @@ import com.example.beside.domain.Friend;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
+import com.example.beside.domain.QFriend;
 import com.example.beside.domain.QMoim;
 import com.example.beside.domain.QMoimDate;
 import com.example.beside.domain.QMoimMember;
@@ -114,7 +115,22 @@ public class MoimRepository {
     }
 
     public long makeFriend(User user, Moim moim) {
+        Long user_id = moim.getUser().getId();
+        Long friend_id = user.getId();
+
+        queryFactory = new JPAQueryFactory(em);
+        QFriend qFriend = QFriend.friend;
+        List<Friend> result = queryFactory.selectFrom(qFriend)
+                .where(qFriend.user.id.eq(user_id)
+                        .and(qFriend.member_id.eq(friend_id)))
+                .fetch();
+
+        // 기존 친구 확인
+        if (result.size() > 0)
+            return -1;
+
         Friend friend = new Friend();
+
         friend.setFirst_moim_id(moim.getId());
         friend.setUser(moim.getUser());
         friend.setMember_id(user.getId());

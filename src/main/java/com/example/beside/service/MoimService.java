@@ -35,12 +35,12 @@ public class MoimService {
     public String makeMoim(User user, Moim moim, List<MoimDate> moim_date_list) throws Exception {
         long moimId = moimRepository.makeMoim(user, moim, moim_date_list);
 
-        moimMakeValida(moim_date_list);
+        moimMakeValidate(moim_date_list);
 
         return encrypt.encrypt(String.valueOf(moimId));
     }
 
-    private void moimMakeValida(List<MoimDate> moim_date_list) throws MoimParticipateException {
+    private void moimMakeValidate(List<MoimDate> moim_date_list) throws MoimParticipateException {
         Set<LocalDateTime> selectedDates = new HashSet<>();
         for (MoimDate moim_date : moim_date_list) {
             LocalDateTime selected_date = moim_date.getSelected_date();
