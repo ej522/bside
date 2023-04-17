@@ -36,8 +36,7 @@ public class UserService {
         user.setPassword(hashPassword);
         user.setSocial_type(LoginType.MOIM.name());
 
-        userRepository.saveUser(user);
-        return user.getId();
+        return userRepository.saveUser(user);
     }
 
     public User loginUser(User user) throws PasswordException, UserNotExistException, PasswordNotCorrectException {
@@ -88,7 +87,7 @@ public class UserService {
     public String updateNickname(User user) throws Exception {
         String nickname = user.getName();
         Optional<User> optionalUser = userRepository.findUserNickname(nickname);
-        if(optionalUser.isPresent()) {
+        if (optionalUser.isPresent()) {
             throw new IllegalStateException("중복된 닉네임입니다.");
         }
         Common.NicknameValidate(nickname);
