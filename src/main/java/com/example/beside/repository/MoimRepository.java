@@ -21,9 +21,7 @@ import com.example.beside.domain.User;
 import com.example.beside.dto.MoimOveralDateDto;
 import com.example.beside.dto.MoimOveralScheduleDto;
 import com.example.beside.util.Encrypt;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
@@ -224,6 +222,9 @@ public class MoimRepository {
                         qMoimMemberTime.am_ten,
                         qMoimMemberTime.am_eleven,
                         qMoimMemberTime.noon,
+                        qMoimMemberTime.pm_one,
+                        qMoimMemberTime.pm_two,
+                        qMoimMemberTime.pm_three,
                         qMoimMemberTime.pm_four,
                         qMoimMemberTime.pm_five,
                         qMoimMemberTime.pm_six,

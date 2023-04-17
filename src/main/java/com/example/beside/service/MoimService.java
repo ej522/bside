@@ -1,7 +1,6 @@
 package com.example.beside.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +38,9 @@ public class MoimService {
 
     @Transactional
     public String makeMoim(User user, Moim moim, List<MoimDate> moim_date_list) throws Exception {
-        long moimId = moimRepository.makeMoim(user, moim, moim_date_list);
-
         moimMakeValidate(moim_date_list);
+
+        long moimId = moimRepository.makeMoim(user, moim, moim_date_list);
 
         return encrypt.encrypt(String.valueOf(moimId));
     }
@@ -66,7 +65,6 @@ public class MoimService {
     public Map<String, Object> participateMoim(User user, String encryptInfo) throws Exception {
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
         Moim moim = getMoimInfo(moimId);
-
         moimValidate(user, moimId, moim);
 
         // 친구 추가
@@ -89,18 +87,17 @@ public class MoimService {
     }
 
     private void moimValidate(User user, Long moimId, Moim moim) throws MoimParticipateException {
-        if (moimRepository.getMoimMembers(moimId).size() >= 10)
-            throw new MoimParticipateException("모임은 최대 10명 까지 가능합니다.");
-
         if (user.getId().equals(moim.getUser().getId()))
             throw new MoimParticipateException("모임 주최자는 모임 멤버로 참여할 수 없습니다.");
 
+        if (moim.getCreated_time().plusHours(moim.getDead_line_hour()).isBefore(LocalDateTime.now()))
+            throw new MoimParticipateException("데드라인 시간이 지난 모임입니다.");
+
+        if (moimRepository.getMoimMembers(moimId).size() >= 10)
+            throw new MoimParticipateException("모임은 최대 10명 까지 가능합니다.");
+
         if (moimRepository.alreadyJoinedMoim(moimId, user.getId()))
             throw new MoimParticipateException("해당 모임에 이미 참여하고 있습니다.");
-
-        if (moim.getCreated_time().plusHours(moim.getDead_line_hour()).isBefore(LocalDateTime.now())) {
-            throw new MoimParticipateException("데드라인 시간이 지난 모임입니다.");
-        }
     }
 
     @Transactional
@@ -132,6 +129,8 @@ public class MoimService {
         List<MoimMember> moimMembers = moimRepository.getMoimMembers(moimId);
         List<MoimOveralDateDto> moimOveralInfo = moimRepository.getMoimOveralInfo(moimId);
 
+        validateMoimTime(moimMemberTimes, moimOveralInfo);
+
         if (moimMembers.stream().noneMatch(tt -> tt.getUser().getId().equals(user.getId()))) {
             throw new AdjustScheduleException("해당 모임에 참여되지 않았습니다.");
         }
@@ -139,48 +138,44 @@ public class MoimService {
         if (moimRepository.isAlreadyScheduled(moimId, user)) {
             throw new AdjustScheduleException("이미 일정을 등록했습니다. 변경을 원하면 수정을 해주세요");
         }
+    }
 
-        // 불가능한 일자를 선택했습니다.
+    private void validateMoimTime(List<MoimMemberTime> moimMemberTimes, List<MoimOveralDateDto> moimOveralInfo)
+            throws AdjustScheduleException {
         Boolean isValidate = false;
+
+        // 모임 참여자 선택 일자
         for (var tt : moimMemberTimes) {
             isValidate = false;
+            // 모임 주최자 선택 일자
             for (var aa : moimOveralInfo) {
-                if (aa.getSelected_date().equals(tt.getSelected_date()))
+                LocalDateTime date = tt.getSelected_date();
+                // 일자 일치
+                if (aa.getSelected_date().equals(date)) {
                     isValidate = true;
+
+                    if (!aa.getMorning())
+                        if (tt.getAm_nine() || tt.getAm_ten() || tt.getAm_eleven())
+                            throw new AdjustScheduleException(set_yyyy_mm_dd(date) + " 해당 일에는 오전 9~11시를 선택할 수 없습니다");
+
+                    if (!aa.getAfternoon())
+                        if (tt.getNoon() || tt.getPm_one() || tt.getPm_two()
+                                || tt.getPm_three() || tt.getPm_four() || tt.getPm_five())
+                            throw new AdjustScheduleException(set_yyyy_mm_dd(date) + " 해당 일에는 오후 12~17시를 선택할 수 없습니다");
+
+                    if (!aa.getEvening())
+                        if (tt.getPm_six() || tt.getPm_seven() || tt.getPm_eigth() || tt.getPm_nine())
+                            throw new AdjustScheduleException(set_yyyy_mm_dd(date) + " 해당 일에는 오후 18~21시를 선택할 수 없습니다");
+                }
             }
             if (isValidate == false)
                 throw new AdjustScheduleException("불가능한 일자를 선택했습니다.");
         }
 
-        // 일자 별 오전, 오후 각 2개씩만 선택 가능합니다.
-        for (var tt : moimMemberTimes) {
-            int am_count = 0, pm_count = 0;
-            if (tt.getAm_nine())
-                am_count++;
-            if (tt.getAm_ten())
-                am_count++;
-            if (tt.getAm_eleven())
-                am_count++;
-            if (tt.getNoon())
-                am_count++;
-            if (am_count > 2)
-                throw new AdjustScheduleException("일자 별 오전, 오후 각 2개씩만 선택 가능합니다.");
+    }
 
-            if (tt.getPm_four())
-                pm_count++;
-            if (tt.getPm_five())
-                pm_count++;
-            if (tt.getPm_six())
-                pm_count++;
-            if (tt.getPm_seven())
-                pm_count++;
-            if (tt.getPm_eigth())
-                pm_count++;
-            if (tt.getPm_nine())
-                pm_count++;
-            if (pm_count > 2)
-                throw new AdjustScheduleException("일자 별 오전, 오후 각 2개씩만 선택 가능합니다.");
-        }
+    private String set_yyyy_mm_dd(LocalDateTime date) {
+        return date.getYear() + "-" + date.getMonthValue() + "-" + date.getDayOfMonth();
     }
 
     public Moim getMoimInfo(Long moimId) {

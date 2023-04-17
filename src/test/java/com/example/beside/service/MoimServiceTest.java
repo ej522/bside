@@ -18,9 +18,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
+import com.example.beside.common.Exception.AdjustScheduleException;
 import com.example.beside.common.Exception.MoimParticipateException;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
+import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
 import com.example.beside.util.Encrypt;
 
@@ -49,6 +51,8 @@ public class MoimServiceTest {
 
     private List<MoimDate> normalMoimDates = new ArrayList<>();
     private List<MoimDate> wrongMoimDates = new ArrayList<>();
+    private List<MoimMemberTime> normalMoimMemberTime = new ArrayList<>();
+    private List<MoimMemberTime> wrongMoimMemberTime = new ArrayList<>();
     private User user;
     private User user2;
     private User user3;
@@ -64,9 +68,7 @@ public class MoimServiceTest {
 
     @BeforeEach
     public void setUp() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        // 유저1 세팅
+        // 유저 세팅
         user = new User();
         user.setName("부엉이");
         user.setEmail("test-user@google.com");
@@ -127,6 +129,9 @@ public class MoimServiceTest {
         user12.setEmail("test-user210@google.com");
         user12.setPassword("Moim@0303");
 
+        // 주최자 모임 일정 세팅
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
         MoimDate moimDate1 = new MoimDate();
         moimDate1.setSelected_date(LocalDate.parse("2023-03-10", formatter).atStartOfDay());
         moimDate1.setMorning(false);
@@ -149,6 +154,31 @@ public class MoimServiceTest {
         normalMoimDates.add(moimDate1);
         normalMoimDates.add(moimDate2);
         wrongMoimDates.add(moimDate3);
+
+        // 참여자 모임 일정 세팅
+        normalMoimMemberTime = new ArrayList<>();
+        wrongMoimMemberTime = new ArrayList<>();
+        MoimMemberTime moimTime = new MoimMemberTime();
+        MoimMemberTime moimTime2 = new MoimMemberTime();
+
+        moimTime.setSelected_date(LocalDate.parse("2023-03-13", formatter).atStartOfDay());
+        moimTime.setAm_nine(false);
+        moimTime.setAm_ten(false);
+        moimTime.setAm_eleven(false);
+        moimTime.setNoon(false);
+        moimTime.setPm_one(true);
+        moimTime.setPm_two(true);
+        moimTime.setPm_three(false);
+        moimTime.setPm_four(false);
+        moimTime.setPm_five(false);
+        moimTime.setPm_six(false);
+        moimTime.setPm_seven(false);
+        moimTime.setPm_eigth(false);
+        moimTime.setPm_nine(false);
+        normalMoimMemberTime.add(moimTime);
+
+        moimTime2.setPm_nine(true);
+        wrongMoimMemberTime.add(moimTime2);
     }
 
     @Test
@@ -298,5 +328,78 @@ public class MoimServiceTest {
 
         // then
         assertThrows(MoimParticipateException.class, () -> moimService.participateMoim(user12, encryptMoimID));
+    }
+
+    @Test
+    @DisplayName("참여자 일정 정하기")
+    void testAdjustSchedule() throws Exception {
+        // given
+        Long userId = userService.saveUser(user);
+        Long userId2 = userService.saveUser(user2);
+        User user1 = userService.findUserById(userId);
+        User user2 = userService.findUserById(userId2);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(user1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+
+        // 모임 생성
+        var encryptedId = moimService.makeMoim(user1, newMoim, normalMoimDates);
+        // 모임 참여
+        moimService.participateMoim(user2, encryptedId);
+
+        // when
+        Map<String, Object> adjustSchedule = moimService.adjustSchedule(user2, encryptedId, normalMoimMemberTime);
+
+        // then
+        Assertions.assertThat(adjustSchedule.get("moim_name")).isEqualTo("테스트 모임");
+        Assertions.assertThat(adjustSchedule.get("moim_maker")).isEqualTo("부엉이");
+    }
+
+    @Test
+    @DisplayName("참여하지 않은 모임의 유저가 모임 일정 정하기")
+    void testAdjustScheduleWithNotParticipate() throws Exception {
+        // given
+        Long userId = userService.saveUser(user);
+        Long userId2 = userService.saveUser(user2);
+        User user1 = userService.findUserById(userId);
+        User user2 = userService.findUserById(userId2);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(user1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+
+        // 모임 생성
+        var encryptedId = moimService.makeMoim(user1, newMoim, normalMoimDates);
+
+        // when, then
+        assertThrows(AdjustScheduleException.class,
+                () -> moimService.adjustSchedule(user2, encryptedId, normalMoimMemberTime));
+    }
+
+    @Test
+    @DisplayName("주최자가 선택하지 않은 일자로 모임 일정 정하기")
+    void testAdjustScheduleWithNotAuthorizedDate() throws Exception {
+        // given
+        Long userId = userService.saveUser(user);
+        Long userId2 = userService.saveUser(user2);
+        User user1 = userService.findUserById(userId);
+        User user2 = userService.findUserById(userId2);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(user1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+
+        // 모임 생성
+        var encryptedId = moimService.makeMoim(user1, newMoim, normalMoimDates);
+        // 모임 참여
+        moimService.participateMoim(user2, encryptedId);
+
+        // when, then
+        assertThrows(AdjustScheduleException.class,
+                () -> moimService.adjustSchedule(user2, encryptedId, wrongMoimMemberTime));
     }
 }

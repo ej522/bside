@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
+import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
 import com.example.beside.dto.MoimOveralDateDto;
 
@@ -30,18 +31,25 @@ public class MoimRepositoryTest {
     private UserRepository userRepository;
 
     private User user;
+    private User user2;
     private Moim newMoim;
     private List<MoimDate> moimdate1 = new ArrayList<>();
+    private List<MoimMemberTime> normalMoimMemberTime = new ArrayList<>();
 
     @BeforeEach
     void settingEntity() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        // 유저1 세팅
+        // 유저 세팅
         user = new User();
         user.setName("부엉이");
         user.setEmail("test-user@google.com");
         user.setPassword("Moim@0303");
+
+        user2 = new User();
+        user2.setName("강아지");
+        user2.setEmail("test-user@2google.com");
+        user2.setPassword("Moim@0303");
 
         // 모임 세팅
         newMoim = new Moim();
@@ -55,6 +63,25 @@ public class MoimRepositoryTest {
         moimDate.setAfternoon(false);
         moimDate.setEvening(true);
         moimdate1.add(moimDate);
+
+        // 참여자 모임 일정 세팅
+        normalMoimMemberTime = new ArrayList<>();
+        MoimMemberTime moimTime = new MoimMemberTime();
+        moimTime.setSelected_date(LocalDate.parse("2023-03-10", formatter).atStartOfDay());
+        moimTime.setAm_nine(false);
+        moimTime.setAm_ten(false);
+        moimTime.setAm_eleven(false);
+        moimTime.setNoon(false);
+        moimTime.setPm_one(false);
+        moimTime.setPm_two(false);
+        moimTime.setPm_three(false);
+        moimTime.setPm_four(false);
+        moimTime.setPm_five(false);
+        moimTime.setPm_six(false);
+        moimTime.setPm_seven(false);
+        moimTime.setPm_eigth(true);
+        moimTime.setPm_nine(true);
+        normalMoimMemberTime.add(moimTime);
     }
 
     @Test
@@ -77,6 +104,7 @@ public class MoimRepositoryTest {
         // given
         long userId = userRepository.saveUser(user);
         User findUser = userRepository.findUserById(userId);
+        // 모임 생성
         long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
 
         // when
@@ -95,7 +123,8 @@ public class MoimRepositoryTest {
         // given
         long userId = userRepository.saveUser(user);
         User findUser = userRepository.findUserById(userId);
-        long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
+        // 모임 생성
+        moimRepository.makeMoim(findUser, newMoim, moimdate1);
 
         // when
         long makeMoimMember = moimRepository.makeMoimMember(findUser, newMoim);
@@ -111,6 +140,7 @@ public class MoimRepositoryTest {
         long userId = userRepository.saveUser(user);
         User findUser = userRepository.findUserById(userId);
         long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
+        // 모임 생성
         moimRepository.makeMoimMember(findUser, newMoim);
 
         // when
@@ -127,6 +157,7 @@ public class MoimRepositoryTest {
         long userId = userRepository.saveUser(user);
         User findUser = userRepository.findUserById(userId);
         long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
+        // 모임 생성
         moimRepository.makeMoimMember(findUser, newMoim);
 
         // when
@@ -149,6 +180,7 @@ public class MoimRepositoryTest {
         long userId = userRepository.saveUser(user);
         User findUser = userRepository.findUserById(userId);
         newMoim.setUser(findUser);
+        // 모임 생성
         moimRepository.makeMoim(findUser, newMoim, moimdate1);
 
         // when
@@ -156,6 +188,56 @@ public class MoimRepositoryTest {
 
         // then
         Assertions.assertThat(makeFriend).isGreaterThan(0);
+    }
+
+    @Test
+    @DisplayName("모임의 상세 일정을 등록할 수 있는가")
+    void testSaveSchedule() throws Exception {
+        // given
+        long userId = userRepository.saveUser(user);
+        User findUser = userRepository.findUserById(userId);
+        long userId2 = userRepository.saveUser(user2);
+        User findUser2 = userRepository.findUserById(userId2);
+
+        newMoim.setUser(findUser);
+        // 모임 생성
+        long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
+        // 모임 참여
+        moimRepository.makeMoimMember(findUser2, newMoim);
+        // 모임 멤버 조회
+        var moimMember = moimRepository.getMoimMemberByMemberId(moimId, findUser2.getId());
+
+        // when
+        long result = moimRepository.saveSchedule(moimMember, normalMoimMemberTime);
+
+        // then
+        Assertions.assertThat(result).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("이미 유저가 상세 모임 일정을 등록했는가?")
+    void testIsAlreadyScheduled() throws Exception {
+        // given
+        long userId = userRepository.saveUser(user);
+        User findUser = userRepository.findUserById(userId);
+        long userId2 = userRepository.saveUser(user2);
+        User findUser2 = userRepository.findUserById(userId2);
+
+        newMoim.setUser(findUser);
+        // 모임 생성
+        long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
+        // 모임 참여
+        moimRepository.makeMoimMember(findUser2, newMoim);
+        // 모임 멤버 조회
+        var moimMember = moimRepository.getMoimMemberByMemberId(moimId, findUser2.getId());
+        // 상세 모임 일정 등록
+        moimRepository.saveSchedule(moimMember, normalMoimMemberTime);
+
+        // when
+        Boolean alreadyScheduled = moimRepository.isAlreadyScheduled(moimId, findUser2);
+
+        // then
+        Assertions.assertThat(alreadyScheduled).isTrue();
     }
 
 }

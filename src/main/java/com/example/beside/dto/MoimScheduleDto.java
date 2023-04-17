@@ -12,6 +12,8 @@ public class MoimScheduleDto {
     @NotEmpty
     private LocalDateTime selected_date;
     @NotEmpty
+    private String member_name;
+    @NotEmpty
     private Boolean am_nine;
     @NotEmpty
     private Boolean am_ten;
@@ -20,6 +22,12 @@ public class MoimScheduleDto {
     @NotEmpty
     private Boolean noon;
 
+    @NotEmpty
+    private Boolean pm_one;
+    @NotEmpty
+    private Boolean pm_two;
+    @NotEmpty
+    private Boolean pm_three;
     @NotEmpty
     private Boolean pm_four;
     @NotEmpty
@@ -35,11 +43,15 @@ public class MoimScheduleDto {
 
     public MoimScheduleDto(MoimOveralScheduleDto moimOveralScheduleDto) {
         this.selected_date = moimOveralScheduleDto.getSelected_date();
+        this.member_name = moimOveralScheduleDto.getMember_name();
         this.am_nine = moimOveralScheduleDto.getAm_nine();
         this.am_ten = moimOveralScheduleDto.getAm_ten();
         this.am_eleven = moimOveralScheduleDto.getAm_eleven();
         this.noon = moimOveralScheduleDto.getNoon();
 
+        this.pm_one = moimOveralScheduleDto.getPm_one();
+        this.pm_two = moimOveralScheduleDto.getPm_two();
+        this.pm_three = moimOveralScheduleDto.getPm_three();
         this.pm_four = moimOveralScheduleDto.getPm_four();
         this.pm_five = moimOveralScheduleDto.getPm_five();
         this.pm_six = moimOveralScheduleDto.getPm_six();

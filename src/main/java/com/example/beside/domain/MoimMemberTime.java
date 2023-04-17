@@ -31,10 +31,14 @@ public class MoimMemberTime {
     private Boolean am_ten;
     private Boolean am_eleven;
     private Boolean noon;
+    private Boolean pm_one;
+    private Boolean pm_two;
+    private Boolean pm_three;
     private Boolean pm_four;
     private Boolean pm_five;
     private Boolean pm_six;
     private Boolean pm_seven;
     private Boolean pm_eigth;
     private Boolean pm_nine;
+
 }

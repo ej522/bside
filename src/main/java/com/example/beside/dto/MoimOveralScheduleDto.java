@@ -38,6 +38,12 @@ public class MoimOveralScheduleDto {
     private Boolean noon;
 
     @NotEmpty
+    private Boolean pm_one;
+    @NotEmpty
+    private Boolean pm_two;
+    @NotEmpty
+    private Boolean pm_three;
+    @NotEmpty
     private Boolean pm_four;
     @NotEmpty
     private Boolean pm_five;
@@ -53,7 +59,8 @@ public class MoimOveralScheduleDto {
     public MoimOveralScheduleDto(Long moim_id, int dead_line_hour, LocalDateTime created_time, String user_name,
             String moim_name,
             String member_name, LocalDateTime selected_date, Boolean am_nine, Boolean am_ten, Boolean am_eleven,
-            Boolean noon, Boolean pm_four, Boolean pm_five, Boolean pm_six, Boolean pm_seven, Boolean pm_eight,
+            Boolean noon, Boolean pm_one, Boolean pm_two, Boolean pm_three, Boolean pm_four, Boolean pm_five,
+            Boolean pm_six, Boolean pm_seven, Boolean pm_eight,
             Boolean pm_nine) {
         this.moim_id = moim_id;
         this.dead_line_hour = dead_line_hour;
@@ -66,6 +73,9 @@ public class MoimOveralScheduleDto {
         this.am_ten = am_ten;
         this.am_eleven = am_eleven;
         this.noon = noon;
+        this.pm_one = pm_one;
+        this.pm_two = pm_two;
+        this.pm_three = pm_three;
         this.pm_four = pm_four;
         this.pm_five = pm_five;
         this.pm_six = pm_six;

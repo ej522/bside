@@ -99,7 +99,6 @@ public class MoimController {
             @ApiResponse(responseCode = "200", description = "모임 스케줄을 등록 했습니다."),
             @ApiResponse(responseCode = "400_1", description = "해당 모임에 참여되지 않았습니다"),
             @ApiResponse(responseCode = "400_2", description = "불가능한 일자를 선택했습니다"),
-            @ApiResponse(responseCode = "400_3", description = "일자 별 오전 오후 각 2개씩만 선택 가능 합니다."),
     })
     @PostMapping(value = "/v1/adjust-schedule")
     public Response<Map<String, Object>> adjustSchedule(HttpServletRequest token,
@@ -117,12 +116,14 @@ public class MoimController {
             LocalDateTime selectedDate = LocalDate.parse(moimTime.selectedDate, formatter).atStartOfDay();
 
             temp.setSelected_date(selectedDate);
-            // 오전
+
             temp.setAm_nine(moimTime.amNine);
             temp.setAm_ten(moimTime.amTen);
             temp.setAm_eleven(moimTime.amEleven);
             temp.setNoon(moimTime.noon);
-            // 오후
+            temp.setPm_one(moimTime.pmOne);
+            temp.setPm_two(moimTime.pmTwo);
+            temp.setPm_three(moimTime.pmThree);
             temp.setPm_four(moimTime.pmFour);
             temp.setPm_five(moimTime.pmFive);
             temp.setPm_six(moimTime.pmSix);
@@ -206,6 +207,15 @@ public class MoimController {
 
         @Schema(description = "정오", example = "true", type = "Boolean")
         private boolean noon;
+
+        @Schema(description = "오후 1시", example = "true", type = "Boolean")
+        private boolean pmOne;
+
+        @Schema(description = "오후 2시", example = "true", type = "Boolean")
+        private boolean pmTwo;
+
+        @Schema(description = "오후 3시", example = "true", type = "Boolean")
+        private boolean pmThree;
 
         @Schema(description = "오후 4시", example = "true", type = "Boolean")
         private boolean pmFour;
