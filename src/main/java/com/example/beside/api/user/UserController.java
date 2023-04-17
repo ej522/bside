@@ -151,15 +151,17 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "한글, 영문, 숫자 조합 8자 이내"),
             @ApiResponse(responseCode = "500", description = "중복된 닉네임 입니다.") })
     @PutMapping(value = "/v1/update/nickname")
-    public Response<User> updateNickname(@RequestBody @Validated UpdateUserNicknameRequest request)
-            throws UserValidateNickName {
-        User user = new User();
-        user.setId(request.id);
-        user.setName(request.name);
+    public Response<String> updateNickname(HttpServletRequest token, @RequestBody @Validated UpdateUserNicknameRequest request)
+            throws Exception {
+        User user = (User) token.getAttribute("user");
 
-        user = userService.updateNickname(user);
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setName(request.name);
 
-        return Response.success(200, "닉네임이 변경 되었습니다.", user);
+        String newNickname = userService.updateNickname(updateUser);
+
+        return Response.success(200, "닉네임이 변경 되었습니다.", newNickname);
     }
 
     private String generateVerificationCode() {
@@ -179,7 +181,7 @@ public class UserController {
     static class EmailRequest {
         @NotNull
         @Email
-        @Schema(description = "email", example = "test@naver.com", type = "String")
+        @Schema(description = "email", example = "test@email.com", type = "String")
         private String email;
     }
 
@@ -187,7 +189,7 @@ public class UserController {
     static class EmailValidateRequest {
         @NotNull
         @Email
-        @Schema(description = "email", example = "test@naver.com", type = "String")
+        @Schema(description = "email", example = "test@email.com", type = "String")
         private String email;
 
         @NotNull
@@ -224,9 +226,5 @@ public class UserController {
         @NotNull
         @Schema(description = "nickname", example = "닉네임", type = "String")
         private String name;
-
-        @NotNull
-        @Schema(description = "회원번호", example = "1", type = "Long")
-        private Long id;
     }
 }
