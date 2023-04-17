@@ -1,5 +1,6 @@
 package com.example.beside.domain;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,11 +19,14 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Moim> moim = new ArrayList();
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Moim> moim;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Friend> friend;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<MoimMember> moimMember;
 
     @Column(length = 10)
     private String social_type;
@@ -36,4 +40,6 @@ public class User {
     private String password;
 
     private String profile_image;
+
+    private LocalDateTime created_time;
 }

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,9 +24,10 @@ public class UserRepository {
 
         QUser qUser = new QUser("u");
         queryFactory.insert(qUser)
-                .columns(qUser.social_type, qUser.name, qUser.email, qUser.password, qUser.profile_image)
+                .columns(qUser.social_type, qUser.name, qUser.email, qUser.password, qUser.profile_image,
+                        qUser.created_time)
                 .values(user.getSocial_type(), user.getName(), user.getEmail(), user.getPassword(),
-                        user.getProfile_image())
+                        user.getProfile_image(), LocalDateTime.now())
                 .execute();
 
         return queryFactory.select(qUser.id)
@@ -87,7 +89,7 @@ public class UserRepository {
                 .where(qUser.email.eq(email)
                         .and(qUser.social_type.eq(social_type)))
                 .fetchOne();
-        if(result == null) {
+        if (result == null) {
             return Optional.empty();
         }
 

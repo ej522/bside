@@ -20,7 +20,8 @@ public class InterCeptorConfig implements WebMvcConfigurer {
         registry.addInterceptor(new JwtInterceptor(userService))
                 .addPathPatterns("/api/users/v1/users")
                 .addPathPatterns("/api/moim/v1/make")
-                .addPathPatterns("/api/moim/v1/participate");
+                .addPathPatterns("/api/moim/v1/participate")
+                .addPathPatterns("/api/moim/v1/adjust-schedule");
     }
 
 }

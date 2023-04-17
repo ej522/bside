@@ -22,11 +22,13 @@ public class MoimMember {
     @JoinColumn(name = "moim_id")
     private Moim moim;
 
-    private Long member_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(length = 20)
     private String member_name;
 
-    private LocalDateTime selected_date;
+    private LocalDateTime join_time;
 
 }

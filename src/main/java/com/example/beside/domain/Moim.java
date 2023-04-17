@@ -39,4 +39,6 @@ public class Moim {
 
     private LocalDateTime created_time;
 
+    private String encrypted_id;
+
 }
