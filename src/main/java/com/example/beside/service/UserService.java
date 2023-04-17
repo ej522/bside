@@ -85,14 +85,17 @@ public class UserService {
     }
 
     @Transactional
-    public User updateNickname(User user) throws UserValidateNickName {
+    public String updateNickname(User user) throws Exception {
         String nickname = user.getName();
         Optional<User> optionalUser = userRepository.findUserNickname(nickname);
         if(optionalUser.isPresent()) {
             throw new IllegalStateException("중복된 닉네임입니다.");
         }
         Common.NicknameValidate(nickname);
-        return userRepository.updateNickname(user);
+
+        User updateUserInfo = userRepository.updateNickname(user);
+
+        return updateUserInfo.getName();
     }
 
 }
