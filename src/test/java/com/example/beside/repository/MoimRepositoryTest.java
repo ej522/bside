@@ -148,7 +148,8 @@ public class MoimRepositoryTest {
         // given
         long userId = userRepository.saveUser(user);
         User findUser = userRepository.findUserById(userId);
-        long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
+        newMoim.setUser(findUser);
+        moimRepository.makeMoim(findUser, newMoim, moimdate1);
 
         // when
         long makeFriend = moimRepository.makeFriend(findUser, newMoim);
