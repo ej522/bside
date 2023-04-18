@@ -1,15 +1,14 @@
 package com.example.beside.service;
 
-import com.example.beside.common.Exception.UserAlreadyExistException;
 import com.example.beside.common.Exception.UserNotExistException;
 import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.repository.UserRepository;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -20,12 +19,12 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class SocialLoginService {
-    private static UserRepository userRepository;
+
+    private final UserRepository userRepository;
 
     // 카카오 유저 정보
     public User getKaKaoUserInfo(String access_token) {
         User userInfo = new User();
-        //HashMap<String, Object> userInfo = new HashMap<>();
         String reqUrl = "https://kapi.kakao.com/v2/user/me";
 
         try {
@@ -48,17 +47,12 @@ public class SocialLoginService {
             }
 
             JsonParser parser = new JsonParser();
-            JsonObject obj = (JsonObject) parser.parse(result);
+            JsonObject object = (JsonObject) parser.parse(result);
+            JsonObject profile = (JsonObject) ((JsonObject) object.get("kakao_account")).get("profile");
 
-            JsonObject id = (JsonObject) obj.get("id");
-            JsonObject kakao_account = (JsonObject) obj.get("kakao_account");
-            JsonObject profile = (JsonObject) kakao_account.get("profile");
-            JsonObject properties = (JsonObject) obj.get("properties");
-
-            // 정보받아와서 db등록 여부 확인 후 DB추가할 곳
-            String kakao_id = id.toString();
-            String nickname = profile.get("nickname").toString();
-            String imgUrl = profile.get("profile_image").toString();
+            String kakao_id = object.get("id").getAsString();
+            String nickname = profile.get("nickname").getAsString();
+            String imgUrl = profile.get("profile_image_url").getAsString();
 
             userInfo.setEmail(kakao_id);
             userInfo.setName(nickname);
@@ -73,6 +67,7 @@ public class SocialLoginService {
     }
 
     //로그인
+    @Transactional
     public User loginKakao(User user) throws UserNotExistException {
         Optional<User> optionalUser = userRepository.findUserByEmailAndSocialType(user.getEmail(), user.getSocial_type());
 
