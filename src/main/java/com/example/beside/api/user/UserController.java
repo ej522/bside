@@ -169,7 +169,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "해당 이메일이 존재합니다"),
             @ApiResponse(responseCode = "400", description = "해당 이메일이 존재하지 않습니다") })
-    @PostMapping(value = "/v1/check/email")
+    @PostMapping(value = "/v1/check-email")
     public Response<String> checkEmailAccount(@RequestBody @Validated EmailRequest request) {
         var email = request.getEmail();
         var user = userService.findUserByEmail(email);
