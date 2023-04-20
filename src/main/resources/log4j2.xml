@@ -14,7 +14,7 @@
         <!-- 파일 -->
         <RollingFile name="rollingFile"
                      fileName="logs/moim_log.log"
-                     filePattern="logs/moim_log_%d{yyyy-MM-dd HH:mm:ss}.%i.log">
+                     filePattern="logs/moim_log_%d{yyyy-MM-dd}.%i.log">
             <PatternLayout pattern="${patternLayout}"/>
             <Policies>
                 <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
