@@ -151,7 +151,8 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "한글, 영문, 숫자 조합 8자 이내"),
             @ApiResponse(responseCode = "500", description = "중복된 닉네임 입니다.") })
     @PutMapping(value = "/v1/update/nickname")
-    public Response<String> updateNickname(HttpServletRequest token, @RequestBody @Validated UpdateUserNicknameRequest request)
+    public Response<String> updateNickname(HttpServletRequest token,
+            @RequestBody @Validated UpdateUserNicknameRequest request)
             throws Exception {
         User user = (User) token.getAttribute("user");
 
@@ -162,6 +163,21 @@ public class UserController {
         String newNickname = userService.updateNickname(updateUser);
 
         return Response.success(200, "닉네임이 변경 되었습니다.", newNickname);
+    }
+
+    @Operation(tags = { "User" }, summary = "이메일 계정 확인")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "해당 이메일이 존재합니다"),
+            @ApiResponse(responseCode = "400", description = "해당 이메일이 존재하지 않습니다") })
+    @PostMapping(value = "/v1/check-email")
+    public Response<String> checkEmailAccount(@RequestBody @Validated EmailRequest request) {
+        var email = request.getEmail();
+        var user = userService.findUserByEmail(email);
+
+        if (user == null) {
+            return Response.success(400, "해당 이메일이 존재하지 않습니다", "not found");
+        }
+        return Response.success(200, "해당 이메일이 존재합니다", "email found");
     }
 
     private String generateVerificationCode() {
