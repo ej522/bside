@@ -36,6 +36,15 @@ public class MoimRepository {
     @Autowired
     private Encrypt encrypt = new Encrypt();
 
+    public List<Moim> getNotFixedScheduleMoims() {
+        queryFactory = new JPAQueryFactory(em);
+
+        QMoim qMoim = new QMoim("moim");
+        return queryFactory.selectFrom(qMoim)
+                .where(qMoim.fixed_date.isNull())
+                .fetch();
+    }
+
     public Moim getMoimInfo(Long moimId) {
         queryFactory = new JPAQueryFactory(em);
 

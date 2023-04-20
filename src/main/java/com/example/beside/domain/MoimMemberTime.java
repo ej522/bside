@@ -25,6 +25,10 @@ public class MoimMemberTime {
     @JoinColumn(name = "moim_member_id")
     private MoimMember moimMember;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "moim_id")
+    private Moim moim;
+
     private LocalDateTime selected_date;
 
     private Boolean am_nine;
