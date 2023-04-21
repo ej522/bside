@@ -118,4 +118,16 @@ public class UserRepository {
         return Optional.ofNullable(result);
     }
 
+    public User updateProfileImage(User user) {
+        queryFactory = new JPAQueryFactory(em);
+        QUser qUser = new QUser("u");
+
+        queryFactory.update(qUser)
+                .set(qUser.profile_image, user.getProfile_image())
+                .where(qUser.id.eq(user.getId()))
+                .execute();
+
+        return queryFactory.selectFrom(qUser).where(qUser.id.eq(user.getId())).fetchOne();
+    }
+
 }
