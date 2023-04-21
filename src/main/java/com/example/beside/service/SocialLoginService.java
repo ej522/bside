@@ -48,7 +48,7 @@ public class SocialLoginService {
 
             JsonParser parser = new JsonParser();
             JsonObject object = (JsonObject) parser.parse(result);
-            JsonObject profile = (JsonObject) ((JsonObject) object.get("kakao_account")).get("profile");
+            JsonObject profile = (JsonObject) ((JsonObject) object.get("kakao_account")).get("static");
 
             String kakao_id = object.get("id").getAsString();
             String nickname = profile.get("nickname").getAsString();

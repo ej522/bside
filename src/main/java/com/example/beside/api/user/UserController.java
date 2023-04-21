@@ -24,9 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Tag(name = "User", description = "유저 API")
 @RequiredArgsConstructor
@@ -178,6 +176,35 @@ public class UserController {
             return Response.success(400, "해당 이메일이 존재하지 않습니다", "not found");
         }
         return Response.success(200, "해당 이메일이 존재합니다", "email found");
+    }
+
+    @Operation(tags = { "User" }, summary = "프로필 이미지 전체 조회")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "프로필 이미지가 조회 되었습니다.")})
+    @GetMapping(value = "/v1/allProfileImg")
+    public Response<List> getAllProfileImage() {
+        List profileList = new ArrayList();
+
+        String img = "";
+        img = "http://moim.life/profile/green.jpg";
+        profileList.add(img);
+        img = "http://moim.life/profile/heart.jpg";
+        profileList.add(img);
+        img = "http://moim.life/profile/lightgreen.jpg";
+        profileList.add(img);
+        img = "http://moim.life/profile/lightpurple.jpg";
+        profileList.add(img);
+        img = "http://moim.life/profile/purple_bubble.jpg";
+        profileList.add(img);
+        img = "http://moim.life/profile/purple_diamond.jpg";
+        profileList.add(img);
+        img = "http://moim.life/profile/purple_flower.jpg";
+        profileList.add(img);
+        img = "http://moim.life/profile/skyblue.jpg";
+        profileList.add(img);
+        img = "http://moim.life/profile/yellow.jpg";
+        profileList.add(img);
+
+        return Response.success(200, "프로필 이미지가 조회 되었습니다.", profileList);
     }
 
     private String generateVerificationCode() {
