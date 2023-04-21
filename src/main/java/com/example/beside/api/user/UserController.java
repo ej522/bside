@@ -123,7 +123,7 @@ public class UserController {
         if (isValid)
             return Response.success(200, "이메일 인증이 완료 되었습니다.", isValid);
         else
-            return Response.success(202, "이메일 인증이 실패 했습니다", isValid);
+            return Response.fail(400, "이메일 인증이 실패 했습니다", isValid);
     }
 
     @Operation(tags = { "User" }, summary = "회원삭제")
@@ -173,13 +173,13 @@ public class UserController {
         var user = userService.findUserByEmail(email);
 
         if (user == null) {
-            return Response.success(400, "해당 이메일이 존재하지 않습니다", "not found");
+            return Response.fail(400, "해당 이메일이 존재하지 않습니다", "not found");
         }
         return Response.success(200, "해당 이메일이 존재합니다", "email found");
     }
 
     @Operation(tags = { "User" }, summary = "프로필 이미지 전체 조회")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "프로필 이미지가 조회 되었습니다.")})
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "프로필 이미지가 조회 되었습니다.") })
     @GetMapping(value = "/v1/allProfileImg")
     public Response<List> getAllProfileImage() {
         List profileList = new ArrayList();
@@ -208,10 +208,10 @@ public class UserController {
     }
 
     @Operation(tags = { "User" }, summary = "유저프로필 수정")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "프로필이 수정되었습니다.")})
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "프로필이 수정되었습니다.") })
     @PutMapping("/v1/update/profileImage")
     public Response<User> updateProfileImage(HttpServletRequest token,
-                                           @RequestBody @Validated UpdateUserProfileImage updateUserProfileImage) throws Exception {
+            @RequestBody @Validated UpdateUserProfileImage updateUserProfileImage) throws Exception {
         User user = (User) token.getAttribute("user");
 
         User updateUser = new User();
