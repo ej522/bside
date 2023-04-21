@@ -207,6 +207,22 @@ public class UserController {
         return Response.success(200, "프로필 이미지가 조회 되었습니다.", profileList);
     }
 
+    @Operation(tags = { "User" }, summary = "유저프로필 수정")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "프로필이 수정되었습니다.")})
+    @PutMapping("/v1/update/profileImage")
+    public Response<User> updateProfileImage(HttpServletRequest token,
+                                           @RequestBody @Validated UpdateUserProfileImage updateUserProfileImage) throws Exception {
+        User user = (User) token.getAttribute("user");
+
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setProfile_image(updateUserProfileImage.profile_image);
+
+        updateUser = userService.updateProfileImage(updateUser);
+
+        return Response.success(200, "프로필 이미지가 수정 되었습니다.", updateUser);
+    }
+
     private String generateVerificationCode() {
         String numbers = "";
         Random random = new Random();
@@ -269,5 +285,12 @@ public class UserController {
         @NotNull
         @Schema(description = "nickname", example = "닉네임", type = "String")
         private String name;
+    }
+
+    @Data
+    static class UpdateUserProfileImage {
+        @NotNull
+        @Schema(description = "profile_image", example = "http://moim.life/profile/yellow.jpg", type = "String")
+        private String profile_image;
     }
 }
