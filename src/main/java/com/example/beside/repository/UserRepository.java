@@ -1,5 +1,6 @@
 package com.example.beside.repository;
 
+import com.example.beside.domain.LoginType;
 import com.example.beside.domain.QUser;
 import com.example.beside.domain.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -109,11 +110,14 @@ public class UserRepository {
         return queryFactory.selectFrom(qUser).where(qUser.id.eq(user.getId())).fetchOne();
     }
 
-    public Optional<User> findUserNickname(String nickname) {
+    public Optional<User> findUserNicknameByMoim(String nickname) {
         queryFactory = new JPAQueryFactory(em);
         QUser qUser = new QUser("u");
 
-        User result = queryFactory.selectFrom(qUser).where(qUser.name.eq(nickname)).fetchOne();
+        User result = queryFactory.selectFrom(qUser)
+                .where(qUser.name.eq(nickname)
+                        .and(qUser.social_type.eq(LoginType.MOIM.name())))
+                .fetchOne();
 
         return Optional.ofNullable(result);
     }
