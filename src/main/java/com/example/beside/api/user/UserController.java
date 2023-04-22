@@ -82,7 +82,8 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "올바른 형식의 이메일, 패스워드야 합니다")
     })
     @PostMapping(value = "/v1/signup")
-    public Response<Void> createUser(@RequestBody @Validated CreateUserRequest requset) throws PasswordException {
+    public Response<Void> createUser(@RequestBody @Validated CreateUserRequest requset)
+            throws PasswordException, UserNotExistException {
         User user = new User();
         user.setEmail(requset.email);
         user.setPassword(requset.password);
