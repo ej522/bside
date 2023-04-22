@@ -56,7 +56,7 @@ public class ApiExceptionHandler {
         List<String> errors = new ArrayList<>();
         errors.add(ex.getMessage());
 
-        ApiError apiError = new ApiError(HttpStatus.ACCEPTED, "Email Validation error", errors);
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "Email Validation error", errors);
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
 

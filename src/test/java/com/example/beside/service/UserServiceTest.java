@@ -82,7 +82,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("유저 삭제")
-    void testDeleteUser() throws NoSuchAlgorithmException, PasswordException {
+    void testDeleteUser() throws NoSuchAlgorithmException, PasswordException, UserNotExistException {
         // given
         String password = user1.getPassword();
         userService.saveUser(user1);
@@ -93,8 +93,7 @@ public class UserServiceTest {
         em.flush();
 
         // then
-        User findUserByEmail = userService.findUserByEmail(user1.getEmail());
-        Assertions.assertThat(findUserByEmail).isNull();
+        assertThrows(UserNotExistException.class, () -> userService.findUserByEmail(user1.getEmail()));
     }
 
     @Test
@@ -112,7 +111,7 @@ public class UserServiceTest {
     @DisplayName("존재하지 않는 유저 삭제")
     void testDeleteUserWithNotExist() throws NoSuchAlgorithmException, PasswordException {
         // when, then
-        assertThrows(NullPointerException.class, () -> userService.deleteUser(user1));
+        assertThrows(UserNotExistException.class, () -> userService.deleteUser(user1));
     }
 
     @Test
@@ -163,7 +162,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("유저 등록")
-    void testSaveUser() throws PasswordException {
+    void testSaveUser() throws PasswordException, UserNotExistException {
         // when
         userService.saveUser(user1);
         em.flush();

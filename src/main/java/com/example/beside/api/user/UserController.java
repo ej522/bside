@@ -123,7 +123,7 @@ public class UserController {
         if (isValid)
             return Response.success(200, "이메일 인증이 완료 되었습니다.", isValid);
         else
-            return Response.success(202, "이메일 인증이 실패 했습니다", isValid);
+            return Response.fail(400, "이메일 인증이 실패 했습니다", isValid);
     }
 
     @Operation(tags = { "User" }, summary = "회원삭제")
@@ -133,7 +133,7 @@ public class UserController {
     })
     @DeleteMapping(value = "/v1/delete")
     public Response<Void> deleteUser(@RequestBody @Validated DeleteUserRequest request)
-            throws NoSuchAlgorithmException {
+            throws NoSuchAlgorithmException, UserNotExistException {
 
         User user = new User();
         user.setEmail(request.email);
@@ -168,18 +168,16 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "해당 이메일이 존재합니다"),
             @ApiResponse(responseCode = "400", description = "해당 이메일이 존재하지 않습니다") })
     @PostMapping(value = "/v1/check-email")
-    public Response<String> checkEmailAccount(@RequestBody @Validated EmailRequest request) {
+    public Response<String> checkEmailAccount(@RequestBody @Validated EmailRequest request)
+            throws UserNotExistException {
         var email = request.getEmail();
         var user = userService.findUserByEmail(email);
 
-        if (user == null) {
-            return Response.success(400, "해당 이메일이 존재하지 않습니다", "not found");
-        }
-        return Response.success(200, "해당 이메일이 존재합니다", "email found");
+        return Response.success(200, "해당 이메일이 존재합니다", user.getName());
     }
 
     @Operation(tags = { "User" }, summary = "프로필 이미지 전체 조회")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "프로필 이미지가 조회 되었습니다.")})
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "프로필 이미지가 조회 되었습니다.") })
     @GetMapping(value = "/v1/allProfileImg")
     public Response<List> getAllProfileImage() {
         List profileList = new ArrayList();
@@ -208,10 +206,10 @@ public class UserController {
     }
 
     @Operation(tags = { "User" }, summary = "유저프로필 수정")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "프로필이 수정되었습니다.")})
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "프로필이 수정되었습니다.") })
     @PutMapping("/v1/update/profileImage")
     public Response<User> updateProfileImage(HttpServletRequest token,
-                                           @RequestBody @Validated UpdateUserProfileImage updateUserProfileImage) throws Exception {
+            @RequestBody @Validated UpdateUserProfileImage updateUserProfileImage) throws Exception {
         User user = (User) token.getAttribute("user");
 
         User updateUser = new User();

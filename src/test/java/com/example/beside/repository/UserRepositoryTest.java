@@ -3,6 +3,7 @@ package com.example.beside.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,10 +43,10 @@ public class UserRepositoryTest {
 
         // when
         userRepository.deleteUser(user);
-        User findUserByEmail = userRepository.findUserByEmail(user.getEmail());
+        Optional<User> findUserByEmail = userRepository.findUserByEmail(user.getEmail());
 
         // then
-        Assertions.assertThat(findUserByEmail).isNull();
+        Assertions.assertThat(findUserByEmail).isEmpty();
     }
 
     @Test
@@ -68,11 +69,11 @@ public class UserRepositoryTest {
         userRepository.saveUser(user);
 
         // when
-        User findUserByEmail = userRepository.findUserByEmail(user.getEmail());
+        Optional<User> findUserByEmail = userRepository.findUserByEmail(user.getEmail());
 
         // then
-        Assertions.assertThat(findUserByEmail.getEmail()).isEqualTo(user.getEmail());
-        Assertions.assertThat(findUserByEmail.getName()).isEqualTo(user.getName());
+        Assertions.assertThat(findUserByEmail.get().getEmail()).isEqualTo(user.getEmail());
+        Assertions.assertThat(findUserByEmail.get().getName()).isEqualTo(user.getName());
     }
 
     @Test
@@ -80,11 +81,11 @@ public class UserRepositoryTest {
     void testSaveUser() {
         // when
         long userId = userRepository.saveUser(user);
-        User findedUser = userRepository.findUserByEmail(user.getEmail());
+        Optional<User> findedUser = userRepository.findUserByEmail(user.getEmail());
         user.setId(userId);
 
         // then
-        assertEquals(findedUser.getId(), user.getId());
-        assertEquals(findedUser.getEmail(), user.getEmail());
+        assertEquals(findedUser.get().getId(), user.getId());
+        assertEquals(findedUser.get().getEmail(), user.getEmail());
     }
 }
