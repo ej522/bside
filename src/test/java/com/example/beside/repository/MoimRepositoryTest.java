@@ -1,6 +1,7 @@
 package com.example.beside.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -215,8 +216,8 @@ public class MoimRepositoryTest {
     }
 
     @Test
-    @DisplayName("이미 유저가 상세 모임 일정을 등록했는가?")
-    void testIsAlreadyScheduled() throws Exception {
+    @DisplayName("모임 일정 확정하기")
+    void testFixMoimDate() throws Exception {
         // given
         long userId = userRepository.saveUser(user);
         User findUser = userRepository.findUserById(userId);
@@ -233,11 +234,72 @@ public class MoimRepositoryTest {
         // 상세 모임 일정 등록
         moimRepository.saveSchedule(moimMember, normalMoimMemberTime);
 
+        LocalDateTime dateTime = LocalDateTime.now(); // 예시로 현재 시간을 사용
+        String dateString = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
         // when
-        Boolean alreadyScheduled = moimRepository.isAlreadyScheduled(moimId, findUser2);
+        moimRepository.fixMoimDate(newMoim, dateTime, 12);
 
         // then
-        Assertions.assertThat(alreadyScheduled).isTrue();
+        Moim moimInfo = moimRepository.getMoimInfo(newMoim.getId());
+        Assertions.assertThat(moimInfo.getFixed_date()).isEqualTo(dateString);
+    }
+
+    @Test
+    @DisplayName("확정나지 않은 모임 일정 조회")
+    void testGetNotFixedScheduleMoims() throws Exception {
+        // given
+        long userId = userRepository.saveUser(user);
+        User findUser = userRepository.findUserById(userId);
+        long userId2 = userRepository.saveUser(user2);
+        User findUser2 = userRepository.findUserById(userId2);
+
+        newMoim.setUser(findUser);
+        // 모임 생성
+        long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
+        // 모임 참여
+        moimRepository.makeMoimMember(findUser2, newMoim);
+        // 모임 멤버 조회
+        var moimMember = moimRepository.getMoimMemberByMemberId(moimId, findUser2.getId());
+
+        moimRepository.saveSchedule(moimMember, normalMoimMemberTime);
+
+        // when
+        List<Moim> notFixedScheduleMoims = moimRepository.getNotFixedScheduleMoims();
+
+        // then
+        Assertions.assertThat(notFixedScheduleMoims).size().isEqualTo(1);
+        Assertions.assertThat(notFixedScheduleMoims.get(0)).isEqualTo(newMoim);
+    }
+
+    @Test
+    @DisplayName("확정 났는데, 확정나지 않은 모임 일정 조회")
+    void testGetNotFixedScheduleMoimsWithFixed() throws Exception {
+        // given
+        long userId = userRepository.saveUser(user);
+        User findUser = userRepository.findUserById(userId);
+        long userId2 = userRepository.saveUser(user2);
+        User findUser2 = userRepository.findUserById(userId2);
+
+        newMoim.setDead_line_hour(0);
+        newMoim.setUser(findUser);
+        // 모임 생성
+        long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
+        // 모임 참여
+        moimRepository.makeMoimMember(findUser2, newMoim);
+        // 모임 멤버 조회
+        var moimMember = moimRepository.getMoimMemberByMemberId(moimId, findUser2.getId());
+
+        moimRepository.saveSchedule(moimMember, normalMoimMemberTime);
+        LocalDateTime dateTime = LocalDateTime.now(); // 예시로 현재 시간을 사용
+        // 모임 일자 확정
+        moimRepository.fixMoimDate(newMoim, dateTime, 12);
+
+        // when
+        List<Moim> notFixedScheduleMoims = moimRepository.getNotFixedScheduleMoims();
+
+        // then
+        Assertions.assertThat(notFixedScheduleMoims).size().isEqualTo(0);
     }
 
 }

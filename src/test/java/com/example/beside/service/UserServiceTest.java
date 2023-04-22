@@ -174,6 +174,16 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("이미 등록된 유저 등록")
+    void testSaveUserWithAlreadyRegistered() throws PasswordException {
+        // given
+        userService.saveUser(user1);
+
+        // when , then
+        assertThrows(IllegalStateException.class, () -> userService.saveUser(user1));
+    }
+
+    @Test
     @DisplayName("숫자로만 이루어진 패스워드로 유저 등록")
     void testSaveUserWithOnlyNumberPassword() throws PasswordException {
         // when, then

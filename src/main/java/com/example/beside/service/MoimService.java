@@ -175,7 +175,9 @@ public class MoimService {
     }
 
     private String set_yyyy_mm_dd(LocalDateTime date) {
-        return date.getYear() + "-" + date.getMonthValue() + "-" + date.getDayOfMonth();
+        var month = String.format("%02d", date.getMonthValue()); // 월 값에 대해 두 자리로 포맷팅
+        var day = String.format("%02d", date.getDayOfMonth()); // 일 값에 대해 두 자리로 포맷팅
+        return date.getYear() + "-" + month + "-" + day;
     }
 
     public Moim getMoimInfo(Long moimId) {

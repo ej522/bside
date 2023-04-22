@@ -28,8 +28,12 @@ public class UserService {
 
     @Transactional
     public Long saveUser(User user) throws PasswordException {
-        String password = user.getPassword();
+        Optional<User> findUser = userRepository.findUserByEmail(user.getEmail());
+        if (findUser.isPresent())
+            throw new IllegalStateException("이미 존재하는 회원입니다");
+
         // 패스워드 검증
+        var password = user.getPassword();
         Common.PasswordValidate(password);
         String hashPassword = PasswordConverter.hashPassword(password);
 
