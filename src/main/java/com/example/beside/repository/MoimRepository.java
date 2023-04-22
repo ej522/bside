@@ -1,6 +1,7 @@
 package com.example.beside.repository;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -36,6 +38,10 @@ public class MoimRepository {
     @Autowired
     private Encrypt encrypt = new Encrypt();
 
+    /**
+     * batch
+     */
+
     public List<Moim> getNotFixedScheduleMoims() {
         queryFactory = new JPAQueryFactory(em);
 
@@ -43,6 +49,44 @@ public class MoimRepository {
         return queryFactory.selectFrom(qMoim)
                 .where(qMoim.fixed_date.isNull())
                 .fetch();
+
+    }
+
+    @Transactional
+    public void fixMoimDate(Moim moim, LocalDateTime date, int time) {
+        String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String formattedTime = String.valueOf(time);
+
+        Moim findMoim = em.find(Moim.class, moim.getId());
+        findMoim.setFixed_date(formattedDate);
+        findMoim.setFixed_time(formattedTime);
+
+        em.persist(findMoim);
+    }
+
+    /**
+     * moim
+     */
+
+    public long makeMoim(User user, Moim moim, List<MoimDate> moim_date_list) throws Exception {
+        // 모임 생성
+        moim.setCreated_time(LocalDateTime.now());
+        em.persist(moim);
+
+        em.flush();
+        // 모임 일정 정보 생성
+        for (var moim_date : moim_date_list) {
+            em.persist(moim_date);
+            moim_date.setMoim(moim);
+        }
+        em.flush();
+
+        // 암호화 모임 ID 업데이트
+        String encryptId = encrypt.encrypt(String.valueOf(moim.getId()));
+        moim.setEncrypted_id(encryptId);
+        em.flush();
+
+        return moim.getId();
     }
 
     public Moim getMoimInfo(Long moimId) {
@@ -55,6 +99,58 @@ public class MoimRepository {
                 .fetchOne();
 
         return result;
+    }
+
+    public List<MoimOveralDateDto> getMoimOveralInfo(Long moinId) {
+        queryFactory = new JPAQueryFactory(em);
+
+        QMoimDate qMoimDate = QMoimDate.moimDate;
+        QMoim qMoim = QMoim.moim;
+        QUser qUser = QUser.user;
+
+        List<MoimOveralDateDto> result = queryFactory.select(Projections.constructor(MoimOveralDateDto.class,
+                qMoim.id, qMoim.user.id, qUser.name, qMoim.moim_name, qMoim.dead_line_hour,
+                qMoimDate.morning, qMoimDate.afternoon, qMoimDate.evening, qMoimDate.selected_date))
+                .from(qMoim)
+                .leftJoin(qMoimDate).on(qMoim.id.eq(qMoimDate.moim.id))
+                .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
+                .where(qMoim.id.eq(moinId))
+                .fetch();
+
+        return result;
+    }
+
+    public Boolean alreadyJoinedMoim(Long moimId, Long userId) {
+        queryFactory = new JPAQueryFactory(em);
+
+        QMoimMember qMoimMember = QMoimMember.moimMember;
+
+        MoimMember fetchOne = queryFactory.selectFrom(qMoimMember)
+                .from(qMoimMember)
+                .where(qMoimMember.moim.id.eq(moimId)
+                        .and(qMoimMember.user.id.eq(userId)))
+                .fetchOne();
+
+        if (fetchOne == null)
+            return false;
+
+        return true;
+    }
+
+    /**
+     * moim member
+     */
+
+    public long makeMoimMember(User user, Moim moim) {
+        MoimMember moimMember = new MoimMember();
+        moimMember.setUser(user);
+        moimMember.setMember_name(user.getName());
+        moimMember.setMoim(moim);
+        moimMember.setJoin_time(LocalDateTime.now());
+
+        em.persist(moimMember);
+        em.flush();
+        return moimMember.getId();
     }
 
     public List<MoimMember> getMoimMembers(Long moimId) {
@@ -81,74 +177,9 @@ public class MoimRepository {
         return result;
     }
 
-    public Boolean alreadyJoinedMoim(Long moimId, Long userId) {
-        queryFactory = new JPAQueryFactory(em);
-
-        QMoimMember qMoimMember = QMoimMember.moimMember;
-
-        MoimMember fetchOne = queryFactory.selectFrom(qMoimMember)
-                .from(qMoimMember)
-                .where(qMoimMember.moim.id.eq(moimId)
-                        .and(qMoimMember.user.id.eq(userId)))
-                .fetchOne();
-
-        if (fetchOne == null)
-            return false;
-
-        return true;
-    }
-
-    public List<MoimOveralDateDto> getMoimOveralInfo(Long moinId) {
-        queryFactory = new JPAQueryFactory(em);
-
-        QMoimDate qMoimDate = QMoimDate.moimDate;
-        QMoim qMoim = QMoim.moim;
-        QUser qUser = QUser.user;
-
-        List<MoimOveralDateDto> result = queryFactory.select(Projections.constructor(MoimOveralDateDto.class,
-                qMoim.id, qMoim.user.id, qUser.name, qMoim.moim_name, qMoim.dead_line_hour,
-                qMoimDate.morning, qMoimDate.afternoon, qMoimDate.evening, qMoimDate.selected_date))
-                .from(qMoim)
-                .leftJoin(qMoimDate).on(qMoim.id.eq(qMoimDate.moim.id))
-                .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
-                .where(qMoim.id.eq(moinId))
-                .fetch();
-
-        return result;
-    }
-
-    public long makeMoim(User user, Moim moim, List<MoimDate> moim_date_list) throws Exception {
-        // 모임 생성
-        moim.setCreated_time(LocalDateTime.now());
-        em.persist(moim);
-
-        em.flush();
-        // 모임 일정 정보 생성
-        for (var moim_date : moim_date_list) {
-            em.persist(moim_date);
-            moim_date.setMoim(moim);
-        }
-        em.flush();
-
-        // 암호화 모임 ID 업데이트
-        String encryptId = encrypt.encrypt(String.valueOf(moim.getId()));
-        moim.setEncrypted_id(encryptId);
-        em.flush();
-
-        return moim.getId();
-    }
-
-    public long makeMoimMember(User user, Moim moim) {
-        MoimMember moimMember = new MoimMember();
-        moimMember.setUser(user);
-        moimMember.setMember_name(user.getName());
-        moimMember.setMoim(moim);
-        moimMember.setJoin_time(LocalDateTime.now());
-
-        em.persist(moimMember);
-        em.flush();
-        return moimMember.getId();
-    }
+    /**
+     * Friend
+     */
 
     public long makeFriend(User user, Moim moim) {
         Long user_id = moim.getUser().getId();
@@ -177,6 +208,10 @@ public class MoimRepository {
         em.flush();
         return friend.getId();
     }
+
+    /**
+     * Schedule
+     */
 
     public long saveSchedule(MoimMember moimMember, List<MoimMemberTime> moimTimeInfos) {
 
@@ -244,6 +279,7 @@ public class MoimRepository {
                 .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
                 .leftJoin(qMoimMemberTime).on(qMoimMember.id.eq(qMoimMemberTime.moimMember.id))
                 .where(qMoim.id.eq(moimId))
+                .orderBy(qMoimMemberTime.selected_date.asc())
                 .fetch();
 
         return result;
