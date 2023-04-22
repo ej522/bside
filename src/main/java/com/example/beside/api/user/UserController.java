@@ -289,7 +289,7 @@ public class UserController {
     @Data
     static class UpdateUserProfileImage {
         @NotNull
-        @Schema(description = "profile_image", example = "http://moim.life/profile/yellow.jpg", type = "String")
+        @Schema(description = "profile_image", example = "https://moim.life/profile/yellow.jpg", type = "String")
         private String profile_image;
     }
 }
