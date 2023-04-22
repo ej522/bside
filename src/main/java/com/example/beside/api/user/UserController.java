@@ -133,7 +133,7 @@ public class UserController {
     })
     @DeleteMapping(value = "/v1/delete")
     public Response<Void> deleteUser(@RequestBody @Validated DeleteUserRequest request)
-            throws NoSuchAlgorithmException {
+            throws NoSuchAlgorithmException, UserNotExistException {
 
         User user = new User();
         user.setEmail(request.email);
@@ -168,14 +168,12 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "해당 이메일이 존재합니다"),
             @ApiResponse(responseCode = "400", description = "해당 이메일이 존재하지 않습니다") })
     @PostMapping(value = "/v1/check-email")
-    public Response<String> checkEmailAccount(@RequestBody @Validated EmailRequest request) {
+    public Response<String> checkEmailAccount(@RequestBody @Validated EmailRequest request)
+            throws UserNotExistException {
         var email = request.getEmail();
         var user = userService.findUserByEmail(email);
 
-        if (user == null) {
-            return Response.fail(400, "해당 이메일이 존재하지 않습니다", "not found");
-        }
-        return Response.success(200, "해당 이메일이 존재합니다", "email found");
+        return Response.success(200, "해당 이메일이 존재합니다", user.getName());
     }
 
     @Operation(tags = { "User" }, summary = "프로필 이미지 전체 조회")

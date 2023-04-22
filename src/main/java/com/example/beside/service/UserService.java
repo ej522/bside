@@ -58,7 +58,7 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(User user) throws NoSuchAlgorithmException {
+    public void deleteUser(User user) throws NoSuchAlgorithmException, UserNotExistException {
         User findUserByEmail = findUserByEmail(user.getEmail());
         Optional<User> optionalUser = Optional.of(findUserByEmail);
 
@@ -79,8 +79,12 @@ public class UserService {
         return userRepository.findUserById(userId);
     }
 
-    public User findUserByEmail(String email) {
-        return userRepository.findUserByEmail(email);
+    public User findUserByEmail(String email) throws UserNotExistException {
+        Optional<User> findUser = userRepository.findUserByEmail(email);
+        if (findUser.isEmpty()) {
+            throw new UserNotExistException("해당 계정이 없습니다.");
+        }
+        return findUser.get();
     }
 
     @Transactional
