@@ -180,27 +180,27 @@ public class UserController {
     @Operation(tags = { "User" }, summary = "프로필 이미지 전체 조회")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "프로필 이미지가 조회 되었습니다.") })
     @GetMapping(value = "/v1/allProfileImg")
-    public Response<List> getAllProfileImage() {
-        List profileList = new ArrayList();
+    public Response<List<String>> getAllProfileImage() {
+        List<String> profileList = new ArrayList<String>();
 
         String img = "";
-        img = "http://moim.life/profile/green.jpg";
+        img = "https://moim.life/profile/green.jpg";
         profileList.add(img);
-        img = "http://moim.life/profile/heart.jpg";
+        img = "https://moim.life/profile/heart.jpg";
         profileList.add(img);
-        img = "http://moim.life/profile/lightgreen.jpg";
+        img = "https://moim.life/profile/lightgreen.jpg";
         profileList.add(img);
-        img = "http://moim.life/profile/lightpurple.jpg";
+        img = "https://moim.life/profile/lightpurple.jpg";
         profileList.add(img);
-        img = "http://moim.life/profile/purple_bubble.jpg";
+        img = "https://moim.life/profile/purple_bubble.jpg";
         profileList.add(img);
-        img = "http://moim.life/profile/purple_diamond.jpg";
+        img = "https://moim.life/profile/purple_diamond.jpg";
         profileList.add(img);
-        img = "http://moim.life/profile/purple_flower.jpg";
+        img = "https://moim.life/profile/purple_flower.jpg";
         profileList.add(img);
-        img = "http://moim.life/profile/skyblue.jpg";
+        img = "https://moim.life/profile/skyblue.jpg";
         profileList.add(img);
-        img = "http://moim.life/profile/yellow.jpg";
+        img = "https://moim.life/profile/yellow.jpg";
         profileList.add(img);
 
         return Response.success(200, "프로필 이미지가 조회 되었습니다.", profileList);
