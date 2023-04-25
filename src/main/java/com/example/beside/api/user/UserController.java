@@ -204,7 +204,7 @@ public class UserController {
         profileList.add(img);
         img = "https://moim.life/profile/skyblue.jpg";
         profileList.add(img);
-        img = "가";
+        img = "https://moim.life/profile/yellow.jpg";
         profileList.add(img);
 
         return Response.success(200, "프로필 이미지가 조회 되었습니다.", profileList);
