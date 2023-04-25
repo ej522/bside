@@ -42,11 +42,8 @@ public class UserService {
         user.setSocial_type(LoginType.MOIM.name());
 
         //닉네임 검증
+        checkNicknameDuplication(user.getName(), user.getSocial_type());
         Common.NicknameValidate(user.getName());
-        Optional<User> findNickname = userRepository.findUserNicknameByMoim(user.getName());
-        if (findNickname.isPresent()) {
-            throw new IllegalStateException("중복된 닉네임입니다.");
-        }
 
         return userRepository.saveUser(user);
     }
@@ -99,16 +96,20 @@ public class UserService {
         return findUser.get();
     }
 
-    @Transactional
-    public String updateNickname(User user) throws Exception {
-        String nickname = user.getName();
-        if(user.getSocial_type().equals("MOIM")) {
-            Optional<User> optionalUser = userRepository.findUserNicknameByMoim(nickname);
+    public void  checkNicknameDuplication(String name, String social_type) {
+        if(social_type.equals("MOIM")) {
+            Optional<User> optionalUser = userRepository.findUserNicknameByMoim(name);
             if (optionalUser.isPresent()) {
                 throw new IllegalStateException("중복된 닉네임입니다.");
             }
         }
+    }
 
+    @Transactional
+    public String updateNickname(User user) throws Exception {
+        String nickname = user.getName();
+
+        checkNicknameDuplication(nickname, user.getSocial_type());
         Common.NicknameValidate(nickname);
 
         User updateUserInfo = userRepository.updateNickname(user);

@@ -248,4 +248,15 @@ public class UserServiceTest {
         // when, then
         assertThrows(IllegalStateException.class, () -> userService.updateNickname(user7));
     }
+
+    @Test
+    @DisplayName("닉네임 중복 검사 - 소셜타입이 모임일 경우")
+    void testCheckNicknameDupcliation() {
+        //given
+        String social_type = "MOIM";
+        String nickname = "닉네임";
+
+        //when, then
+        assertThrows(IllegalStateException.class, () -> userService.checkNicknameDuplication(nickname, social_type));
+    }
 }

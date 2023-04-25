@@ -147,6 +147,17 @@ public class UserController {
         return Response.success(200, "유저가 삭제되었습니다.", null);
     }
 
+    @Operation(tags = { "User" }, summary = "닉네임 중복 검사")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "등록 가능한 닉네임 입니다."),
+            @ApiResponse(responseCode = "500", description = "중복된 닉네임 입니다.") })
+    @PostMapping(value = "/v1/check-nickname-duplication")
+    public Response<Void> checkNicknameDuplication(@RequestBody @Validated UpdateUserNicknameRequest request) {
+        userService.checkNicknameDuplication(request.name, request.social_type);
+
+        return Response.success(200, "등록 가능한 닉네임 입니다.", null);
+    }
+
     @Operation(tags = { "User" }, summary = "닉네임변경")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "닉네임이 변경 되었습니다."),
@@ -294,6 +305,9 @@ public class UserController {
         @NotNull
         @Schema(description = "nickname", example = "닉네임", type = "String")
         private String name;
+
+        @Schema(description = "social_type", example = "소셜타입", type = "String")
+        private String social_type;
     }
 
     @Data
