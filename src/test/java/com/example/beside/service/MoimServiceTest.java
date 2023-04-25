@@ -70,7 +70,7 @@ public class MoimServiceTest {
     public void setUp() {
         // 유저 세팅
         user = new User();
-        user.setName("부엉이");
+        user.setName("부엉이2");
         user.setEmail("test-user@google.com");
         user.setPassword("Moim@0303");
 
@@ -354,7 +354,7 @@ public class MoimServiceTest {
 
         // then
         Assertions.assertThat(adjustSchedule.get("moim_name")).isEqualTo("테스트 모임");
-        Assertions.assertThat(adjustSchedule.get("moim_maker")).isEqualTo("부엉이");
+        Assertions.assertThat(adjustSchedule.get("moim_maker")).isEqualTo("부엉이2");
     }
 
     @Test
