@@ -68,6 +68,7 @@ public class UserController {
         User user = new User();
         user.setEmail(requset.email);
         user.setPassword(requset.password);
+        user.setPassword(requset.password);
 
         User userInfo = userService.loginUser(user);
         String userToken = JwtProvider.createToken(userInfo);
@@ -83,10 +84,12 @@ public class UserController {
     })
     @PostMapping(value = "/v1/signup")
     public Response<Void> createUser(@RequestBody @Validated CreateUserRequest requset)
-            throws PasswordException, UserNotExistException {
+            throws PasswordException, UserNotExistException, UserValidateNickName {
         User user = new User();
         user.setEmail(requset.email);
         user.setPassword(requset.password);
+        user.setName(requset.name);
+        user.setProfile_image(requset.imgUrl);
 
         userService.saveUser(user);
 
@@ -201,7 +204,7 @@ public class UserController {
         profileList.add(img);
         img = "https://moim.life/profile/skyblue.jpg";
         profileList.add(img);
-        img = "https://moim.life/profile/yellow.jpg";
+        img = "가";
         profileList.add(img);
 
         return Response.success(200, "프로필 이미지가 조회 되었습니다.", profileList);
@@ -266,6 +269,12 @@ public class UserController {
         @NotNull
         @Schema(description = "password", example = "password", type = "String")
         private String password;
+
+        @Schema(description = "image_url", example = "https://www.moim.life", type = "String")
+        private String imgUrl;
+
+        @Schema(description = "nickname", example = "닉네임", type = "String")
+        private String name;
     }
 
     @Data
