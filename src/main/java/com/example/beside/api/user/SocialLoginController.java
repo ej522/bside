@@ -1,5 +1,6 @@
 package com.example.beside.api.user;
 
+import com.example.beside.common.Exception.SocialLoginException;
 import com.example.beside.common.Exception.UserAlreadyExistException;
 import com.example.beside.common.Exception.UserNotExistException;
 import com.example.beside.common.response.Response;
@@ -35,7 +36,8 @@ public class SocialLoginController {
             @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다.")
     })
     @PostMapping(value = "/v1/login/Kakao")
-    public Response<UserTokenDto> kakaoLogin(@RequestBody @Valid SocialUserRequest request) throws UserNotExistException {
+    public Response<UserTokenDto> kakaoLogin(@RequestBody @Valid SocialUserRequest request)
+            throws UserNotExistException, SocialLoginException {
         User userInfo = socialLoginService.getKaKaoUserInfo(request.access_token);
 
         User user = socialLoginService.loginKakao(userInfo);
