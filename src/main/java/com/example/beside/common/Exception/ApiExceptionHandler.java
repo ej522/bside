@@ -117,4 +117,14 @@ public class ApiExceptionHandler {
 
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
+
+    @ExceptionHandler(SocialLoginException.class)
+    public ResponseEntity<?> handleSocialLoginException(SocialLoginException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add(ex.getMessage());
+
+        ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "소셜 로그인이 실패했습니다", errors);
+
+        return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
 }
