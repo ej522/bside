@@ -158,6 +158,7 @@ public class UserController {
         User updateUser = new User();
         updateUser.setId(user.getId());
         updateUser.setName(request.name);
+        updateUser.setSocial_type(user.getSocial_type());
 
         String newNickname = userService.updateNickname(updateUser);
 

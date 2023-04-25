@@ -13,6 +13,7 @@ import com.example.beside.util.PasswordConverter;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.util.Optionals;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,10 +95,13 @@ public class UserService {
     @Transactional
     public String updateNickname(User user) throws Exception {
         String nickname = user.getName();
-        Optional<User> optionalUser = userRepository.findUserNickname(nickname);
-        if (optionalUser.isPresent()) {
-            throw new IllegalStateException("중복된 닉네임입니다.");
+        if(user.getSocial_type().equals("MOIM")) {
+            Optional<User> optionalUser = userRepository.findUserNicknameByMoim(nickname);
+            if (optionalUser.isPresent()) {
+                throw new IllegalStateException("중복된 닉네임입니다.");
+            }
         }
+
         Common.NicknameValidate(nickname);
 
         User updateUserInfo = userRepository.updateNickname(user);

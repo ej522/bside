@@ -1,6 +1,7 @@
 package com.example.beside.service;
 
 import com.example.beside.common.Exception.UserValidateNickName;
+import com.example.beside.domain.LoginType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -68,6 +69,7 @@ public class UserServiceTest {
 
         user7.setEmail("test_678@naver.com");
         user7.setName("은지");
+        user7.setSocial_type(LoginType.MOIM.name());
         user7.setPassword("wd!2awQWDas!@");
     }
 
@@ -226,10 +228,11 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("중복 닉네임")
-    void testUpdateNickNameDuplication() throws PasswordException {
+    @DisplayName("소셜타입이 모임일 경우 중복 닉네임")
+    void testUpdateMoimNickNameDuplication() throws PasswordException {
         // given
         userService.saveUser(user7);
+
         // when, then
         assertThrows(IllegalStateException.class, () -> userService.updateNickname(user7));
     }
