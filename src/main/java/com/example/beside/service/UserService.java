@@ -28,7 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Long saveUser(User user) throws PasswordException {
+    public Long saveUser(User user) throws PasswordException, UserValidateNickName {
         Optional<User> findUser = userRepository.findUserByEmail(user.getEmail());
         if (findUser.isPresent())
             throw new IllegalStateException("이미 존재하는 회원입니다");
@@ -40,6 +40,13 @@ public class UserService {
 
         user.setPassword(hashPassword);
         user.setSocial_type(LoginType.MOIM.name());
+
+        //닉네임 검증
+        Common.NicknameValidate(user.getName());
+        Optional<User> findNickname = userRepository.findUserNicknameByMoim(user.getName());
+        if (findNickname.isPresent()) {
+            throw new IllegalStateException("중복된 닉네임입니다.");
+        }
 
         return userRepository.saveUser(user);
     }
