@@ -3,7 +3,6 @@ package com.example.beside.service;
 import com.example.beside.common.Exception.PasswordException;
 import com.example.beside.common.Exception.PasswordNotCorrectException;
 import com.example.beside.common.Exception.UserNotExistException;
-import com.example.beside.common.Exception.UserValidateNickName;
 import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.repository.UserRepository;
@@ -13,7 +12,6 @@ import com.example.beside.util.PasswordConverter;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.util.Optionals;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,16 +62,15 @@ public class UserService {
 
     @Transactional
     public void deleteUser(User user) throws NoSuchAlgorithmException, UserNotExistException {
-        User findUserByEmail = findUserByEmail(user.getEmail());
-        Optional<User> optionalUser = Optional.of(findUserByEmail);
+        Optional<User> findUserByEmail = findUserByEmail(user.getEmail());
 
-        if (!optionalUser.isPresent())
+        if (!findUserByEmail.isPresent())
             throw new IllegalStateException("이미 존재하는 회원입니다");
 
-        if (!optionalUser.get().getPassword().toString().equals(Encrypt.getHashingPassword(user.getPassword())))
+        if (!findUserByEmail.get().getPassword().toString().equals(Encrypt.getHashingPassword(user.getPassword())))
             throw new IllegalStateException("비밀번호가 동일하지 않습니다");
 
-        userRepository.deleteUser(findUserByEmail);
+        userRepository.deleteUser(findUserByEmail.get());
     }
 
     public List<User> findUserAll() {
@@ -84,18 +81,14 @@ public class UserService {
         return userRepository.findUserById(userId);
     }
 
-    public User findUserByEmail(String email) throws UserNotExistException {
-        Optional<User> findUser = userRepository.findUserByEmail(email);
-        if (findUser.isEmpty()) {
-            throw new UserNotExistException("해당 계정이 없습니다.");
-        }
-        return findUser.get();
+    public Optional<User> findUserByEmail(String email) throws UserNotExistException {
+        return userRepository.findUserByEmail(email);
     }
 
     @Transactional
     public String updateNickname(User user) throws Exception {
         String nickname = user.getName();
-        if(user.getSocial_type().equals("MOIM")) {
+        if (user.getSocial_type().equals("MOIM")) {
             Optional<User> optionalUser = userRepository.findUserNicknameByMoim(nickname);
             if (optionalUser.isPresent()) {
                 throw new IllegalStateException("중복된 닉네임입니다.");

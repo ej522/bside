@@ -175,7 +175,10 @@ public class UserController {
         var email = request.getEmail();
         var user = userService.findUserByEmail(email);
 
-        return Response.success(200, "해당 이메일이 존재합니다", user.getName());
+        if (user.isEmpty())
+            return Response.success(200, "중복된 이메일이 없습니다", "Success");
+        else
+            return Response.success(400, "해당 이메일이 존재합니다", "Error");
     }
 
     @Operation(tags = { "User" }, summary = "프로필 이미지 전체 조회")
