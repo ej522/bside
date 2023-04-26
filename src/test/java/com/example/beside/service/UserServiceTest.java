@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -104,10 +105,10 @@ public class UserServiceTest {
 
         // when
         userService.deleteUser(user1);
-        em.flush();
+        Optional<User> findUserByEmail = userService.findUserByEmail(user1.getEmail());
 
         // then
-        assertThrows(UserNotExistException.class, () -> userService.findUserByEmail(user1.getEmail()));
+        Assertions.assertThat(findUserByEmail).isEmpty();
     }
 
     @Test
@@ -125,7 +126,7 @@ public class UserServiceTest {
     @DisplayName("존재하지 않는 유저 삭제")
     void testDeleteUserWithNotExist() throws NoSuchAlgorithmException, PasswordException {
         // when, then
-        assertThrows(UserNotExistException.class, () -> userService.deleteUser(user1));
+        assertThrows(IllegalStateException.class, () -> userService.deleteUser(user1));
     }
 
     @Test
@@ -182,9 +183,9 @@ public class UserServiceTest {
         em.flush();
 
         // then
-        User findUserById = userService.findUserByEmail(user1.getEmail());
+        Optional<User> findUserById = userService.findUserByEmail(user1.getEmail());
 
-        Assertions.assertThat(user1.getEmail()).isEqualTo(findUserById.getEmail());
+        Assertions.assertThat(user1.getEmail()).isEqualTo(findUserById.get().getEmail());
     }
 
     @Test
