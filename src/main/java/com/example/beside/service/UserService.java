@@ -3,6 +3,7 @@ package com.example.beside.service;
 import com.example.beside.common.Exception.PasswordException;
 import com.example.beside.common.Exception.PasswordNotCorrectException;
 import com.example.beside.common.Exception.UserNotExistException;
+import com.example.beside.common.Exception.UserValidateNickName;
 import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.repository.UserRepository;
@@ -39,7 +40,7 @@ public class UserService {
         user.setPassword(hashPassword);
         user.setSocial_type(LoginType.MOIM.name());
 
-        //닉네임 검증
+        // 닉네임 검증
         Common.NicknameValidate(user.getName());
         Optional<User> findNickname = userRepository.findUserNicknameByMoim(user.getName());
         if (findNickname.isPresent()) {
