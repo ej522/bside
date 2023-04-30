@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import com.example.beside.dto.MyMoimDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -284,4 +285,46 @@ public class MoimRepository {
 
         return result;
     }
+
+    public List<MyMoimDto> findMyMoimList(Long user_id) {
+        queryFactory = new JPAQueryFactory(em);
+
+        QMoim qMoim = QMoim.moim;
+        QMoimMember qMoimMember = QMoimMember.moimMember;
+        QUser qUser = QUser.user;
+
+        List<MyMoimDto> result = queryFactory.select(
+                Projections.fields(MyMoimDto.class,
+                        qMoim.id.as("moim_id"),
+                        qMoim.moim_name.as("moim_name"),
+                        qUser.profile_image.as("host_profile_img"),
+                        qMoim.fixed_date.as("fixed_date"),
+                        qMoim.fixed_time.as("fixed_time")))
+                .from(qMoim)
+                .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
+                .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
+                    .where(qMoim.user.id.eq(user_id)
+                            .or(qMoimMember.user.id.eq(user_id))
+                            .and(qMoim.fixed_date.isNotNull())
+                        .and(qMoim.fixed_time.isNotNull()))
+                .groupBy(qMoim.id, qMoim.moim_name, qUser.profile_image, qMoim.fixed_date, qMoim.fixed_time)
+                .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc())
+                .fetch();
+
+        return result;
+
+    }
+
+    public Long findMemberCount(Long moim_id) {
+        queryFactory = new JPAQueryFactory(em);
+
+        QMoimMember qMoimMember = QMoimMember.moimMember;
+        Long cnt = queryFactory.select(qMoimMember.moim.id)
+                .from(qMoimMember)
+                .where(qMoimMember.moim.id.eq(moim_id))
+                .fetchCount();
+
+        return cnt;
+    }
+
 }

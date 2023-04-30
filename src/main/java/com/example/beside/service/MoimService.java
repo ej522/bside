@@ -1,13 +1,10 @@
 package com.example.beside.service;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import com.example.beside.dto.MoimScheduleDto;
+import com.example.beside.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -182,5 +179,20 @@ public class MoimService {
 
     public Moim getMoimInfo(Long moimId) {
         return moimRepository.getMoimInfo(moimId);
+    }
+
+    public List<MyMoimDto> getMyMoimList(Long user_id) {
+        List<MyMoimDto> moimList =  moimRepository.findMyMoimList(user_id);
+
+        for(MyMoimDto moim : moimList) {
+            Long cnt = moimRepository.findMemberCount(moim.getMoim_id());
+
+            //주최자도 더해줌
+            cnt += 1;
+
+            moim.setMemeber_cnt(cnt);
+        }
+
+        return moimList;
     }
 }
