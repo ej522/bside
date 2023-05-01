@@ -149,8 +149,7 @@ public class UserController {
     @Operation(tags = { "User" }, summary = "닉네임변경")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "닉네임이 변경 되었습니다."),
-            @ApiResponse(responseCode = "400", description = "한글, 영문, 숫자 조합 8자 이내"),
-            @ApiResponse(responseCode = "500", description = "중복된 닉네임 입니다.") })
+            @ApiResponse(responseCode = "400", description = "닉네임은 8자 이내여야 합니다.")})
     @PutMapping(value = "/v1/update/nickname")
     public Response<String> updateNickname(HttpServletRequest token,
             @RequestBody @Validated UpdateUserNicknameRequest request)
