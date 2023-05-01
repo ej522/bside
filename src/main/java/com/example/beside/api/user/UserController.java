@@ -182,7 +182,7 @@ public class UserController {
 
     @Operation(tags = { "User" }, summary = "프로필 이미지 전체 조회")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "프로필 이미지가 조회 되었습니다.") })
-    @GetMapping(value = "/v1/allProfileImg")
+    @GetMapping(value = "/v1/all-Profile-img")
     public Response<List<String>> getAllProfileImage() {
         List<String> profileList = new ArrayList<String>();
 
@@ -211,8 +211,8 @@ public class UserController {
 
     @Operation(tags = { "User" }, summary = "유저프로필 수정")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "프로필이 수정되었습니다.") })
-    @PutMapping("/v1/update/profileImage")
-    public Response<User> updateProfileImage(HttpServletRequest token,
+    @PutMapping("/v1/update/profile-image")
+    public Response<String> updateProfileImage(HttpServletRequest token,
             @RequestBody @Validated UpdateUserProfileImage updateUserProfileImage) throws Exception {
         User user = (User) token.getAttribute("user");
 
@@ -222,7 +222,7 @@ public class UserController {
 
         updateUser = userService.updateProfileImage(updateUser);
 
-        return Response.success(200, "프로필 이미지가 수정 되었습니다.", updateUser);
+        return Response.success(200, "프로필 이미지가 수정 되었습니다.", updateUser.getProfile_image());
     }
 
     private String generateVerificationCode() {

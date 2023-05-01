@@ -144,7 +144,7 @@ public class MoimController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "나의 모임 목록이 조회 되었습니다.")
     })
-    @PostMapping(value = "/v1/my_moim_history")
+    @PostMapping(value = "/v1/my-moim-history")
     public Response<List<MyMoimDto>> getMyMoimList(HttpServletRequest token) {
         User user = (User) token.getAttribute("user");
 
