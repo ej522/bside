@@ -63,7 +63,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "비밀번호가 일치하지 않습니다.")
     })
     @PostMapping(value = "/v1/login")
-    public Response<UserTokenDto> login(@RequestBody @Validated CreateUserRequest requset)
+    public Response<UserTokenDto> login(@RequestBody @Validated LoginUserRequest requset)
             throws PasswordException, UserNotExistException, PasswordNotCorrectException {
         User user = new User();
         user.setEmail(requset.email);
@@ -257,6 +257,18 @@ public class UserController {
         @NotNull
         @Schema(description = "인증번호", example = "321219", type = "String")
         private String validateCode;
+    }
+
+    @Data
+    static class LoginUserRequest {
+        @NotNull
+        @Email
+        @Schema(description = "email", example = "test@naver.com", type = "String")
+        private String email;
+
+        @NotNull
+        @Schema(description = "password", example = "password", type = "String")
+        private String password;
     }
 
     @Data
