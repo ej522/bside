@@ -46,6 +46,11 @@ public class Scheduler {
 
             // 최다 선택일 구하기
             List<LocalDateTime> maxSelectedDate = getMaxSelectedDate(moimInfo);
+
+            // 아무도 선택을 안했는데 데드라인 넘김
+            if (maxSelectedDate.get(0) == null)
+                continue;
+
             // 동일 최다 선택일 중 우선 순위 날짜
             LocalDateTime fixedDate = getPriorityDate(maxSelectedDate);
 
