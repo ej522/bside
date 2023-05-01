@@ -1,18 +1,11 @@
 package com.example.beside.dto;
 
 import com.example.beside.domain.Moim;
-import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.User;
-import jakarta.persistence.ColumnResult;
-import jakarta.persistence.SqlResultSetMapping;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
