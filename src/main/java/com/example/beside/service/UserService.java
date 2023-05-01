@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.List;
 
@@ -105,7 +107,6 @@ public class UserService {
 
         Common.NicknameValidate(nickname);
 
-        System.out.println("user:"+user.getId());
         User updateUserInfo = userRepository.updateNickname(user);
 
         return updateUserInfo.getName();
@@ -119,15 +120,15 @@ public class UserService {
     }
 
     @Transactional
-    public String updateTemporaryPassword(String email) throws UserNotExistException, NoSuchAlgorithmException {
+    public Map updateTemporaryPassword(String email) throws UserNotExistException, NoSuchAlgorithmException {
         Optional<User> user = userRepository.findUserByEmail(email);
-        System.out.println("user_id="+user.get().getId());
 
+        Map chgInfo = new HashMap();
         if(user.isEmpty()) {
             throw new UserNotExistException("해당 이메일이 존재하지 않습니다");
         } else {
             if(!user.get().getSocial_type().equals(LoginType.MOIM.name())) {
-                throw new UserNotExistException("해당 이메일이 존재하지 않습니다");
+                throw new UserNotExistException("해당 이메일이 존재하지 않습니다.");
             } else {
                 String randomPsw = Common.generateRandomPassword();
                 System.out.println("randomPsw="+randomPsw);
@@ -140,11 +141,12 @@ public class UserService {
                 userInfo.setEmail(user.get().getEmail());
                 userInfo.setSocial_type(user.get().getSocial_type());
 
-                System.out.println("userInfo_id="+userInfo.getId());
-                System.out.println("userInfo_password="+userInfo.getPassword());
-                System.out.println("yp0date="+userRepository.updatePassword(userInfo).getPassword());
+                User chgUser = userRepository.updatePassword(userInfo);
 
-                return randomPsw;
+                chgInfo.put("password", randomPsw);
+                chgInfo.put("userInfo", chgUser);
+
+                return chgInfo;
             }
         }
     }

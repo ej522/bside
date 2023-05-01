@@ -234,17 +234,18 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "이메일 인증 번호를 발송했습니다."),
             @ApiResponse(responseCode = "500", description = "이메일 전송 실패")})
-    @PutMapping("/v1/send-password")
+    @PostMapping("/v1/send-password")
     public Response<String> sendPassword(@RequestBody @Validated EmailRequest request) throws Exception {
-        String password = userService.updateTemporaryPassword(request.email);
+        Map userInfo = userService.updateTemporaryPassword(request.email);
+        User user = (User) userInfo.get("userInfo");
 
         try {
-            emailService.sendVerificationEmail(request.getEmail(), password);
-            return Response.success(200, "이메일 인증 번호를 발송했습니다.", "Success");
-
+            emailService.sendTemporaryPasswordEmail(request.email, user.getName(), userInfo.get("password").toString());
         } catch (MessagingException ex) {
             return Response.fail(500, ex.getMessage());
         }
+
+        return Response.success(200, "이메일 인증 번호를 발송했습니다.", "Success");
     }
 
     private String generateVerificationCode() {

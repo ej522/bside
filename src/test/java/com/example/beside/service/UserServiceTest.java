@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -258,14 +259,9 @@ public class UserServiceTest {
         Long user_id = userService.saveUser(user7);
         user7.setId(user_id);
         String beforePsw = user7.getPassword();
-        System.out.println("beforePsw="+beforePsw);
 
-        String tt = userService.updateTemporaryPassword(user7.getEmail());
-        System.out.println("tt="+tt);
-        Optional<User> afterUser = userService.findUserByEmail(user7.getEmail());
-        System.out.println("afterUser="+afterUser.get().getId());
-        String afterPsw = afterUser.get().getPassword();
-        System.out.println("afterPsw="+afterPsw);
+        Map userInfo = userService.updateTemporaryPassword(user7.getEmail());
+        String afterPsw = userInfo.get("password").toString();
 
         assertTrue(!beforePsw.equals(afterPsw));
 
