@@ -1,13 +1,12 @@
 package com.example.beside.service;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.example.beside.dto.MyMoimDto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +26,8 @@ import com.example.beside.domain.User;
 import com.example.beside.util.Encrypt;
 
 import jakarta.transaction.Transactional;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -402,4 +403,44 @@ public class MoimServiceTest {
         assertThrows(AdjustScheduleException.class,
                 () -> moimService.adjustSchedule(user2, encryptedId, wrongMoimMemberTime));
     }
+
+    @Test
+    void testGetMyMoimList() throws Exception {
+        //given
+        Long userId = userService.saveUser(user);
+        Long userId2 = userService.saveUser(user2);
+        Long userId3 = userService.saveUser(user3);
+        User user1 = userService.findUserById(userId);
+        User user2 = userService.findUserById(userId2);
+        User user3 = userService.findUserById(userId3);
+
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(user1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+        newMoim.setFixed_date("2023-03-13");
+        newMoim.setFixed_time("2");
+
+        var encryptedId = moimService.makeMoim(user1, newMoim, normalMoimDates);
+        moimService.participateMoim(user2, encryptedId);
+
+        Moim newMoim2 = new Moim();
+        newMoim2.setUser(user2);
+        newMoim2.setMoim_name("테스트 모임2");
+        newMoim2.setDead_line_hour(5);
+        newMoim2.setFixed_date("2023-03-14");
+        newMoim2.setFixed_time("2");
+        var encryptedId2 = moimService.makeMoim(user2, newMoim2, normalMoimDates);
+        moimService.participateMoim(user1, encryptedId2);
+        moimService.participateMoim(user3, encryptedId2);
+
+        //when
+        List<MyMoimDto> moimList = moimService.getMyMoimList(user1.getId());
+
+        //then
+       assertTrue(moimList.get(0).getMemeber_cnt()>1);
+
+    }
+
 }

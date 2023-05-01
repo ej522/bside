@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.example.beside.dto.MyMoimDto;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -137,6 +138,19 @@ public class MoimController {
         Map<String, Object> adjustSchedule = moimService.adjustSchedule(user_, encrptedInfo, moimMemberTimeList);
 
         return Response.success(200, "모임 스케줄을 등록 했습니다.", adjustSchedule);
+    }
+
+    @Operation(tags = { "Moim" }, summary = "마이약속 모임 목록")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "나의 모임 목록이 조회 되었습니다.")
+    })
+    @PostMapping(value = "/v1/my-moim-history")
+    public Response<List<MyMoimDto>> getMyMoimList(HttpServletRequest token) {
+        User user = (User) token.getAttribute("user");
+
+        List<MyMoimDto> moimList = moimService.getMyMoimList(user.getId());
+
+        return Response.success(200, "나의 모임 목록이 조회 되었습니다.", moimList);
     }
 
     @Data
