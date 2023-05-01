@@ -138,8 +138,6 @@ public class UserRepository {
         queryFactory = new JPAQueryFactory(em);
         QUser qUser = QUser.user;
 
-        System.out.println("rep_user="+user.getId());
-        System.out.println("rep_pass="+user.getPassword());
         queryFactory.update(qUser)
                 .set(qUser.password, user.getPassword())
                 .where(qUser.id.eq(user.getId()))

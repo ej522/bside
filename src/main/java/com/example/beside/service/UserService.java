@@ -131,9 +131,7 @@ public class UserService {
                 throw new UserNotExistException("해당 이메일이 존재하지 않습니다.");
             } else {
                 String randomPsw = Common.generateRandomPassword();
-                System.out.println("randomPsw="+randomPsw);
                 String encryptPws = Encrypt.getHashingPassword(randomPsw);
-                System.out.println("encryptPws="+encryptPws);
 
                 User userInfo = new User();
                 userInfo.setId(user.get().getId());

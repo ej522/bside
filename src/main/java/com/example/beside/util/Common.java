@@ -1,6 +1,9 @@
 package com.example.beside.util;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,15 +52,34 @@ public class Common {
     }
 
     public static String generateRandomPassword() {
-        String randomStr = "ABCDEFGHIGKNLMOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&";
-        StringBuilder password = new StringBuilder();
+        String alphabet = "abcdefghijklnmopqrstuvwxyzABCDEFGHIJKLNMOPQRSTUVWXYZ";
+        String number = "0123456789";
+        String specialKey = "~!@#$%^&";
 
-        SecureRandom random = new SecureRandom();
-        while (password.length()<9) {
-            int randomIdx = random.nextInt(randomStr.length());
-            password.append(randomStr.charAt(randomIdx));
+        List<String> pswList = new ArrayList<>();
+        pswList.addAll(getPassword(alphabet, 5));
+        pswList.addAll(getPassword(number, 2));
+        pswList.addAll(getPassword(specialKey, 1));
+
+        Collections.shuffle(pswList);
+        StringBuilder password = new StringBuilder();
+        for(String psw: pswList) {
+            password.append(psw);
         }
 
         return password.toString();
+    }
+
+    private static List<String> getPassword(String str, int len) {
+        SecureRandom random = new SecureRandom();
+
+        List<String> randomList = new ArrayList<>();
+        while (randomList.size()<len) {
+            int randomIdx = random.nextInt(str.length());
+
+            randomList.add(String.valueOf(str.charAt(randomIdx)));
+        }
+
+        return randomList;
     }
 }
