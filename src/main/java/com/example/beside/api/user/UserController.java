@@ -68,7 +68,6 @@ public class UserController {
         User user = new User();
         user.setEmail(requset.email);
         user.setPassword(requset.password);
-        user.setPassword(requset.password);
 
         User userInfo = userService.loginUser(user);
         String userToken = JwtProvider.createToken(userInfo);
