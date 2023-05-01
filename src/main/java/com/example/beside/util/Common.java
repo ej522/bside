@@ -57,9 +57,9 @@ public class Common {
         String specialKey = "~!@#$%^&";
 
         List<String> pswList = new ArrayList<>();
-        pswList.addAll(getPassword(alphabet, 5));
-        pswList.addAll(getPassword(number, 2));
-        pswList.addAll(getPassword(specialKey, 1));
+        pswList.addAll(getRandomStrList(alphabet, 5));
+        pswList.addAll(getRandomStrList(number, 2));
+        pswList.addAll(getRandomStrList(specialKey, 1));
 
         Collections.shuffle(pswList);
         StringBuilder password = new StringBuilder();
@@ -70,7 +70,7 @@ public class Common {
         return password.toString();
     }
 
-    private static List<String> getPassword(String str, int len) {
+    private static List<String> getRandomStrList(String str, int len) {
         SecureRandom random = new SecureRandom();
 
         List<String> randomList = new ArrayList<>();
