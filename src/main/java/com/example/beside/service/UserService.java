@@ -105,6 +105,7 @@ public class UserService {
 
         Common.NicknameValidate(nickname);
 
+        System.out.println("user:"+user.getId());
         User updateUserInfo = userRepository.updateNickname(user);
 
         return updateUserInfo.getName();
@@ -115,6 +116,37 @@ public class UserService {
         User updateUserInfo = userRepository.updateProfileImage(user);
 
         return updateUserInfo;
+    }
+
+    @Transactional
+    public String updateTemporaryPassword(String email) throws UserNotExistException, NoSuchAlgorithmException {
+        Optional<User> user = userRepository.findUserByEmail(email);
+        System.out.println("user_id="+user.get().getId());
+
+        if(user.isEmpty()) {
+            throw new UserNotExistException("해당 이메일이 존재하지 않습니다");
+        } else {
+            if(!user.get().getSocial_type().equals(LoginType.MOIM.name())) {
+                throw new UserNotExistException("해당 이메일이 존재하지 않습니다");
+            } else {
+                String randomPsw = Common.generateRandomPassword();
+                System.out.println("randomPsw="+randomPsw);
+                String encryptPws = Encrypt.getHashingPassword(randomPsw);
+                System.out.println("encryptPws="+encryptPws);
+
+                User userInfo = new User();
+                userInfo.setId(user.get().getId());
+                userInfo.setPassword(encryptPws);
+                userInfo.setEmail(user.get().getEmail());
+                userInfo.setSocial_type(user.get().getSocial_type());
+
+                System.out.println("userInfo_id="+userInfo.getId());
+                System.out.println("userInfo_password="+userInfo.getPassword());
+                System.out.println("yp0date="+userRepository.updatePassword(userInfo).getPassword());
+
+                return randomPsw;
+            }
+        }
     }
 
 }

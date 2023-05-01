@@ -1,5 +1,6 @@
 package com.example.beside.util;
 
+import java.security.SecureRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,5 +46,18 @@ public class Common {
             throw new UserValidateNickName("한글, 영문, 숫자 조합 8자 이내");
         }
         return true;
+    }
+
+    public static String generateRandomPassword() {
+        String randomStr = "ABCDEFGHIGKNLMOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&";
+        StringBuilder password = new StringBuilder();
+
+        SecureRandom random = new SecureRandom();
+        while (password.length()<9) {
+            int randomIdx = random.nextInt(randomStr.length());
+            password.append(randomStr.charAt(randomIdx));
+        }
+
+        return password.toString();
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.DisplayName;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -248,5 +249,25 @@ public class UserServiceTest {
 
         // when, then
         assertThrows(IllegalStateException.class, () -> userService.updateNickname(user7));
+    }
+
+    @Test
+    @DisplayName("임시 비밀번호 발급")
+    void testUpdateTemporaryPassword() throws Exception {
+        //given
+        Long user_id = userService.saveUser(user7);
+        user7.setId(user_id);
+        String beforePsw = user7.getPassword();
+        System.out.println("beforePsw="+beforePsw);
+
+        String tt = userService.updateTemporaryPassword(user7.getEmail());
+        System.out.println("tt="+tt);
+        Optional<User> afterUser = userService.findUserByEmail(user7.getEmail());
+        System.out.println("afterUser="+afterUser.get().getId());
+        String afterPsw = afterUser.get().getPassword();
+        System.out.println("afterPsw="+afterPsw);
+
+        assertTrue(!beforePsw.equals(afterPsw));
+
     }
 }
