@@ -6,8 +6,6 @@ import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.dto.KakaoLoginInfoDto;
 import com.example.beside.repository.UserRepository;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +16,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 

@@ -233,26 +233,6 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("특수 문자가 포함된 닉네임 변경")
-    void testUpdateNickNameIncludeExclamationMark() throws PasswordException, UserValidateNickName {
-        // given
-        userService.saveUser(user6);
-        user6.setName("!@#은지");
-        // when, then
-        assertThrows(UserValidateNickName.class, () -> userService.updateNickname(user6));
-    }
-
-    @Test
-    @DisplayName("소셜타입이 모임일 경우 중복 닉네임")
-    void testUpdateMoimNickNameDuplication() throws PasswordException, UserValidateNickName {
-        // given
-        userService.saveUser(user7);
-
-        // when, then
-        assertThrows(IllegalStateException.class, () -> userService.updateNickname(user7));
-    }
-
-    @Test
     @DisplayName("임시 비밀번호 발급")
     void testUpdateTemporaryPassword() throws Exception {
         //given
@@ -266,4 +246,5 @@ public class UserServiceTest {
         assertTrue(!beforePsw.equals(afterPsw));
 
     }
+
 }

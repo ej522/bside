@@ -110,13 +110,12 @@ public class UserRepository {
         return queryFactory.selectFrom(qUser).where(qUser.id.eq(user.getId())).fetchOne();
     }
 
-    public Optional<User> findUserNicknameByMoim(String nickname) {
+    public Optional<User> findUserNickname(String nickname) {
         queryFactory = new JPAQueryFactory(em);
         QUser qUser = new QUser("u");
 
         User result = queryFactory.selectFrom(qUser)
-                .where(qUser.name.eq(nickname)
-                        .and(qUser.social_type.eq(LoginType.MOIM.name())))
+                .where(qUser.name.eq(nickname))
                 .fetchOne();
 
         return Optional.ofNullable(result);
