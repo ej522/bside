@@ -51,7 +51,7 @@ public class Common {
     }
 
     public static String generateRandomPassword() {
-        String alphabet = "abcdefghijklnmopqrstuvwxyzABCDEFGHIJKLNMOPQRSTUVWXYZ";
+        String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String number = "0123456789";
         String specialKey = "~!@#$%^&";
 
