@@ -354,8 +354,11 @@ public class MoimServiceTest {
         Map<String, Object> adjustSchedule = moimService.adjustSchedule(user2, encryptedId, normalMoimMemberTime);
 
         // then
+        Moim moim = moimService.getMoimInfo((Long) adjustSchedule.get("moim_id"));
+
         Assertions.assertThat(adjustSchedule.get("moim_name")).isEqualTo("테스트 모임");
         Assertions.assertThat(adjustSchedule.get("moim_maker")).isEqualTo("부엉이2");
+        Assertions.assertThat(moim.getNobody_schedule_selected()).isEqualTo(false);
     }
 
     @Test

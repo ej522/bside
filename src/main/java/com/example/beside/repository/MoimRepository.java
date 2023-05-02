@@ -48,7 +48,7 @@ public class MoimRepository {
 
         QMoim qMoim = new QMoim("moim");
         return queryFactory.selectFrom(qMoim)
-                .where(qMoim.fixed_date.isNull())
+                .where(qMoim.nobody_schedule_selected.eq(false))
                 .fetch();
 
     }
@@ -72,6 +72,7 @@ public class MoimRepository {
     public long makeMoim(User user, Moim moim, List<MoimDate> moim_date_list) throws Exception {
         // 모임 생성
         moim.setCreated_time(LocalDateTime.now());
+        moim.setNobody_schedule_selected(true);
         em.persist(moim);
 
         em.flush();
@@ -215,6 +216,10 @@ public class MoimRepository {
      */
 
     public long saveSchedule(MoimMember moimMember, List<MoimMemberTime> moimTimeInfos) {
+
+        Moim moim = moimMember.getMoim();
+        moim.setNobody_schedule_selected(false);
+        em.persist(moim);
 
         for (var tt : moimTimeInfos) {
             tt.setMoimMember(moimMember);

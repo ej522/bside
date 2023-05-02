@@ -41,4 +41,6 @@ public class Moim {
 
     private String encrypted_id;
 
+    private Boolean nobody_schedule_selected;
+
 }

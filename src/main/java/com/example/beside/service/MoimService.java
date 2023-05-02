@@ -178,6 +178,7 @@ public class MoimService {
     }
 
     public Moim getMoimInfo(Long moimId) {
+        System.out.println("service-"+moimRepository.getMoimInfo(moimId).getNobody_schedule_selected());
         return moimRepository.getMoimInfo(moimId);
     }
 

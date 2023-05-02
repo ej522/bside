@@ -96,7 +96,9 @@ public class MoimRepositoryTest {
         long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
 
         // then
+        Moim moim = moimRepository.getMoimInfo(moimId);
         Assertions.assertThat(moimId).isGreaterThan(0);
+        Assertions.assertThat(moim.getNobody_schedule_selected()).isEqualTo(true);
     }
 
     @Test
