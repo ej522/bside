@@ -1,9 +1,6 @@
 package com.example.beside.service;
 
-import com.example.beside.common.Exception.PasswordException;
-import com.example.beside.common.Exception.PasswordNotCorrectException;
-import com.example.beside.common.Exception.UserNotExistException;
-import com.example.beside.common.Exception.UserValidateNickName;
+import com.example.beside.common.Exception.*;
 import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.repository.UserRepository;
@@ -137,6 +134,28 @@ public class UserService {
                 return chgInfo;
             }
         }
+    }
+
+    @Transactional
+    public void updatePassword(User user, String new_password) throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
+        User userInfo = userRepository.findUserById(user.getId());
+
+        //비밀번호 일치 여부
+        String hashPassword = PasswordConverter.hashPassword(user.getPassword());
+        if (!userInfo.getPassword().equals(hashPassword))
+            throw new PasswordNotCorrectException("비밀번호가 일치하지 않습니다.");
+
+        //현재 비밀번호, 새 비밀번호 일치 여부
+        if(user.getPassword().equals(new_password))
+            throw new CurrentPasswordEqualNewPassword("현재 비밀번호와 새 비밀번호가 일치합니다.");
+
+        // 패스워드 검증
+        Common.PasswordValidate(new_password);
+
+        user.setPassword(PasswordConverter.hashPassword(new_password));
+        userRepository.updatePassword(user);
+
+
     }
 
 }

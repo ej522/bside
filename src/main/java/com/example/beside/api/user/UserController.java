@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.*;
 
 @Tag(name = "User", description = "유저 API")
@@ -245,6 +244,20 @@ public class UserController {
 
         return Response.success(200, "이메일 인증 번호를 발송했습니다.", "Success");
     }
+    @Operation(tags = { "User" }, summary = "비밀번호 수정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호가 변경되었습니다."),
+            @ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않습니다."),
+            @ApiResponse(responseCode = "400", description = "현재 비밀번호와 새 비밀번호가 일치합니다.")})
+    @PutMapping("/v1/update/password")
+    public Response updatePassword(HttpServletRequest token, @RequestBody @Validated PasswordRequest passwordRequest) throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
+        User user = (User) token.getAttribute("user");
+        user.setPassword(passwordRequest.current_password);
+
+        userService.updatePassword(user, passwordRequest.new_password);
+
+        return Response.success(200, "비밀번호가 변경되었습니다.", "");
+    }
 
     private String generateVerificationCode() {
         String numbers = "";
@@ -333,5 +346,17 @@ public class UserController {
         @NotNull
         @Schema(description = "profile_image", example = "https://moim.life/profile/yellow.jpg", type = "String")
         private String profile_image;
+    }
+
+    @Data
+    static class PasswordRequest {
+        @NotNull
+        @Schema(description = "현재 비밀번호", example = "password123!", type = "String")
+        private String current_password;
+
+        @NotNull
+        @Schema(description = "새 비밀번호", example = "newPassword123!", type = "String")
+        private String new_password;
+
     }
 }
