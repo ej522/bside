@@ -230,13 +230,17 @@ public class MoimServiceTest {
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
         String encryptMoimID = moimService.makeMoim(user1, newMoim, normalMoimDates);
+경        String decrypt = mockEncrypt.decrypt(encryptMoimID);
+        System.out.println("decrypt="+decrypt);
 
         // when
         Map<String, Object> participateMoim = moimService.participateMoim(user2, encryptMoimID);
 
         // then
+        Moim moim = moimService.getMoimInfo(newMoim.getId());
         Assertions.assertThat(participateMoim.get("moim_name")).isEqualTo("테스트 모임");
         Assertions.assertThat(participateMoim.get("dead_line_hour")).isEqualTo(5);
+        //Assertions.assertThat(moim.getNobody_schedule_selected()).isEqualTo(false);
     }
 
     @Test
