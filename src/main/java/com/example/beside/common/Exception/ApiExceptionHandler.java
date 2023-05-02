@@ -127,4 +127,14 @@ public class ApiExceptionHandler {
 
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
+
+    @ExceptionHandler(CurrentPasswordEqualNewPassword.class)
+    public ResponseEntity<?> handleCurrentPasswordEqualNewPassword(CurrentPasswordEqualNewPassword ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add(ex.getMessage());
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "The current password and the new password are the same", errors);
+
+        return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
 }

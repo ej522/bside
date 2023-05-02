@@ -1,6 +1,6 @@
 package com.example.beside.service;
 
-import com.example.beside.common.Exception.UserValidateNickName;
+import com.example.beside.common.Exception.*;
 import com.example.beside.domain.LoginType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +19,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import com.example.beside.common.Exception.PasswordException;
-import com.example.beside.common.Exception.PasswordNotCorrectException;
-import com.example.beside.common.Exception.UserNotExistException;
 import com.example.beside.domain.QUser;
 import com.example.beside.domain.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -95,6 +92,11 @@ public class UserServiceTest {
 
         queryFactory.delete(qUser).where(qUser.email.eq(user1.getEmail())).execute();
         queryFactory.delete(qUser).where(qUser.email.eq(user2.getEmail())).execute();
+        queryFactory.delete(qUser).where(qUser.email.eq(user3.getEmail())).execute();
+        queryFactory.delete(qUser).where(qUser.email.eq(user4.getEmail())).execute();
+        queryFactory.delete(qUser).where(qUser.email.eq(user5.getEmail())).execute();
+        queryFactory.delete(qUser).where(qUser.email.eq(user6.getEmail())).execute();
+        queryFactory.delete(qUser).where(qUser.email.eq(user7.getEmail())).execute();
     }
 
     @Test
@@ -236,15 +238,100 @@ public class UserServiceTest {
     @DisplayName("임시 비밀번호 발급")
     void testUpdateTemporaryPassword() throws Exception {
         //given
+        String beforePsw = user7.getPassword();
         Long user_id = userService.saveUser(user7);
         user7.setId(user_id);
-        String beforePsw = user7.getPassword();
 
+        //when
         Map userInfo = userService.updateTemporaryPassword(user7.getEmail());
-        String afterPsw = userInfo.get("password").toString();
 
+        //then
+        String afterPsw = userInfo.get("password").toString();
         assertTrue(!beforePsw.equals(afterPsw));
 
     }
+
+    @Test
+    @DisplayName("비밀 번호 수정")
+    void testUpdatePassword() throws Exception {
+        //given
+        String beforePsw = user7.getPassword();
+        Long user_id = userService.saveUser(user7);
+        user7.setId(user_id);
+        user7.setPassword(beforePsw);
+
+        //when
+        userService.updatePassword(user7, "newPsw123!");
+
+        //then
+        User user = userService.findUserById(user7.getId());
+        assertTrue(!user7.getPassword().equals(user.getPassword()));
+    }
+
+    @Test
+    @DisplayName("현재 비밀번호가 틀렸을 경우")
+    void testUpdatePasswordByWrongPassword() throws Exception {
+        //given
+        Long user_id = userService.saveUser(user7);
+        user7.setId(user_id);
+        user7.setPassword("wrongPsw12!");
+
+        //when, then
+        assertThrows(PasswordNotCorrectException.class, () -> userService.updatePassword(user7, "newPsw123!"));
+    }
+
+    @Test
+    @DisplayName("숫자로만 이루어진 패스워드로 유저 등록")
+    void testUpdatePasswordWithOnlyNumber() throws PasswordException, UserValidateNickName {
+        //given
+        String beforePsw = user7.getPassword();
+        Long user_id = userService.saveUser(user7);
+        user7.setId(user_id);
+        user7.setPassword(beforePsw);
+
+        // when, then
+        assertThrows(PasswordException.class, () -> userService.updatePassword(user7, "1234567890"));
+    }
+
+    @Test
+    @DisplayName("영어로만 이루어진 패스워드로 유저 등록")
+    void testUpdatePasswordWithOnlyEnglish() throws PasswordException, UserValidateNickName {
+        //given
+        String beforePsw = user7.getPassword();
+        Long user_id = userService.saveUser(user7);
+        user7.setId(user_id);
+        user7.setPassword(beforePsw);
+
+        // when, then
+        assertThrows(PasswordException.class, () -> userService.updatePassword(user7, "abcdefghijk"));
+    }
+
+    @Test
+    @DisplayName("8자 이하로 이루어진 패스워드로 유저 등록")
+    void testUpdatePasswordByWithless8letter() throws PasswordException, UserValidateNickName {
+        //given
+        String beforePsw = user7.getPassword();
+        Long user_id = userService.saveUser(user7);
+        user7.setId(user_id);
+        user7.setPassword(beforePsw);
+
+        // when, then
+        assertThrows(PasswordException.class, () -> userService.updatePassword(user7, "abc12!"));
+    }
+
+    @Test
+    @DisplayName("현재 비밀번호와 새 비밀번호가 일치할 경우")
+    void testUpdatePasswordWithEqualNewPassword() throws PasswordException, UserValidateNickName {
+        //given
+        String beforePsw = user7.getPassword();
+        Long user_id = userService.saveUser(user7);
+        user7.setId(user_id);
+        user7.setPassword(beforePsw);
+
+        // when, then
+        assertThrows(CurrentPasswordEqualNewPassword.class, () -> userService.updatePassword(user7, "wd!2awQWDas!@"));
+    }
+
+
 
 }

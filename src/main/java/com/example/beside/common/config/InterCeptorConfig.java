@@ -24,7 +24,8 @@ public class InterCeptorConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/users/v1/update/nickname")
                 .addPathPatterns("/api/moim/v1/adjust-schedule")
                 .addPathPatterns("/api/users/v1/update/profile-image")
-                .addPathPatterns("/api/moim/v1/my-moim-history");
+                .addPathPatterns("/api/moim/v1/my-moim-history")
+                .addPathPatterns("/api/users/v1/update/password");
     }
 
 }
