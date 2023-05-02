@@ -44,7 +44,6 @@ class EncryptTest {
         // when
         String test = Encrypt.getHashingPassword(plainText);
 
-        System.out.println("tettt-" + Encrypt.getHashingPassword("testtt"));
         // then
         assertNotEquals(plainText, test);
     }
