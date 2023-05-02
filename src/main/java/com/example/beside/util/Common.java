@@ -1,5 +1,9 @@
 package com.example.beside.util;
 
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,5 +48,37 @@ public class Common {
         }
 
         return true;
+    }
+
+    public static String generateRandomPassword() {
+        String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String number = "0123456789";
+        String specialKey = "~!@#$%^&";
+
+        List<String> pswList = new ArrayList<>();
+        pswList.addAll(getRandomStrList(alphabet, 5));
+        pswList.addAll(getRandomStrList(number, 2));
+        pswList.addAll(getRandomStrList(specialKey, 1));
+
+        Collections.shuffle(pswList);
+        StringBuilder password = new StringBuilder();
+        for(String psw: pswList) {
+            password.append(psw);
+        }
+
+        return password.toString();
+    }
+
+    private static List<String> getRandomStrList(String str, int len) {
+        SecureRandom random = new SecureRandom();
+
+        List<String> randomList = new ArrayList<>();
+        while (randomList.size()<len) {
+            int randomIdx = random.nextInt(str.length());
+
+            randomList.add(String.valueOf(str.charAt(randomIdx)));
+        }
+
+        return randomList;
     }
 }

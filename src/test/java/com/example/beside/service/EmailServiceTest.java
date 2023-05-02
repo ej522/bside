@@ -81,4 +81,14 @@ public class EmailServiceTest {
         // then
         Assertions.assertThat(emailService).isNotNull();
     }
+
+    @Test
+    @DisplayName("임시 비밀번호 전송")
+    void testSendTemporaryPasswordEmail() throws Exception {
+        //when
+        emailService.sendTemporaryPasswordEmail(toEmail, "test", "test123!");
+
+        //then
+        Assertions.assertThat(emailService).isNotNull();
+    }
 }

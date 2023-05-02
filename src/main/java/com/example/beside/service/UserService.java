@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.List;
 
@@ -105,6 +107,36 @@ public class UserService {
         User updateUserInfo = userRepository.updateProfileImage(user);
 
         return updateUserInfo;
+    }
+
+    @Transactional
+    public Map updateTemporaryPassword(String email) throws UserNotExistException, NoSuchAlgorithmException {
+        Optional<User> user = userRepository.findUserByEmail(email);
+
+        Map chgInfo = new HashMap();
+        if(user.isEmpty()) {
+            throw new UserNotExistException("해당 이메일이 존재하지 않습니다");
+        } else {
+            if(!user.get().getSocial_type().equals(LoginType.MOIM.name())) {
+                throw new UserNotExistException("해당 이메일이 존재하지 않습니다.");
+            } else {
+                String randomPsw = Common.generateRandomPassword();
+                String encryptPws = Encrypt.getHashingPassword(randomPsw);
+
+                User userInfo = new User();
+                userInfo.setId(user.get().getId());
+                userInfo.setPassword(encryptPws);
+                userInfo.setEmail(user.get().getEmail());
+                userInfo.setSocial_type(user.get().getSocial_type());
+
+                User chgUser = userRepository.updatePassword(userInfo);
+
+                chgInfo.put("password", randomPsw);
+                chgInfo.put("userInfo", chgUser);
+
+                return chgInfo;
+            }
+        }
     }
 
 }

@@ -8,9 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.DisplayName;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -228,6 +230,21 @@ public class UserServiceTest {
 
         // when, then
         assertThrows(UserValidateNickName.class, () -> userService.updateNickname(user5));
+    }
+
+    @Test
+    @DisplayName("임시 비밀번호 발급")
+    void testUpdateTemporaryPassword() throws Exception {
+        //given
+        Long user_id = userService.saveUser(user7);
+        user7.setId(user_id);
+        String beforePsw = user7.getPassword();
+
+        Map userInfo = userService.updateTemporaryPassword(user7.getEmail());
+        String afterPsw = userInfo.get("password").toString();
+
+        assertTrue(!beforePsw.equals(afterPsw));
+
     }
 
 }

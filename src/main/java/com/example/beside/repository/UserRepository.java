@@ -133,4 +133,16 @@ public class UserRepository {
         return queryFactory.selectFrom(qUser).where(qUser.id.eq(user.getId())).fetchOne();
     }
 
+    public User updatePassword(User user) {
+        queryFactory = new JPAQueryFactory(em);
+        QUser qUser = QUser.user;
+
+        queryFactory.update(qUser)
+                .set(qUser.password, user.getPassword())
+                .where(qUser.id.eq(user.getId()))
+                .execute();
+
+        return queryFactory.selectFrom(qUser).where(qUser.id.eq(user.getId())).fetchOne();
+    }
+
 }

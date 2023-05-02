@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 
 @Tag(name = "User", description = "유저 API")
@@ -225,6 +226,24 @@ public class UserController {
         updateUser = userService.updateProfileImage(updateUser);
 
         return Response.success(200, "프로필 이미지가 수정 되었습니다.", updateUser.getProfile_image());
+    }
+
+    @Operation(tags = { "User" }, summary = "임시 비밀번호 발급")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이메일 인증 번호를 발송했습니다."),
+            @ApiResponse(responseCode = "500", description = "이메일 전송 실패")})
+    @PostMapping("/v1/send-password")
+    public Response<String> sendPassword(@RequestBody @Validated EmailRequest request) throws Exception {
+        Map userInfo = userService.updateTemporaryPassword(request.email);
+        User user = (User) userInfo.get("userInfo");
+
+        try {
+            emailService.sendTemporaryPasswordEmail(request.email, user.getName(), userInfo.get("password").toString());
+        } catch (MessagingException ex) {
+            return Response.fail(500, ex.getMessage());
+        }
+
+        return Response.success(200, "이메일 인증 번호를 발송했습니다.", "Success");
     }
 
     private String generateVerificationCode() {
