@@ -255,9 +255,9 @@ public class UserServiceTest {
     @DisplayName("비밀 번호 수정")
     void testUpdatePassword() throws Exception {
         //given
-        String beforePsw = user7.getPassword();
         Long user_id = userService.saveUser(user7);
         user7.setId(user_id);
+        String beforePsw = user7.getPassword();
         user7.setPassword(beforePsw);
 
         //when
@@ -265,19 +265,17 @@ public class UserServiceTest {
 
         //then
         User user = userService.findUserById(user7.getId());
-        assertTrue(!user7.getPassword().equals(user.getPassword()));
+        assertTrue(!beforePsw.equals(user.getPassword()));
     }
 
     @Test
     @DisplayName("현재 비밀번호가 틀렸을 경우")
-    void testUpdatePasswordByWrongPassword() throws Exception {
+    void testUpdatePasswordByWrongPassword() throws PasswordException, UserValidateNickName {
         //given
         Long user_id = userService.saveUser(user7);
-        user7.setId(user_id);
-        user7.setPassword("wrongPsw12!");
 
         //when, then
-        assertThrows(PasswordNotCorrectException.class, () -> userService.updatePassword(user7, "newPsw123!"));
+        assertTrue(!userService.validateCurrentPassword(user_id, "wrongPsw12!"));
     }
 
     @Test

@@ -138,13 +138,6 @@ public class UserService {
 
     @Transactional
     public void updatePassword(User user, String new_password) throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
-        User userInfo = userRepository.findUserById(user.getId());
-
-        //비밀번호 일치 여부
-        String hashPassword = PasswordConverter.hashPassword(user.getPassword());
-        if (!userInfo.getPassword().equals(hashPassword))
-            throw new PasswordNotCorrectException("비밀번호가 일치하지 않습니다.");
-
         //현재 비밀번호, 새 비밀번호 일치 여부
         if(user.getPassword().equals(new_password))
             throw new CurrentPasswordEqualNewPassword("현재 비밀번호와 새 비밀번호가 일치합니다.");
@@ -154,8 +147,18 @@ public class UserService {
 
         user.setPassword(PasswordConverter.hashPassword(new_password));
         userRepository.updatePassword(user);
+    }
 
+    public Boolean validateCurrentPassword(Long user_id, String validatedPsw) {
+        User userInfo = userRepository.findUserById(user_id);
 
+        //비밀번호 일치 여부
+        String hashPassword = PasswordConverter.hashPassword(validatedPsw);
+
+        if (!userInfo.getPassword().equals(hashPassword))
+            return false;
+
+        return true;
     }
 
 }

@@ -244,10 +244,25 @@ public class UserController {
 
         return Response.success(200, "이메일 인증 번호를 발송했습니다.", "Success");
     }
+
+    @Operation(tags = { "User" }, summary = "현재 비밀번호 확인")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호가 변경되었습니다."),
+            @ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않습니다.")})
+    @PostMapping("/v1/check/current-password")
+    public Response validateCurrentPasswordMatch(HttpServletRequest token, @RequestBody @Validated PasswordRequest passwordRequest) throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
+        User user = (User) token.getAttribute("user");
+
+        if(!userService.validateCurrentPassword(user.getId(), passwordRequest.current_password)) {
+            throw new PasswordNotCorrectException("비밀번호가 일치하지 않습니다.");
+        }
+
+        return Response.success(200, "비밀 번호가 일치합니다.", "");
+    }
+
     @Operation(tags = { "User" }, summary = "비밀번호 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "비밀번호가 변경되었습니다."),
-            @ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않습니다."),
             @ApiResponse(responseCode = "400", description = "현재 비밀번호와 새 비밀번호가 일치합니다.")})
     @PutMapping("/v1/update/password")
     public Response updatePassword(HttpServletRequest token, @RequestBody @Validated PasswordRequest passwordRequest) throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
