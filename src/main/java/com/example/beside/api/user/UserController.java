@@ -151,7 +151,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "닉네임이 변경 되었습니다."),
             @ApiResponse(responseCode = "400", description = "닉네임은 8자 이내여야 합니다.")})
     @PutMapping(value = "/v1/update/nickname")
-    public Response<String> updateNickname(HttpServletRequest token,
+    public Response<UserDto> updateNickname(HttpServletRequest token,
             @RequestBody @Validated UpdateUserNicknameRequest request)
             throws Exception {
         User user = (User) token.getAttribute("user");
@@ -161,9 +161,11 @@ public class UserController {
         updateUser.setName(request.name);
         updateUser.setSocial_type(user.getSocial_type());
 
-        String newNickname = userService.updateNickname(updateUser);
+        User changUser = userService.updateNickname(updateUser);
 
-        return Response.success(200, "닉네임이 변경 되었습니다.", newNickname);
+        UserDto userDto = new UserDto(changUser);
+
+        return Response.success(200, "닉네임이 변경 되었습니다.", userDto);
     }
 
     @Operation(tags = { "User" }, summary = "이메일 계정 확인")
@@ -214,7 +216,7 @@ public class UserController {
     @Operation(tags = { "User" }, summary = "유저프로필 수정")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "프로필이 수정되었습니다.") })
     @PutMapping("/v1/update/profile-image")
-    public Response<String> updateProfileImage(HttpServletRequest token,
+    public Response<UserDto> updateProfileImage(HttpServletRequest token,
             @RequestBody @Validated UpdateUserProfileImage updateUserProfileImage) throws Exception {
         User user = (User) token.getAttribute("user");
 
@@ -224,7 +226,9 @@ public class UserController {
 
         updateUser = userService.updateProfileImage(updateUser);
 
-        return Response.success(200, "프로필 이미지가 수정 되었습니다.", updateUser.getProfile_image());
+        UserDto userDto = new UserDto(updateUser);
+
+        return Response.success(200, "프로필 이미지가 수정 되었습니다.", userDto);
     }
 
     @Operation(tags = { "User" }, summary = "임시 비밀번호 발급")

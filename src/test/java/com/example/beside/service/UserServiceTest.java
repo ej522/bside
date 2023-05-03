@@ -224,6 +224,22 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("닉네임 변경")
+    void testUpdateNickname() throws Exception {
+        //given
+        String nickname = user5.getName();
+        Long user_id = userService.saveUser(user5);
+        user5.setId(user_id);
+        user5.setName("변경닉네임");
+
+        //when
+        User updateUser = userService.updateNickname(user5);
+
+        // then
+        assertTrue(!nickname.equals(updateUser.getName()));
+    }
+
+    @Test
     @DisplayName("8자 이상 닉네임 변경")
     void testUpdateNickNameWithMore8letter() throws PasswordException, UserValidateNickName {
         // given
@@ -330,6 +346,21 @@ public class UserServiceTest {
         assertThrows(CurrentPasswordEqualNewPassword.class, () -> userService.updatePassword(user7, "wd!2awQWDas!@"));
     }
 
+    @Test
+    @DisplayName("유저 프로필 수정")
+    void testUpdateProfileImg() throws Exception {
+        //given
+        String nickname = user7.getProfile_image();
+        Long user_id = userService.saveUser(user7);
+        user7.setId(user_id);
+        user7.setProfile_image("https://moim.life/profile/skyblue.jpg");
+
+        //when
+        User user = userService.updateProfileImage(user7);
+
+        //then
+        assertTrue(!nickname.equals(user.getName()));
+    }
 
 
 }
