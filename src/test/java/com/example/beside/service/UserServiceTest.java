@@ -255,9 +255,9 @@ public class UserServiceTest {
     @DisplayName("비밀 번호 수정")
     void testUpdatePassword() throws Exception {
         //given
-        String beforePsw = user7.getPassword();
         Long user_id = userService.saveUser(user7);
         user7.setId(user_id);
+        String beforePsw = user7.getPassword();
         user7.setPassword(beforePsw);
 
         //when
@@ -265,7 +265,7 @@ public class UserServiceTest {
 
         //then
         User user = userService.findUserById(user7.getId());
-        assertTrue(!user7.getPassword().equals(user.getPassword()));
+        assertTrue(!beforePsw.equals(user.getPassword()));
     }
 
     @Test
