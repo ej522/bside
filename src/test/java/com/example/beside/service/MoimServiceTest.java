@@ -186,16 +186,15 @@ public class MoimServiceTest {
     @DisplayName("모임 생성")
     void testMakeMoim() throws Exception {
         // given
-        Long userId = userService.saveUser(user);
-        User user = userService.findUserById(userId);
+        User saveUser = userService.saveUser(user);
 
         Moim newMoim = new Moim();
-        newMoim.setUser(user);
+        newMoim.setUser(saveUser);
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
 
         // when
-        String encryptMoimID = moimService.makeMoim(user, newMoim, normalMoimDates);
+        String encryptMoimID = moimService.makeMoim(saveUser, newMoim, normalMoimDates);
 
         // then
         Assertions.assertThat(encryptMoimID).isNotNull();
@@ -205,34 +204,31 @@ public class MoimServiceTest {
     @DisplayName("중복된 날짜를 가진 모임 생성")
     void testMakeMoimWithWrongDateList() throws Exception {
         // given
-        Long userId = userService.saveUser(user);
-        User user = userService.findUserById(userId);
+        User saveUser = userService.saveUser(user);
         Moim newMoim = new Moim();
-        newMoim.setUser(user);
+        newMoim.setUser(saveUser);
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
 
         // when, then
-        assertThrows(MoimParticipateException.class, () -> moimService.makeMoim(user, newMoim, wrongMoimDates));
+        assertThrows(MoimParticipateException.class, () -> moimService.makeMoim(saveUser, newMoim, wrongMoimDates));
     }
 
     @Test
     @DisplayName("모임 참여하기")
     void testParticipateMoim() throws Exception {
         // given
-        Long userId = userService.saveUser(user);
-        User user1 = userService.findUserById(userId);
-        Long userId2 = userService.saveUser(user2);
-        User user2 = userService.findUserById(userId2);
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
 
         Moim newMoim = new Moim();
-        newMoim.setUser(user1);
+        newMoim.setUser(saveUser1);
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
-        String encryptMoimID = moimService.makeMoim(user1, newMoim, normalMoimDates);
+        String encryptMoimID = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
 
         // when
-        Map<String, Object> participateMoim = moimService.participateMoim(user2, encryptMoimID);
+        Map<String, Object> participateMoim = moimService.participateMoim(saveUser2, encryptMoimID);
 
         // then
         Assertions.assertThat(participateMoim.get("moim_name")).isEqualTo("테스트 모임");
@@ -243,115 +239,97 @@ public class MoimServiceTest {
     @DisplayName("모임 주최자가 만든 모임 참여하기")
     void testParticipateMoimByMoimCreator() throws Exception {
         // given
-        Long userId = userService.saveUser(user);
-        User user = userService.findUserById(userId);
+        User saveUser1 = userService.saveUser(user);
         Moim newMoim = new Moim();
-        newMoim.setUser(user);
+        newMoim.setUser(saveUser1);
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
-        String encryptMoimID = moimService.makeMoim(user, newMoim, normalMoimDates);
+        String encryptMoimID = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
 
         // when, then
-        assertThrows(MoimParticipateException.class, () -> moimService.participateMoim(user, encryptMoimID));
+        assertThrows(MoimParticipateException.class, () -> moimService.participateMoim(saveUser1, encryptMoimID));
     }
 
     @Test
     @DisplayName("기존 참여한 모임 다시 참여하기")
     void testParticipateMoimByAlreadyJoinedPeople() throws Exception {
         // given
-        Long userId = userService.saveUser(user);
-        User user1 = userService.findUserById(userId);
-        Long userId2 = userService.saveUser(user2);
-        User user2 = userService.findUserById(userId2);
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
 
         Moim newMoim = new Moim();
-        newMoim.setUser(user1);
+        newMoim.setUser(saveUser1);
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
-        String encryptMoimID = moimService.makeMoim(user1, newMoim, normalMoimDates);
+        String encryptMoimID = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
 
         // when
-        moimService.participateMoim(user2, encryptMoimID);
+        moimService.participateMoim(saveUser2, encryptMoimID);
 
         // then
-        assertThrows(MoimParticipateException.class, () -> moimService.participateMoim(user2, encryptMoimID));
+        assertThrows(MoimParticipateException.class, () -> moimService.participateMoim(saveUser2, encryptMoimID));
     }
 
     @Test
     @DisplayName("11명 이상 모임 참여하기")
     void testParticipateMoimByMoreThanTenPeople() throws Exception {
         // given
-        Long userId = userService.saveUser(user);
-        Long userId2 = userService.saveUser(user2);
-        Long userId3 = userService.saveUser(user3);
-        Long userId4 = userService.saveUser(user4);
-        Long userId5 = userService.saveUser(user5);
-        Long userId6 = userService.saveUser(user6);
-        Long userId7 = userService.saveUser(user7);
-        Long userId8 = userService.saveUser(user8);
-        Long userId9 = userService.saveUser(user9);
-        Long userId10 = userService.saveUser(user10);
-        Long userId11 = userService.saveUser(user11);
-        Long userId12 = userService.saveUser(user12);
-
-        User user1 = userService.findUserById(userId);
-        User user2 = userService.findUserById(userId2);
-        User user3 = userService.findUserById(userId3);
-        User user4 = userService.findUserById(userId4);
-        User user5 = userService.findUserById(userId5);
-        User user6 = userService.findUserById(userId6);
-        User user7 = userService.findUserById(userId7);
-        User user8 = userService.findUserById(userId8);
-        User user9 = userService.findUserById(userId9);
-        User user10 = userService.findUserById(userId10);
-        User user11 = userService.findUserById(userId11);
-        User user12 = userService.findUserById(userId12);
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
+        User saveUser3 = userService.saveUser(user3);
+        User saveUser4 = userService.saveUser(user4);
+        User saveUser5 = userService.saveUser(user5);
+        User saveUser6 = userService.saveUser(user6);
+        User saveUser7 = userService.saveUser(user7);
+        User saveUser8 = userService.saveUser(user8);
+        User saveUser9 = userService.saveUser(user9);
+        User saveUser10 = userService.saveUser(user10);
+        User saveUser11 = userService.saveUser(user11);
+        User saveUser12 = userService.saveUser(user12);
 
         Moim newMoim = new Moim();
-        newMoim.setUser(user1);
+        newMoim.setUser(saveUser1);
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
 
         // 모임 생성
-        String encryptMoimID = moimService.makeMoim(user1, newMoim, normalMoimDates);
+        String encryptMoimID = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
 
         // when
-        moimService.participateMoim(user2, encryptMoimID);
-        moimService.participateMoim(user3, encryptMoimID);
-        moimService.participateMoim(user4, encryptMoimID);
-        moimService.participateMoim(user5, encryptMoimID);
-        moimService.participateMoim(user6, encryptMoimID);
-        moimService.participateMoim(user7, encryptMoimID);
-        moimService.participateMoim(user8, encryptMoimID);
-        moimService.participateMoim(user9, encryptMoimID);
-        moimService.participateMoim(user10, encryptMoimID);
-        moimService.participateMoim(user11, encryptMoimID);
+        moimService.participateMoim(saveUser2, encryptMoimID);
+        moimService.participateMoim(saveUser3, encryptMoimID);
+        moimService.participateMoim(saveUser4, encryptMoimID);
+        moimService.participateMoim(saveUser5, encryptMoimID);
+        moimService.participateMoim(saveUser6, encryptMoimID);
+        moimService.participateMoim(saveUser7, encryptMoimID);
+        moimService.participateMoim(saveUser8, encryptMoimID);
+        moimService.participateMoim(saveUser9, encryptMoimID);
+        moimService.participateMoim(saveUser10, encryptMoimID);
+        moimService.participateMoim(saveUser11, encryptMoimID);
 
         // then
-        assertThrows(MoimParticipateException.class, () -> moimService.participateMoim(user12, encryptMoimID));
+        assertThrows(MoimParticipateException.class, () -> moimService.participateMoim(saveUser12, encryptMoimID));
     }
 
     @Test
     @DisplayName("참여자 일정 정하기")
     void testAdjustSchedule() throws Exception {
         // given
-        Long userId = userService.saveUser(user);
-        Long userId2 = userService.saveUser(user2);
-        User user1 = userService.findUserById(userId);
-        User user2 = userService.findUserById(userId2);
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
 
         Moim newMoim = new Moim();
-        newMoim.setUser(user1);
+        newMoim.setUser(saveUser1);
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
 
         // 모임 생성
-        var encryptedId = moimService.makeMoim(user1, newMoim, normalMoimDates);
+        var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
         // 모임 참여
-        moimService.participateMoim(user2, encryptedId);
+        moimService.participateMoim(saveUser2, encryptedId);
 
         // when
-        Map<String, Object> adjustSchedule = moimService.adjustSchedule(user2, encryptedId, normalMoimMemberTime);
+        Map<String, Object> adjustSchedule = moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
 
         // then
         Moim moim = moimService.getMoimInfo((Long) adjustSchedule.get("moim_id"));
@@ -365,84 +343,78 @@ public class MoimServiceTest {
     @DisplayName("참여하지 않은 모임의 유저가 모임 일정 정하기")
     void testAdjustScheduleWithNotParticipate() throws Exception {
         // given
-        Long userId = userService.saveUser(user);
-        Long userId2 = userService.saveUser(user2);
-        User user1 = userService.findUserById(userId);
-        User user2 = userService.findUserById(userId2);
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
 
         Moim newMoim = new Moim();
-        newMoim.setUser(user1);
+        newMoim.setUser(saveUser1);
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
 
         // 모임 생성
-        var encryptedId = moimService.makeMoim(user1, newMoim, normalMoimDates);
+        var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
 
         // when, then
         assertThrows(AdjustScheduleException.class,
-                () -> moimService.adjustSchedule(user2, encryptedId, normalMoimMemberTime));
+                () -> moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime));
     }
 
     @Test
     @DisplayName("주최자가 선택하지 않은 일자로 모임 일정 정하기")
     void testAdjustScheduleWithNotAuthorizedDate() throws Exception {
         // given
-        Long userId = userService.saveUser(user);
-        Long userId2 = userService.saveUser(user2);
-        User user1 = userService.findUserById(userId);
-        User user2 = userService.findUserById(userId2);
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
 
         Moim newMoim = new Moim();
-        newMoim.setUser(user1);
+        newMoim.setUser(saveUser1);
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
 
         // 모임 생성
-        var encryptedId = moimService.makeMoim(user1, newMoim, normalMoimDates);
+        var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
         // 모임 참여
-        moimService.participateMoim(user2, encryptedId);
+        moimService.participateMoim(saveUser2, encryptedId);
 
         // when, then
         assertThrows(AdjustScheduleException.class,
-                () -> moimService.adjustSchedule(user2, encryptedId, wrongMoimMemberTime));
+                () -> moimService.adjustSchedule(saveUser2, encryptedId, wrongMoimMemberTime));
     }
 
     @Test
     void testGetMyMoimList() throws Exception {
-        //given
-        Long userId = userService.saveUser(user);
-        Long userId2 = userService.saveUser(user2);
-        Long userId3 = userService.saveUser(user3);
-        User user1 = userService.findUserById(userId);
-        User user2 = userService.findUserById(userId2);
-        User user3 = userService.findUserById(userId3);
-
+        // given
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
+        User saveUser3 = userService.saveUser(user3);
 
         Moim newMoim = new Moim();
-        newMoim.setUser(user1);
+        newMoim.setUser(saveUser1);
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
         newMoim.setFixed_date("2023-03-13");
         newMoim.setFixed_time("2");
 
-        var encryptedId = moimService.makeMoim(user1, newMoim, normalMoimDates);
-        moimService.participateMoim(user2, encryptedId);
+        var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        moimService.participateMoim(saveUser2, encryptedId);
+        moimService.participateMoim(saveUser3, encryptedId);
 
         Moim newMoim2 = new Moim();
-        newMoim2.setUser(user2);
+        newMoim2.setUser(saveUser2);
         newMoim2.setMoim_name("테스트 모임2");
         newMoim2.setDead_line_hour(5);
         newMoim2.setFixed_date("2023-03-14");
         newMoim2.setFixed_time("2");
+
         var encryptedId2 = moimService.makeMoim(user2, newMoim2, normalMoimDates);
-        moimService.participateMoim(user1, encryptedId2);
-        moimService.participateMoim(user3, encryptedId2);
+        moimService.participateMoim(saveUser1, encryptedId2);
+        moimService.participateMoim(saveUser3, encryptedId2);
 
-        //when
-        List<MyMoimDto> moimList = moimService.getMyMoimList(user1.getId());
+        // when
+        List<MyMoimDto> moimList = moimService.getMyMoimList(saveUser1.getId());
 
-        //then
-       assertTrue(moimList.get(0).getMemeber_cnt()>1);
+        // then
+        assertTrue(moimList.get(0).getMemeber_cnt() > 1);
 
     }
 

@@ -57,7 +57,6 @@ public class UserServiceTest {
         user2.setName("은지");
         user2.setProfile_image("https://moim.life/profile/yellow.jpg");
 
-
         user3.setEmail("test_3456@naver.com");
         user3.setPassword("abcdefghi");
         user3.setName("은지");
@@ -101,7 +100,8 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("유저 삭제")
-    void testDeleteUser() throws NoSuchAlgorithmException, PasswordException, UserNotExistException, UserValidateNickName {
+    void testDeleteUser()
+            throws NoSuchAlgorithmException, PasswordException, UserNotExistException, UserValidateNickName {
         // given
         String password = user1.getPassword();
         userService.saveUser(user1);
@@ -146,7 +146,8 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("유저 로그인")
-    void testLoginUser() throws PasswordException, UserNotExistException, PasswordNotCorrectException, UserValidateNickName {
+    void testLoginUser()
+            throws PasswordException, UserNotExistException, PasswordNotCorrectException, UserValidateNickName {
         // given
         String password = user1.getPassword();
         userService.saveUser(user1);
@@ -226,16 +227,16 @@ public class UserServiceTest {
     @Test
     @DisplayName("닉네임 변경")
     void testUpdateNickname() throws Exception {
-        //given
+        // given
         String nickname = user5.getName();
-        Long user_id = userService.saveUser(user5);
-        user5.setId(user_id);
-        user5.setName("변경닉네임");
+        User saveUser = userService.saveUser(user5);
+        saveUser.setName("변경닉네임");
 
-        //when
-        User updateUser = userService.updateNickname(user5);
+        // when
+        User updateUser = userService.updateNickname(saveUser);
 
         // then
+        Assertions.assertThat(updateUser.getName()).isNotEqualTo(nickname);
         assertTrue(!nickname.equals(updateUser.getName()));
     }
 
@@ -253,15 +254,14 @@ public class UserServiceTest {
     @Test
     @DisplayName("임시 비밀번호 발급")
     void testUpdateTemporaryPassword() throws Exception {
-        //given
+        // given
         String beforePsw = user7.getPassword();
-        Long user_id = userService.saveUser(user7);
-        user7.setId(user_id);
+        User saveUser = userService.saveUser(user7);
 
-        //when
-        Map userInfo = userService.updateTemporaryPassword(user7.getEmail());
+        // when
+        Map<String, Object> userInfo = userService.updateTemporaryPassword(saveUser.getEmail());
 
-        //then
+        // then
         String afterPsw = userInfo.get("password").toString();
         assertTrue(!beforePsw.equals(afterPsw));
 
@@ -270,97 +270,84 @@ public class UserServiceTest {
     @Test
     @DisplayName("비밀 번호 수정")
     void testUpdatePassword() throws Exception {
-        //given
-        Long user_id = userService.saveUser(user7);
-        user7.setId(user_id);
-        String beforePsw = user7.getPassword();
-        user7.setPassword(beforePsw);
+        // given
+        User saveUser = userService.saveUser(user7);
+        String beforePsw = saveUser.getPassword();
 
-        //when
-        userService.updatePassword(user7, "newPsw123!");
+        // when
+        userService.updatePassword(saveUser, "newPsw123!");
 
-        //then
-        User user = userService.findUserById(user7.getId());
-        assertTrue(!beforePsw.equals(user.getPassword()));
+        // then
+        userService.findUserById(saveUser.getId());
+        Assertions.assertThat(beforePsw).isNotEqualTo(saveUser.getPassword());
     }
 
     @Test
     @DisplayName("현재 비밀번호가 틀렸을 경우")
     void testUpdatePasswordByWrongPassword() throws PasswordException, UserValidateNickName {
-        //given
-        Long user_id = userService.saveUser(user7);
+        // given
+        User saveUser = userService.saveUser(user7);
 
-        //when, then
-        assertTrue(!userService.validateCurrentPassword(user_id, "wrongPsw12!"));
+        // when, then
+        Assertions.assertThat(
+                userService.validateCurrentPassword(saveUser.getId(), "wrongPsw12!")).isFalse();
     }
 
     @Test
     @DisplayName("숫자로만 이루어진 패스워드로 유저 등록")
     void testUpdatePasswordWithOnlyNumber() throws PasswordException, UserValidateNickName {
-        //given
-        String beforePsw = user7.getPassword();
-        Long user_id = userService.saveUser(user7);
-        user7.setId(user_id);
-        user7.setPassword(beforePsw);
+        // given
+        User saveUser = userService.saveUser(user7);
 
         // when, then
-        assertThrows(PasswordException.class, () -> userService.updatePassword(user7, "1234567890"));
+        assertThrows(PasswordException.class, () -> userService.updatePassword(saveUser, "1234567890"));
     }
 
     @Test
     @DisplayName("영어로만 이루어진 패스워드로 유저 등록")
     void testUpdatePasswordWithOnlyEnglish() throws PasswordException, UserValidateNickName {
-        //given
-        String beforePsw = user7.getPassword();
-        Long user_id = userService.saveUser(user7);
-        user7.setId(user_id);
-        user7.setPassword(beforePsw);
+        // given
+        User saveUser = userService.saveUser(user7);
 
         // when, then
-        assertThrows(PasswordException.class, () -> userService.updatePassword(user7, "abcdefghijk"));
+        assertThrows(PasswordException.class, () -> userService.updatePassword(saveUser, "abcdefghijk"));
     }
 
     @Test
     @DisplayName("8자 이하로 이루어진 패스워드로 유저 등록")
     void testUpdatePasswordByWithless8letter() throws PasswordException, UserValidateNickName {
-        //given
-        String beforePsw = user7.getPassword();
-        Long user_id = userService.saveUser(user7);
-        user7.setId(user_id);
-        user7.setPassword(beforePsw);
+        // given
+        User saveUser = userService.saveUser(user7);
 
         // when, then
-        assertThrows(PasswordException.class, () -> userService.updatePassword(user7, "abc12!"));
+        assertThrows(PasswordException.class, () -> userService.updatePassword(saveUser, "abc12!"));
     }
 
     @Test
     @DisplayName("현재 비밀번호와 새 비밀번호가 일치할 경우")
     void testUpdatePasswordWithEqualNewPassword() throws PasswordException, UserValidateNickName {
-        //given
-        String beforePsw = user7.getPassword();
-        Long user_id = userService.saveUser(user7);
-        user7.setId(user_id);
-        user7.setPassword(beforePsw);
+        // given
+        User saveUser = userService.saveUser(user7);
 
         // when, then
-        assertThrows(CurrentPasswordEqualNewPassword.class, () -> userService.updatePassword(user7, "wd!2awQWDas!@"));
+        assertThrows(CurrentPasswordEqualNewPassword.class,
+                () -> userService.updatePassword(saveUser, "wd!2awQWDas!@"));
     }
 
     @Test
     @DisplayName("유저 프로필 수정")
     void testUpdateProfileImg() throws Exception {
-        //given
-        String nickname = user7.getProfile_image();
-        Long user_id = userService.saveUser(user7);
-        user7.setId(user_id);
-        user7.setProfile_image("https://moim.life/profile/skyblue.jpg");
+        // given
+        User saveUser = userService.saveUser(user7);
+        saveUser.setName("부엉이");
+        saveUser.setProfile_image("https://moim.life/profile/skyblue.jpg");
 
-        //when
-        User user = userService.updateProfileImage(user7);
+        // when
+        User user = userService.updateProfileImage(saveUser);
 
-        //then
-        assertTrue(!nickname.equals(user.getName()));
+        // then
+        Assertions.assertThat(user7.getName()).isNotEqualTo(user.getName());
+        Assertions.assertThat(user7.getProfile_image()).isNotEqualTo(user.getProfile_image());
     }
-
 
 }
