@@ -155,8 +155,7 @@ public class UserRepository {
 
         List<FriendDto> result = queryFactory.select(
                 Projections.constructor(FriendDto.class,
-                        qFriend.id,
-                        qFriend.user.id,
+                        qFriend.first_moim_id,
                         qFriend.member_id,
                         qUser.name))
                 .from(qFriend)
