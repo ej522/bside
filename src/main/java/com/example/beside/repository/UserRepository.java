@@ -1,6 +1,6 @@
 package com.example.beside.repository;
 
-import com.example.beside.domain.QFriend;s
+import com.example.beside.domain.QFriend;
 import com.example.beside.domain.QUser;
 import com.example.beside.domain.User;
 import com.example.beside.dto.FriendDto;
