@@ -1,8 +1,11 @@
 package com.example.beside.repository;
 
 import com.example.beside.domain.LoginType;
+import com.example.beside.domain.QFriend;
 import com.example.beside.domain.QUser;
 import com.example.beside.domain.User;
+import com.example.beside.dto.FriendDto;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
@@ -143,6 +146,27 @@ public class UserRepository {
                 .execute();
 
         return queryFactory.selectFrom(qUser).where(qUser.id.eq(user.getId())).fetchOne();
+    }
+
+    public List<FriendDto> findFriendByUserId(Long user_id) {
+        queryFactory = new JPAQueryFactory(em);
+        QFriend qFriend = QFriend.friend;
+        QUser qUser = QUser.user;
+
+         List<FriendDto> result = queryFactory.select(
+                Projections.constructor(FriendDto.class,
+                        qFriend.id,
+                        qFriend.user.id,
+                        qFriend.member_id,
+                        qUser.name)
+                )
+                .from(qFriend)
+                .leftJoin(qUser)
+                .on(qFriend.member_id.eq(qUser.id))
+                .where(qFriend.user.id.eq(user_id))
+                 .fetch();
+
+        return result;
     }
 
 }
