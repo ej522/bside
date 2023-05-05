@@ -3,6 +3,7 @@ package com.example.beside.service;
 import com.example.beside.common.Exception.*;
 import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
+import com.example.beside.dto.FriendDto;
 import com.example.beside.repository.UserRepository;
 import com.example.beside.util.Common;
 import com.example.beside.util.Encrypt;
@@ -160,6 +161,10 @@ public class UserService {
             return false;
 
         return true;
+    }
+
+    public List<FriendDto> findFriendByUserId(User user) {
+        return userRepository.findFriendByUserId(user.getId());
     }
 
 }

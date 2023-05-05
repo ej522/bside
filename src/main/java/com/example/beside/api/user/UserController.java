@@ -3,6 +3,7 @@ package com.example.beside.api.user;
 import com.example.beside.common.Exception.*;
 import com.example.beside.common.response.Response;
 import com.example.beside.domain.User;
+import com.example.beside.dto.FriendDto;
 import com.example.beside.dto.UserDto;
 import com.example.beside.dto.UserTokenDto;
 import com.example.beside.service.EmailService;
@@ -276,6 +277,18 @@ public class UserController {
         userService.updatePassword(user, passwordRequest.new_password);
 
         return Response.success(200, "비밀번호가 변경되었습니다.", "");
+    }
+
+    @Operation(tags = { "User" }, summary = "친구 목록 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "친구 목록이 조회되었습니다.")})
+    @GetMapping("/v1/my-friend")
+    public Response<List<FriendDto>> getMyfriendList(HttpServletRequest token) {
+        User user = (User) token.getAttribute("user");
+
+        List<FriendDto> friendDtoList = userService.findFriendByUserId(user);
+
+        return Response.success(200, "친구 목록이 조회되었습니다.", friendDtoList);
     }
 
     private String generateVerificationCode() {

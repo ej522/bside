@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.beside.dto.FriendDto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -274,6 +275,34 @@ public class MoimRepositoryTest {
         // then
         Assertions.assertThat(notFixedScheduleMoims).size().isGreaterThan(0);
         Assertions.assertThat(myMoim).isEqualTo(newMoim);
+    }
+
+    @Test
+    @DisplayName("유저의 친구 목록을 조회할 수 있는가?")
+    void testFindFriendByUserId() throws Exception {
+        // given
+        long userId = userRepository.saveUser(user);
+        User findUser = userRepository.findUserById(userId);
+        long userId2 = userRepository.saveUser(user2);
+        User findUser2 = userRepository.findUserById(userId2);
+
+        newMoim.setUser(findUser);
+        // 모임 생성
+        long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
+        newMoim.setId(moimId);
+
+        // 모임 참여
+        moimRepository.makeMoimMember(findUser2, newMoim);
+
+        //친구등록
+        moimRepository.makeFriend(findUser, newMoim);
+
+        // when
+        List<FriendDto> friendDtoList = userRepository.findFriendByUserId(userId);
+
+        // then
+        Assertions.assertThat(friendDtoList.size()).isGreaterThan(0);
+
     }
 
 }
