@@ -27,7 +27,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Long saveUser(User user) throws PasswordException, UserValidateNickName {
+    public User saveUser(User user) throws PasswordException, UserValidateNickName {
         Optional<User> findUser = userRepository.findUserByEmail(user.getEmail());
         if (findUser.isPresent())
             throw new IllegalStateException("이미 존재하는 회원입니다");
@@ -92,12 +92,10 @@ public class UserService {
     @Transactional
     public User updateNickname(User user) throws Exception {
         String nickname = user.getName();
-
         Common.NicknameValidate(nickname);
 
         User updateUserInfo = userRepository.updateNickname(user);
 
-        //return updateUserInfo.getName();
         return updateUserInfo;
     }
 
@@ -109,43 +107,47 @@ public class UserService {
     }
 
     @Transactional
-    public Map updateTemporaryPassword(String email) throws UserNotExistException, NoSuchAlgorithmException {
+    public Map<String, Object> updateTemporaryPassword(String email)
+            throws UserNotExistException, NoSuchAlgorithmException {
         Optional<User> user = userRepository.findUserByEmail(email);
+        Map<String, Object> chgInfo = new HashMap<>();
 
-        Map chgInfo = new HashMap();
-        if(user.isEmpty()) {
+        if (user.isEmpty())
             throw new UserNotExistException("해당 이메일이 존재하지 않습니다");
-        } else {
-            if(!user.get().getSocial_type().equals(LoginType.MOIM.name())) {
-                throw new UserNotExistException("해당 이메일이 존재하지 않습니다.");
-            } else {
-                String randomPsw = Common.generateRandomPassword();
-                String encryptPws = Encrypt.getHashingPassword(randomPsw);
 
-                User userInfo = new User();
-                userInfo.setId(user.get().getId());
-                userInfo.setPassword(encryptPws);
-                userInfo.setEmail(user.get().getEmail());
-                userInfo.setSocial_type(user.get().getSocial_type());
+        if (!user.get().getSocial_type().equals(LoginType.MOIM.name()))
+            throw new UserNotExistException("해당 이메일이 존재하지 않습니다.");
 
-                User chgUser = userRepository.updatePassword(userInfo);
+        String randomPsw = Common.generateRandomPassword();
+        String encryptPws = Encrypt.getHashingPassword(randomPsw);
 
-                chgInfo.put("password", randomPsw);
-                chgInfo.put("userInfo", chgUser);
+        User userInfo = new User();
+        userInfo.setId(user.get().getId());
+        userInfo.setEmail(user.get().getEmail());
+        userInfo.setSocial_type(user.get().getSocial_type());
+        userInfo.setPassword(encryptPws);
 
-                return chgInfo;
-            }
-        }
+        User chgUser = userRepository.updatePassword(userInfo);
+
+        chgInfo.put("password", randomPsw);
+        chgInfo.put("userInfo", chgUser);
+
+        return chgInfo;
+
     }
 
     @Transactional
-    public void updatePassword(User user, String new_password) throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
-        //현재 비밀번호, 새 비밀번호 일치 여부
-        if(user.getPassword().equals(new_password))
-            throw new CurrentPasswordEqualNewPassword("현재 비밀번호와 새 비밀번호가 일치합니다.");
-
+    public void updatePassword(User user, String new_password)
+            throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
         // 패스워드 검증
         Common.PasswordValidate(new_password);
+
+        // 현재 비밀번호, 새 비밀번호 일치 여부
+        var findUser = userRepository.findUserById(user.getId());
+        var encrypedPassword = PasswordConverter.hashPassword(new_password);
+
+        if (findUser.getPassword().equals(encrypedPassword))
+            throw new CurrentPasswordEqualNewPassword("현재 비밀번호와 새 비밀번호가 일치합니다.");
 
         user.setPassword(PasswordConverter.hashPassword(new_password));
         userRepository.updatePassword(user);
@@ -154,7 +156,7 @@ public class UserService {
     public Boolean validateCurrentPassword(Long user_id, String validatedPsw) {
         User userInfo = userRepository.findUserById(user_id);
 
-        //비밀번호 일치 여부
+        // 비밀번호 일치 여부
         String hashPassword = PasswordConverter.hashPassword(validatedPsw);
 
         if (!userInfo.getPassword().equals(hashPassword))

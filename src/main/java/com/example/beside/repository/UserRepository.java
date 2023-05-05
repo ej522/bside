@@ -23,7 +23,7 @@ public class UserRepository {
     private final EntityManager em;
     private JPAQueryFactory queryFactory;
 
-    public long saveUser(User user) {
+    public User saveUser(User user) {
         queryFactory = new JPAQueryFactory(em);
 
         QUser qUser = new QUser("u");
@@ -34,7 +34,7 @@ public class UserRepository {
                         user.getProfile_image(), LocalDateTime.now())
                 .execute();
 
-        return queryFactory.select(qUser.id)
+        return queryFactory.select(qUser)
                 .from(qUser).where(qUser.email.eq(user.getEmail())).fetchOne();
 
     }
@@ -153,18 +153,17 @@ public class UserRepository {
         QFriend qFriend = QFriend.friend;
         QUser qUser = QUser.user;
 
-         List<FriendDto> result = queryFactory.select(
+        List<FriendDto> result = queryFactory.select(
                 Projections.constructor(FriendDto.class,
                         qFriend.id,
                         qFriend.user.id,
                         qFriend.member_id,
-                        qUser.name)
-                )
+                        qUser.name))
                 .from(qFriend)
                 .leftJoin(qUser)
                 .on(qFriend.member_id.eq(qUser.id))
                 .where(qFriend.user.id.eq(user_id))
-                 .fetch();
+                .fetch();
 
         return result;
     }

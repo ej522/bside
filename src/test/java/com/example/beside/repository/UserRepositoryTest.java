@@ -1,7 +1,5 @@
 package com.example.beside.repository;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -31,21 +29,21 @@ public class UserRepositoryTest {
         user = new User();
         user.setName("부엉이");
         user.setEmail("test-user@google.com");
-        user.setPassword("Moim@0303");
+        user.setPassword("myMoim@0313");
 
     }
 
     @Test
-    @DisplayName("이메일로 유저를 삭제할 수 있는가")
+    @DisplayName("유저를 삭제할 수 있는가")
     void testDeleteUser() {
         // given
-        userRepository.saveUser(user);
+        User saveUser = userRepository.saveUser(user);
 
         // when
-        userRepository.deleteUser(user);
-        Optional<User> findUserByEmail = userRepository.findUserByEmail(user.getEmail());
+        userRepository.deleteUser(saveUser);
 
         // then
+        Optional<User> findUserByEmail = userRepository.findUserByEmail(user.getEmail());
         Assertions.assertThat(findUserByEmail).isEmpty();
     }
 
@@ -80,12 +78,10 @@ public class UserRepositoryTest {
     @DisplayName("유저를 저장할 수 있는가?")
     void testSaveUser() {
         // when
-        long userId = userRepository.saveUser(user);
-        Optional<User> findedUser = userRepository.findUserByEmail(user.getEmail());
-        user.setId(userId);
+        User saveUser = userRepository.saveUser(user);
 
         // then
-        assertEquals(findedUser.get().getId(), user.getId());
-        assertEquals(findedUser.get().getEmail(), user.getEmail());
+        Assertions.assertThat(saveUser.getEmail()).isEqualTo("test-user@google.com");
+        Assertions.assertThat(saveUser.getName()).isEqualTo("부엉이");
     }
 }

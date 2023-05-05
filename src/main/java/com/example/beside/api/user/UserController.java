@@ -14,10 +14,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.validation.annotation.Validated;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -64,7 +66,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "비밀번호가 일치하지 않습니다.")
     })
     @PostMapping(value = "/v1/login")
-    public Response<UserTokenDto> login(@RequestBody @Validated LoginUserRequest requset)
+    public Response<UserTokenDto> login(@RequestBody @Validated LoginUserRequest requset, HttpServletResponse response)
             throws PasswordException, UserNotExistException, PasswordNotCorrectException {
         User user = new User();
         user.setEmail(requset.email);
@@ -72,6 +74,7 @@ public class UserController {
 
         User userInfo = userService.loginUser(user);
         String userToken = JwtProvider.createToken(userInfo);
+        response.addHeader("Authorization", "Bearer " + userToken);
 
         UserTokenDto result = new UserTokenDto(userToken, new UserDto(userInfo));
         return Response.success(200, "정상 로그인 되었습니다.", result);
@@ -83,15 +86,17 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "올바른 형식의 이메일, 패스워드야 합니다")
     })
     @PostMapping(value = "/v1/signup")
-    public Response<Void> createUser(@RequestBody @Validated CreateUserRequest requset)
-            throws PasswordException, UserNotExistException, UserValidateNickName {
+    public Response<Void> createUser(@RequestBody @Validated CreateUserRequest requset, HttpServletResponse response)
+            throws PasswordException, UserNotExistException, UserValidateNickName, PasswordNotCorrectException {
         User user = new User();
         user.setEmail(requset.email);
         user.setPassword(requset.password);
         user.setName(requset.name);
         user.setProfile_image(requset.imgUrl);
 
-        userService.saveUser(user);
+        User saveUser = userService.saveUser(user);
+        String userToken = JwtProvider.createToken(saveUser);
+        response.addHeader("Authorization", "Bearer " + userToken);
 
         return Response.success(201, "회원가입이 완료되었습니다.", null);
     }
@@ -150,7 +155,7 @@ public class UserController {
     @Operation(tags = { "User" }, summary = "닉네임변경")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "닉네임이 변경 되었습니다."),
-            @ApiResponse(responseCode = "400", description = "닉네임은 8자 이내여야 합니다.")})
+            @ApiResponse(responseCode = "400", description = "닉네임은 8자 이내여야 합니다.") })
     @PutMapping(value = "/v1/update/nickname")
     public Response<UserDto> updateNickname(HttpServletRequest token,
             @RequestBody @Validated UpdateUserNicknameRequest request)
@@ -235,10 +240,10 @@ public class UserController {
     @Operation(tags = { "User" }, summary = "임시 비밀번호 발급")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "이메일 인증 번호를 발송했습니다."),
-            @ApiResponse(responseCode = "500", description = "이메일 전송 실패")})
+            @ApiResponse(responseCode = "500", description = "이메일 전송 실패") })
     @PostMapping("/v1/send-password")
     public Response<String> sendPassword(@RequestBody @Validated EmailRequest request) throws Exception {
-        Map userInfo = userService.updateTemporaryPassword(request.email);
+        Map<String, Object> userInfo = userService.updateTemporaryPassword(request.email);
         User user = (User) userInfo.get("userInfo");
 
         try {
@@ -253,12 +258,14 @@ public class UserController {
     @Operation(tags = { "User" }, summary = "현재 비밀번호 확인")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "비밀번호가 변경되었습니다."),
-            @ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않습니다.")})
+            @ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않습니다.") })
     @PostMapping("/v1/check/current-password")
-    public Response validateCurrentPasswordMatch(HttpServletRequest token, @RequestBody @Validated PasswordRequest passwordRequest) throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
+    public Response validateCurrentPasswordMatch(HttpServletRequest token,
+            @RequestBody @Validated PasswordRequest passwordRequest)
+            throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
         User user = (User) token.getAttribute("user");
 
-        if(!userService.validateCurrentPassword(user.getId(), passwordRequest.current_password)) {
+        if (!userService.validateCurrentPassword(user.getId(), passwordRequest.current_password)) {
             throw new PasswordNotCorrectException("비밀번호가 일치하지 않습니다.");
         }
 
@@ -268,9 +275,10 @@ public class UserController {
     @Operation(tags = { "User" }, summary = "비밀번호 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "비밀번호가 변경되었습니다."),
-            @ApiResponse(responseCode = "400", description = "현재 비밀번호와 새 비밀번호가 일치합니다.")})
+            @ApiResponse(responseCode = "400", description = "현재 비밀번호와 새 비밀번호가 일치합니다.") })
     @PutMapping("/v1/update/password")
-    public Response updatePassword(HttpServletRequest token, @RequestBody @Validated PasswordRequest passwordRequest) throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
+    public Response updatePassword(HttpServletRequest token, @RequestBody @Validated PasswordRequest passwordRequest)
+            throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
         User user = (User) token.getAttribute("user");
         user.setPassword(passwordRequest.current_password);
 
@@ -281,7 +289,7 @@ public class UserController {
 
     @Operation(tags = { "User" }, summary = "친구 목록 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "친구 목록이 조회되었습니다.")})
+            @ApiResponse(responseCode = "200", description = "친구 목록이 조회되었습니다.") })
     @GetMapping("/v1/my-friend")
     public Response<List<FriendDto>> getMyfriendList(HttpServletRequest token) {
         User user = (User) token.getAttribute("user");

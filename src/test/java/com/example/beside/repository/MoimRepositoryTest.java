@@ -90,8 +90,7 @@ public class MoimRepositoryTest {
     @DisplayName("모임을 등록할 수 있는가?")
     void testMakeMoim() throws Exception {
         // given
-        long userId = userRepository.saveUser(user);
-        User findUser = userRepository.findUserById(userId);
+        User findUser = userRepository.saveUser(user);
 
         // when
         long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
@@ -106,8 +105,7 @@ public class MoimRepositoryTest {
     @DisplayName("모임 정보를 가져올 수 있는가?")
     void testGetMoimInfo() throws Exception {
         // given
-        long userId = userRepository.saveUser(user);
-        User findUser = userRepository.findUserById(userId);
+        User findUser = userRepository.saveUser(user);
         // 모임 생성
         long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
 
@@ -125,8 +123,7 @@ public class MoimRepositoryTest {
     @DisplayName("만들어진 모임에 참여할수 있는가?")
     void testMakeMoimMember() throws Exception {
         // given
-        long userId = userRepository.saveUser(user);
-        User findUser = userRepository.findUserById(userId);
+        User findUser = userRepository.saveUser(user);
         // 모임 생성
         moimRepository.makeMoim(findUser, newMoim, moimdate1);
 
@@ -141,14 +138,13 @@ public class MoimRepositoryTest {
     @DisplayName("이미 참여한 모임인가?")
     void testAlreadyJoinedMoim() throws Exception {
         // given
-        long userId = userRepository.saveUser(user);
-        User findUser = userRepository.findUserById(userId);
+        User findUser = userRepository.saveUser(user);
         long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
         // 모임 생성
         moimRepository.makeMoimMember(findUser, newMoim);
 
         // when
-        Boolean alreadyJoinedMoim = moimRepository.alreadyJoinedMoim(moimId, userId);
+        Boolean alreadyJoinedMoim = moimRepository.alreadyJoinedMoim(moimId, findUser.getId());
 
         // then
         Assertions.assertThat(alreadyJoinedMoim).isTrue();
@@ -158,8 +154,7 @@ public class MoimRepositoryTest {
     @DisplayName("해당 모임의 정보를 보여줄 수 있는가?")
     void testGetMoimOveralInfo() throws Exception {
         // given
-        long userId = userRepository.saveUser(user);
-        User findUser = userRepository.findUserById(userId);
+        User findUser = userRepository.saveUser(user);
         long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
         // 모임 생성
         moimRepository.makeMoimMember(findUser, newMoim);
@@ -181,8 +176,7 @@ public class MoimRepositoryTest {
     @DisplayName("친구를 등록할 수 있는가?")
     void testMakeFriend() throws Exception {
         // given
-        long userId = userRepository.saveUser(user);
-        User findUser = userRepository.findUserById(userId);
+        User findUser = userRepository.saveUser(user);
         newMoim.setUser(findUser);
         // 모임 생성
         moimRepository.makeMoim(findUser, newMoim, moimdate1);
@@ -198,10 +192,8 @@ public class MoimRepositoryTest {
     @DisplayName("모임의 상세 일정을 등록할 수 있는가")
     void testSaveSchedule() throws Exception {
         // given
-        long userId = userRepository.saveUser(user);
-        User findUser = userRepository.findUserById(userId);
-        long userId2 = userRepository.saveUser(user2);
-        User findUser2 = userRepository.findUserById(userId2);
+        User findUser = userRepository.saveUser(user);
+        User findUser2 = userRepository.saveUser(user2);
 
         newMoim.setUser(findUser);
         // 모임 생성
@@ -222,10 +214,8 @@ public class MoimRepositoryTest {
     @DisplayName("모임 일정 확정하기")
     void testFixMoimDate() throws Exception {
         // given
-        long userId = userRepository.saveUser(user);
-        User findUser = userRepository.findUserById(userId);
-        long userId2 = userRepository.saveUser(user2);
-        User findUser2 = userRepository.findUserById(userId2);
+        User findUser = userRepository.saveUser(user);
+        User findUser2 = userRepository.saveUser(user2);
 
         newMoim.setUser(findUser);
         // 모임 생성
@@ -252,10 +242,8 @@ public class MoimRepositoryTest {
     @DisplayName("확정나지 않은 모임 일정 조회")
     void testGetNotFixedScheduleMoims() throws Exception {
         // given
-        long userId = userRepository.saveUser(user);
-        User findUser = userRepository.findUserById(userId);
-        long userId2 = userRepository.saveUser(user2);
-        User findUser2 = userRepository.findUserById(userId2);
+        User findUser = userRepository.saveUser(user);
+        User findUser2 = userRepository.saveUser(user2);
 
         newMoim.setUser(findUser);
         // 모임 생성
@@ -281,10 +269,8 @@ public class MoimRepositoryTest {
     @DisplayName("유저의 친구 목록을 조회할 수 있는가?")
     void testFindFriendByUserId() throws Exception {
         // given
-        long userId = userRepository.saveUser(user);
-        User findUser = userRepository.findUserById(userId);
-        long userId2 = userRepository.saveUser(user2);
-        User findUser2 = userRepository.findUserById(userId2);
+        User findUser = userRepository.saveUser(user);
+        User findUser2 = userRepository.saveUser(user2);
 
         newMoim.setUser(findUser);
         // 모임 생성
@@ -294,11 +280,11 @@ public class MoimRepositoryTest {
         // 모임 참여
         moimRepository.makeMoimMember(findUser2, newMoim);
 
-        //친구등록
+        // 친구등록
         moimRepository.makeFriend(findUser, newMoim);
 
         // when
-        List<FriendDto> friendDtoList = userRepository.findFriendByUserId(userId);
+        List<FriendDto> friendDtoList = userRepository.findFriendByUserId(findUser.getId());
 
         // then
         Assertions.assertThat(friendDtoList.size()).isGreaterThan(0);

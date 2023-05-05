@@ -87,10 +87,8 @@ public class SchedulerTest {
     @Test
     void testFixMoimSchedulering() throws Exception {
         // given
-        long userId = userRepository.saveUser(user);
-        User findUser = userRepository.findUserById(userId);
-        long userId2 = userRepository.saveUser(user2);
-        User findUser2 = userRepository.findUserById(userId2);
+        User findUser = userRepository.saveUser(user);
+        User findUser2 = userRepository.saveUser(user2);
 
         newMoim.setUser(findUser);
         newMoim.setDead_line_hour(0);
