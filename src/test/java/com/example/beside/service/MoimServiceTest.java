@@ -4,8 +4,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import com.example.beside.dto.MoimAdjustScheduleDto;
+import com.example.beside.dto.MoimParticipateInfoDto;
 import com.example.beside.dto.MyMoimDto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -228,11 +229,11 @@ public class MoimServiceTest {
         String encryptMoimID = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
 
         // when
-        Map<String, Object> participateMoim = moimService.participateMoim(saveUser2, encryptMoimID);
+        MoimParticipateInfoDto participateMoim = moimService.participateMoim(saveUser2, encryptMoimID);
 
         // then
-        Assertions.assertThat(participateMoim.get("moim_name")).isEqualTo("테스트 모임");
-        Assertions.assertThat(participateMoim.get("dead_line_hour")).isEqualTo(5);
+        Assertions.assertThat(participateMoim.getMoim_name()).isEqualTo("테스트 모임");
+        Assertions.assertThat(participateMoim.getDead_line_hour()).isEqualTo(5);
     }
 
     @Test
@@ -329,13 +330,13 @@ public class MoimServiceTest {
         moimService.participateMoim(saveUser2, encryptedId);
 
         // when
-        Map<String, Object> adjustSchedule = moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
+        MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
 
         // then
-        Moim moim = moimService.getMoimInfo((Long) adjustSchedule.get("moim_id"));
+        Moim moim = moimService.getMoimInfoWithEncrypedMoimId(encryptedId);
 
-        Assertions.assertThat(adjustSchedule.get("moim_name")).isEqualTo("테스트 모임");
-        Assertions.assertThat(adjustSchedule.get("moim_maker")).isEqualTo("부엉이2");
+        Assertions.assertThat(adjustSchedule.getMoim_name()).isEqualTo("테스트 모임");
+        Assertions.assertThat(adjustSchedule.getMoim_leader()).isEqualTo("부엉이2");
         Assertions.assertThat(moim.getNobody_schedule_selected()).isEqualTo(false);
     }
 
