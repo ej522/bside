@@ -2,6 +2,11 @@ package com.example.beside.api.user;
 
 import com.example.beside.common.Exception.*;
 import com.example.beside.common.response.Response;
+import com.example.beside.common.response.UserResponse;
+import com.example.beside.common.response.AllUsersResponse;
+import com.example.beside.common.response.BooleanResponse;
+import com.example.beside.common.response.LoginResponse;
+import com.example.beside.common.response.MyFriendResponse;
 import com.example.beside.domain.User;
 import com.example.beside.dto.FriendDto;
 import com.example.beside.dto.UserDto;
@@ -27,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
+import io.swagger.v3.oas.annotations.media.Content;
 import java.util.*;
 
 @Tag(name = "User", description = "유저 API")
@@ -41,11 +47,11 @@ public class UserController {
 
     @Operation(tags = { "User" }, summary = "사용자 목록 페이지 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 목록 조회를 성공했습니다."),
+            @ApiResponse(responseCode = "200", description = "사용자 목록 조회를 성공했습니다.", content = @Content(schema = @Schema(implementation = AllUsersResponse.class))),
             @ApiResponse(responseCode = "400", description = "존재하지 않는 사용자입니다.")
     })
     @GetMapping(value = "/v1/users")
-    public Response<List<UserDto>> getAllUsers(HttpServletRequest request) {
+    public AllUsersResponse getAllUsers(HttpServletRequest request) {
         List<UserDto> UserDtoList = new ArrayList<>();
         User user_ = (User) request.getAttribute("user");
 
@@ -56,17 +62,17 @@ public class UserController {
             UserDtoList.add(userDto);
         });
 
-        return Response.success(200, "유저 목록 조회를 완료했습니다", UserDtoList);
+        return AllUsersResponse.success(200, "유저 목록 조회를 완료했습니다", UserDtoList);
     }
 
     @Operation(tags = { "User" }, summary = "로그인")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다."),
+            @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다.", content = @Content(schema = @Schema(implementation = LoginResponse.class))),
             @ApiResponse(responseCode = "400", description = "해당 계정이 존재하지 않습니다."),
             @ApiResponse(responseCode = "401", description = "비밀번호가 일치하지 않습니다.")
     })
     @PostMapping(value = "/v1/login")
-    public Response<UserTokenDto> login(@RequestBody @Validated LoginUserRequest requset, HttpServletResponse response)
+    public LoginResponse login(@RequestBody @Validated LoginUserRequest requset, HttpServletResponse response)
             throws PasswordException, UserNotExistException, PasswordNotCorrectException {
         User user = new User();
         user.setEmail(requset.email);
@@ -77,12 +83,12 @@ public class UserController {
         response.addHeader("Authorization", "Bearer " + userToken);
 
         UserTokenDto result = new UserTokenDto(userToken, new UserDto(userInfo));
-        return Response.success(200, "정상 로그인 되었습니다.", result);
+        return LoginResponse.success(200, "정상 로그인 되었습니다.", result);
     }
 
     @Operation(tags = { "User" }, summary = "회원가입")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "회원가입이 완료되었습니다."),
+            @ApiResponse(responseCode = "201", description = "회원가입이 완료되었습니다.", content = @Content(schema = @Schema(implementation = Response.class))),
             @ApiResponse(responseCode = "400", description = "올바른 형식의 이메일, 패스워드야 합니다")
     })
     @PostMapping(value = "/v1/signup")
@@ -103,11 +109,11 @@ public class UserController {
 
     @Operation(tags = { "User" }, summary = "이메일 인증번호 전송")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이메일 인증 코드가 발송되었습니다."),
+            @ApiResponse(responseCode = "200", description = "이메일 인증 코드가 발송되었습니다.", content = @Content(schema = @Schema(implementation = Response.class))),
             @ApiResponse(responseCode = "500", description = "이메일 전송이 실패했습니다.")
     })
     @PostMapping(value = "/v1/signup/email-validate")
-    public Response<String> sendVerificationEmail(@RequestBody @Validated EmailRequest request) {
+    public Response<Void> sendVerificationEmail(@RequestBody @Validated EmailRequest request) {
         try {
             String verificationCode = generateVerificationCode();
 
@@ -121,23 +127,23 @@ public class UserController {
 
     @Operation(tags = { "User" }, summary = "이메일 인증 코드 확인")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이메일 인증 코드가 발송되었습니다."),
+            @ApiResponse(responseCode = "200", description = "이메일 인증 코드가 발송되었습니다.", content = @Content(schema = @Schema(implementation = BooleanResponse.class))),
             @ApiResponse(responseCode = "500", description = "이메일 전송이 실패했습니다.")
     })
     @PostMapping(value = "/v1/signup/verify-code")
-    public Response<Boolean> checkVerificationCode(@RequestBody @Validated EmailValidateRequest request)
+    public BooleanResponse checkVerificationCode(@RequestBody @Validated EmailValidateRequest request)
             throws EmailValidateException {
 
         Boolean isValid = emailService.checkEmailValidate(request.getEmail(), request.getValidateCode());
         if (isValid)
-            return Response.success(200, "이메일 인증이 완료 되었습니다.", isValid);
+            return BooleanResponse.success(200, "이메일 인증이 완료 되었습니다.", isValid);
         else
-            return Response.fail(400, "이메일 인증이 실패 했습니다", isValid);
+            return BooleanResponse.fail(400, "이메일 인증이 실패 했습니다", isValid);
     }
 
     @Operation(tags = { "User" }, summary = "회원삭제")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "유저가 삭제되었습니다."),
+            @ApiResponse(responseCode = "200", description = "유저가 삭제되었습니다.", content = @Content(schema = @Schema(implementation = Response.class))),
             @ApiResponse(responseCode = "400", description = "존재하지 않는 유저입니다")
     })
     @DeleteMapping(value = "/v1/delete")
@@ -154,10 +160,10 @@ public class UserController {
 
     @Operation(tags = { "User" }, summary = "닉네임변경")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "닉네임이 변경 되었습니다."),
+            @ApiResponse(responseCode = "200", description = "닉네임이 변경 되었습니다.", content = @Content(schema = @Schema(implementation = UserResponse.class))),
             @ApiResponse(responseCode = "400", description = "닉네임은 8자 이내여야 합니다.") })
     @PutMapping(value = "/v1/update/nickname")
-    public Response<UserDto> updateNickname(HttpServletRequest token,
+    public UserResponse updateNickname(HttpServletRequest token,
             @RequestBody @Validated UpdateUserNicknameRequest request)
             throws Exception {
         User user = (User) token.getAttribute("user");
@@ -171,27 +177,28 @@ public class UserController {
 
         UserDto userDto = new UserDto(changUser);
 
-        return Response.success(200, "닉네임이 변경 되었습니다.", userDto);
+        return UserResponse.success(200, "닉네임이 변경 되었습니다.", userDto);
     }
 
     @Operation(tags = { "User" }, summary = "이메일 계정 확인")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "해당 이메일이 존재합니다"),
+            @ApiResponse(responseCode = "200", description = "해당 이메일이 존재합니다", content = @Content(schema = @Schema(implementation = BooleanResponse.class))),
             @ApiResponse(responseCode = "400", description = "해당 이메일이 존재하지 않습니다") })
     @PostMapping(value = "/v1/check-email")
-    public Response<String> checkEmailAccount(@RequestBody @Validated EmailRequest request)
+    public BooleanResponse checkEmailAccount(@RequestBody @Validated EmailRequest request)
             throws UserNotExistException {
         var email = request.getEmail();
         var user = userService.findUserByEmail(email);
 
         if (user.isEmpty())
-            return Response.success(200, "중복된 이메일이 없습니다", "Success");
+            return BooleanResponse.success(200, "중복된 이메일이 없습니다", true);
         else
-            return Response.success(400, "해당 이메일이 존재합니다", "Error");
+            return BooleanResponse.success(400, "해당 이메일이 존재합니다", false);
     }
 
     @Operation(tags = { "User" }, summary = "프로필 이미지 전체 조회")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "프로필 이미지가 조회 되었습니다.") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 이미지가 조회 되었습니다.", content = @Content(schema = @Schema(implementation = Response.class))), })
     @GetMapping(value = "/v1/all-Profile-img")
     public Response<List<String>> getAllProfileImage() {
         List<String> profileList = new ArrayList<String>();
@@ -220,9 +227,10 @@ public class UserController {
     }
 
     @Operation(tags = { "User" }, summary = "유저프로필 수정")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "프로필이 수정되었습니다.") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필이 수정되었습니다.", content = @Content(schema = @Schema(implementation = UserResponse.class))), })
     @PutMapping("/v1/update/profile-image")
-    public Response<UserDto> updateProfileImage(HttpServletRequest token,
+    public UserResponse updateProfileImage(HttpServletRequest token,
             @RequestBody @Validated UpdateUserProfileImage updateUserProfileImage) throws Exception {
         User user = (User) token.getAttribute("user");
 
@@ -234,12 +242,12 @@ public class UserController {
 
         UserDto userDto = new UserDto(updateUser);
 
-        return Response.success(200, "프로필 이미지가 수정 되었습니다.", userDto);
+        return UserResponse.success(200, "프로필 이미지가 수정 되었습니다.", userDto);
     }
 
     @Operation(tags = { "User" }, summary = "임시 비밀번호 발급")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이메일 인증 번호를 발송했습니다."),
+            @ApiResponse(responseCode = "200", description = "이메일 인증 번호를 발송했습니다.", content = @Content(schema = @Schema(implementation = Response.class))),
             @ApiResponse(responseCode = "500", description = "이메일 전송 실패") })
     @PostMapping("/v1/send-password")
     public Response<String> sendPassword(@RequestBody @Validated EmailRequest request) throws Exception {
@@ -257,10 +265,10 @@ public class UserController {
 
     @Operation(tags = { "User" }, summary = "현재 비밀번호 확인")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "비밀번호가 변경되었습니다."),
+            @ApiResponse(responseCode = "200", description = "비밀번호가 변경되었습니다.", content = @Content(schema = @Schema(implementation = Response.class))),
             @ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않습니다.") })
     @PostMapping("/v1/check/current-password")
-    public Response validateCurrentPasswordMatch(HttpServletRequest token,
+    public Response<Void> validateCurrentPasswordMatch(HttpServletRequest token,
             @RequestBody @Validated PasswordRequest passwordRequest)
             throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
         User user = (User) token.getAttribute("user");
@@ -269,34 +277,35 @@ public class UserController {
             throw new PasswordNotCorrectException("비밀번호가 일치하지 않습니다.");
         }
 
-        return Response.success(200, "비밀 번호가 일치합니다.", "");
+        return Response.success(200, "비밀 번호가 일치합니다.", null);
     }
 
     @Operation(tags = { "User" }, summary = "비밀번호 수정")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "비밀번호가 변경되었습니다."),
+            @ApiResponse(responseCode = "200", description = "비밀번호가 변경되었습니다.", content = @Content(schema = @Schema(implementation = Response.class))),
             @ApiResponse(responseCode = "400", description = "현재 비밀번호와 새 비밀번호가 일치합니다.") })
     @PutMapping("/v1/update/password")
-    public Response updatePassword(HttpServletRequest token, @RequestBody @Validated PasswordRequest passwordRequest)
+    public Response<Void> updatePassword(HttpServletRequest token,
+            @RequestBody @Validated PasswordRequest passwordRequest)
             throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
         User user = (User) token.getAttribute("user");
         user.setPassword(passwordRequest.current_password);
 
         userService.updatePassword(user, passwordRequest.new_password);
 
-        return Response.success(200, "비밀번호가 변경되었습니다.", "");
+        return Response.success(200, "비밀번호가 변경되었습니다.", null);
     }
 
     @Operation(tags = { "User" }, summary = "친구 목록 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "친구 목록이 조회되었습니다.") })
+            @ApiResponse(responseCode = "200", description = "친구 목록이 조회되었습니다.", content = @Content(schema = @Schema(implementation = MyFriendResponse.class))), })
     @GetMapping("/v1/my-friend")
-    public Response<List<FriendDto>> getMyfriendList(HttpServletRequest token) {
+    public MyFriendResponse getMyfriendList(HttpServletRequest token) {
         User user = (User) token.getAttribute("user");
 
         List<FriendDto> friendDtoList = userService.findFriendByUserId(user);
 
-        return Response.success(200, "친구 목록이 조회되었습니다.", friendDtoList);
+        return MyFriendResponse.success(200, "친구 목록이 조회되었습니다.", friendDtoList);
     }
 
     private String generateVerificationCode() {

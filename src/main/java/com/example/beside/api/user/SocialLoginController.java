@@ -2,6 +2,7 @@ package com.example.beside.api.user;
 
 import com.example.beside.common.Exception.SocialLoginException;
 import com.example.beside.common.Exception.UserNotExistException;
+import com.example.beside.common.response.LoginResponse;
 import com.example.beside.common.response.Response;
 import com.example.beside.domain.User;
 import com.example.beside.dto.UserDto;
@@ -17,6 +18,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.media.Content;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -28,10 +30,10 @@ public class SocialLoginController {
 
     @Operation(tags = { "Social" }, summary = "카카오 로그인")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다.")
+            @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다.", content = @Content(schema = @Schema(implementation = LoginResponse.class))),
     })
     @PostMapping(value = "/v1/login/Kakao")
-    public Response<UserTokenDto> kakaoLogin(@RequestBody @Valid SocialUserRequest request,
+    public LoginResponse kakaoLogin(@RequestBody @Valid SocialUserRequest request,
             HttpServletResponse response)
             throws UserNotExistException, SocialLoginException {
         User userInfo = socialLoginService.getKaKaoUserInfo(request.access_token);
@@ -42,7 +44,7 @@ public class SocialLoginController {
         UserTokenDto result = new UserTokenDto(userToken, new UserDto(user));
         response.addHeader("Authorization", "Bearer " + userToken);
 
-        return Response.success(200, "정상 로그인 되었습니다.", result);
+        return LoginResponse.success(200, "정상 로그인 되었습니다.", result);
     }
 
     @Data
