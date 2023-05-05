@@ -92,7 +92,6 @@ public class UserService {
     @Transactional
     public User updateNickname(User user) throws Exception {
         String nickname = user.getName();
-
         Common.NicknameValidate(nickname);
 
         User updateUserInfo = userRepository.updateNickname(user);

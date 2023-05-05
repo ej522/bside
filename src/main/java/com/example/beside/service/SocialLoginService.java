@@ -73,9 +73,7 @@ public class SocialLoginService {
         if (optionalUser.isPresent()) {
             return optionalUser.get();
         } else {
-            Long id = userRepository.saveUser(user);
-            user.setId(id);
-            return user;
+            return userRepository.saveUser(user);
         }
     }
 }
