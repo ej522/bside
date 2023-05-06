@@ -96,5 +96,6 @@ public class MailRepositoryTest {
         // when, then
         assertThrows(EmailValidateException.class, () -> mailRepository.checkEmailValidateTime(emailValidate.getEmail(),
                 emailValidate.getValidate_code()));
+
     }
 }

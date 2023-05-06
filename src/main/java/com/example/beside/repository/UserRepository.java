@@ -1,6 +1,5 @@
 package com.example.beside.repository;
 
-import com.example.beside.domain.LoginType;
 import com.example.beside.domain.QFriend;
 import com.example.beside.domain.QUser;
 import com.example.beside.domain.User;
@@ -155,8 +154,7 @@ public class UserRepository {
 
         List<FriendDto> result = queryFactory.select(
                 Projections.constructor(FriendDto.class,
-                        qFriend.id,
-                        qFriend.user.id,
+                        qFriend.first_moim_id,
                         qFriend.member_id,
                         qUser.name))
                 .from(qFriend)

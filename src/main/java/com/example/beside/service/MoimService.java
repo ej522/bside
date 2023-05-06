@@ -2,7 +2,6 @@ package com.example.beside.service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import com.example.beside.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
-import com.example.beside.dto.MoimDateDto;
 import com.example.beside.dto.MoimOveralDateDto;
 import com.example.beside.dto.MoimOveralScheduleDto;
 import com.example.beside.repository.MoimRepository;
@@ -35,14 +33,14 @@ public class MoimService {
 
     @Transactional
     public String makeMoim(User user, Moim moim, List<MoimDate> moim_date_list) throws Exception {
-        moimMakeValidate(moim_date_list);
+        makeMoimValidate(moim_date_list);
 
         long moimId = moimRepository.makeMoim(user, moim, moim_date_list);
 
         return encrypt.encrypt(String.valueOf(moimId));
     }
 
-    private void moimMakeValidate(List<MoimDate> moim_date_list) throws MoimParticipateException {
+    private void makeMoimValidate(List<MoimDate> moim_date_list) throws MoimParticipateException {
         Set<LocalDateTime> selectedDates = new HashSet<>();
         for (MoimDate moim_date : moim_date_list) {
             LocalDateTime selected_date = moim_date.getSelected_date();
@@ -59,10 +57,10 @@ public class MoimService {
     }
 
     @Transactional
-    public Map<String, Object> participateMoim(User user, String encryptInfo) throws Exception {
+    public MoimParticipateInfoDto participateMoim(User user, String encryptInfo) throws Exception {
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
-        Moim moim = getMoimInfo(moimId);
-        moimValidate(user, moimId, moim);
+        Moim moim = getMoimInfoWithMoimId(moimId);
+        participateMoimValidate(user, moimId, moim);
 
         // 친구 추가
         moimRepository.makeFriend(user, moim);
@@ -72,18 +70,14 @@ public class MoimService {
 
         // 모임 종합 정보 조회
         List<MoimOveralDateDto> moimOveralInfo = moimRepository.getMoimOveralInfo(moimId);
-        List<MoimDateDto> moimDateDtos = moimOveralInfo.stream().map(MoimDateDto::new).collect(Collectors.toList());
 
         // 데이터 결과 가공
-        Map<String, Object> result = Map.of("moim_leader", moimOveralInfo.get(0).getUser_name(),
-                "moim_name", moimOveralInfo.get(0).getMoim_name(),
-                "dead_line_hour", moimOveralInfo.get(0).getDead_line_hour(),
-                "dateList", moimDateDtos);
+        MoimParticipateInfoDto result = new MoimParticipateInfoDto(moimOveralInfo);
 
         return result;
     }
 
-    private void moimValidate(User user, Long moimId, Moim moim) throws MoimParticipateException {
+    private void participateMoimValidate(User user, Long moimId, Moim moim) throws MoimParticipateException {
         if (user.getId().equals(moim.getUser().getId()))
             throw new MoimParticipateException("모임 주최자는 모임 멤버로 참여할 수 없습니다.");
 
@@ -98,7 +92,7 @@ public class MoimService {
     }
 
     @Transactional
-    public Map<String, Object> adjustSchedule(User user, String encryptInfo, List<MoimMemberTime> moimTimeInfos)
+    public MoimAdjustScheduleDto adjustSchedule(User user, String encryptInfo, List<MoimMemberTime> moimTimeInfos)
             throws Exception {
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
         adjustScheduleValidate(user, moimId, moimTimeInfos);
@@ -108,15 +102,9 @@ public class MoimService {
         moimRepository.saveSchedule(moimMember, moimTimeInfos);
         // 모임 일정 현황 조회
         List<MoimOveralScheduleDto> moimScheduleInfo = moimRepository.getMoimScheduleInfo(moimId);
-        List<MoimScheduleDto> moimDateDtos = moimScheduleInfo.stream().map(MoimScheduleDto::new)
-                .collect(Collectors.toList());
-
         // 데이터 결과 가공
-        Map<String, Object> result = Map.of("moim_id", moimScheduleInfo.get(0).getMoim_id(),
-                "moim_maker", moimScheduleInfo.get(0).getUser_name(),
-                "moim_name", moimScheduleInfo.get(0).getMoim_name(),
-                "dead_line_hour", moimScheduleInfo.get(0).getDead_line_hour(),
-                "dateList", moimDateDtos);
+        MoimAdjustScheduleDto result = new MoimAdjustScheduleDto(moimScheduleInfo);
+
         return result;
     }
 
@@ -177,18 +165,22 @@ public class MoimService {
         return date.getYear() + "-" + month + "-" + day;
     }
 
-    public Moim getMoimInfo(Long moimId) {
-        System.out.println("service-"+moimRepository.getMoimInfo(moimId).getNobody_schedule_selected());
+    public Moim getMoimInfoWithMoimId(Long moimId) {
+        return moimRepository.getMoimInfo(moimId);
+    }
+
+    public Moim getMoimInfoWithEncrypedMoimId(String encryptInfo) throws NumberFormatException, Exception {
+        Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
         return moimRepository.getMoimInfo(moimId);
     }
 
     public List<MyMoimDto> getMyMoimList(Long user_id) {
-        List<MyMoimDto> moimList =  moimRepository.findMyMoimList(user_id);
+        List<MyMoimDto> moimList = moimRepository.findMyMoimList(user_id);
 
-        for(MyMoimDto moim : moimList) {
+        for (MyMoimDto moim : moimList) {
             Long cnt = moimRepository.findMemberCount(moim.getMoim_id());
 
-            //주최자도 더해줌
+            // 주최자도 더해줌
             cnt += 1;
 
             moim.setMemeber_cnt(cnt);

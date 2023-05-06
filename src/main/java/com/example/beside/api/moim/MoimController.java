@@ -5,8 +5,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import com.example.beside.dto.MoimAdjustScheduleDto;
+import com.example.beside.dto.MoimParticipateInfoDto;
 import com.example.beside.dto.MyMoimDto;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.beside.common.response.MoimParticipateResponse;
+import com.example.beside.common.response.MoimAdjustScheduleResponse;
+import com.example.beside.common.response.MoimHistoryResponse;
 import com.example.beside.common.response.Response;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
@@ -25,6 +29,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.micrometer.common.lang.NonNull;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,27 +48,28 @@ public class MoimController {
 
     @Operation(tags = { "Moim" }, summary = "모임 참여하기")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "모임에 참여 됐습니다."),
+            @ApiResponse(responseCode = "200", description = "모임에 참여 됐습니다.", content = @Content(schema = @Schema(implementation = MoimParticipateResponse.class))),
             @ApiResponse(responseCode = "400", description = "모임은 최대 10명 까지 가능합니다."),
             @ApiResponse(responseCode = "400_1", description = "모임 주최자는 모임 멤버로 참여할 수 없습니다."),
             @ApiResponse(responseCode = "400_2", description = "해당 모임에 이미 참여하고 있습니다.")
     })
     @PostMapping(value = "/v1/participate")
-    public Response<Map<String, Object>> participateMoim(HttpServletRequest token,
+    public MoimParticipateResponse participateMoim(HttpServletRequest token,
             @RequestBody @Validated MoimParticipateRequest request) throws Exception {
         User user_ = (User) token.getAttribute("user");
         String encrptedInfo = request.getEncrptedInfo();
 
-        Map<String, Object> participateMoim = moimService.participateMoim(user_, encrptedInfo);
+        MoimParticipateInfoDto participateMoim = moimService.participateMoim(user_, encrptedInfo);
 
-        return Response.success(200, "모임에 참여 됐습니다.", participateMoim);
+        return MoimParticipateResponse.success(200, "모임에 참여 됐습니다.", participateMoim);
     }
 
     @Operation(tags = { "Moim" }, summary = "모임 생성하기")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "모임을 생성했습니다"),
+            @ApiResponse(responseCode = "200", description = "모임을 생성했습니다", content = @Content(schema = @Schema(implementation = Response.class))),
             @ApiResponse(responseCode = "400", description = "날짜별 가능한 시간대는 최소 1개 ~ 2개만 선택 가능합니다."),
             @ApiResponse(responseCode = "400_1", description = "동일한 날짜가 포함되어 있습니다."),
+
     })
     @PostMapping(value = "/v1/make")
     public Response<String> createMoim(HttpServletRequest token, @RequestBody @Validated CreateMoimRequest request)
@@ -91,18 +97,18 @@ public class MoimController {
             moimDates.add(temp);
         }
 
-        String moimId = moimService.makeMoim(user_, newMoim, moimDates);
-        return Response.success(200, "모임 생성을 완료했습니다", moimId);
+        String encryptedMoimId = moimService.makeMoim(user_, newMoim, moimDates);
+        return Response.success(200, "모임 생성을 완료했습니다", encryptedMoimId);
     }
 
     @Operation(tags = { "Moim" }, summary = "참여 모임 일정 정하기")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "모임 스케줄을 등록 했습니다."),
+            @ApiResponse(responseCode = "200", description = "모임 스케줄을 등록 했습니다.", content = @Content(schema = @Schema(implementation = MoimAdjustScheduleResponse.class))),
             @ApiResponse(responseCode = "400_1", description = "해당 모임에 참여되지 않았습니다"),
             @ApiResponse(responseCode = "400_2", description = "불가능한 일자를 선택했습니다"),
     })
     @PostMapping(value = "/v1/adjust-schedule")
-    public Response<Map<String, Object>> adjustSchedule(HttpServletRequest token,
+    public MoimAdjustScheduleResponse adjustSchedule(HttpServletRequest token,
             @RequestBody @Validated AdjustScheduleRequest request) throws Exception {
         User user_ = (User) token.getAttribute("user");
         String encrptedInfo = request.getEncrptedInfo();
@@ -115,7 +121,6 @@ public class MoimController {
         for (MoimTimeInfo moimTime : moimTimeList) {
             var temp = new MoimMemberTime();
             LocalDateTime selectedDate = LocalDate.parse(moimTime.selectedDate, formatter).atStartOfDay();
-
             temp.setSelected_date(selectedDate);
 
             temp.setAm_nine(moimTime.amNine);
@@ -135,22 +140,22 @@ public class MoimController {
             moimMemberTimeList.add(temp);
         }
 
-        Map<String, Object> adjustSchedule = moimService.adjustSchedule(user_, encrptedInfo, moimMemberTimeList);
+        MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(user_, encrptedInfo, moimMemberTimeList);
 
-        return Response.success(200, "모임 스케줄을 등록 했습니다.", adjustSchedule);
+        return MoimAdjustScheduleResponse.success(200, "모임 스케줄을 등록 했습니다.", adjustSchedule);
     }
 
     @Operation(tags = { "Moim" }, summary = "마이약속 모임 목록")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "나의 모임 목록이 조회 되었습니다.")
+            @ApiResponse(responseCode = "200", description = "나의 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MoimHistoryResponse.class))),
     })
     @PostMapping(value = "/v1/my-moim-history")
-    public Response<List<MyMoimDto>> getMyMoimList(HttpServletRequest token) {
+    public MoimHistoryResponse getMyMoimList(HttpServletRequest token) {
         User user = (User) token.getAttribute("user");
 
         List<MyMoimDto> moimList = moimService.getMyMoimList(user.getId());
 
-        return Response.success(200, "나의 모임 목록이 조회 되었습니다.", moimList);
+        return MoimHistoryResponse.success(200, "나의 모임 목록이 조회 되었습니다.", moimList);
     }
 
     @Data
