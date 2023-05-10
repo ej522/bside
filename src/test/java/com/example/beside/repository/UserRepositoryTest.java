@@ -1,5 +1,8 @@
 package com.example.beside.repository;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.example.beside.domain.Moim;
+import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.User;
 
 import jakarta.transaction.Transactional;
@@ -20,7 +25,14 @@ public class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private MoimRepository moimRepository;
+
     private User user;
+    private User user2;
+    private Moim newMoim;
+    private List<MoimDate> moimdate1 = new ArrayList<>();
 
     @BeforeEach
     @DisplayName("각각의 Test 함수 실행 전 실행되는 함수")
@@ -30,6 +42,26 @@ public class UserRepositoryTest {
         user.setName("부엉이");
         user.setEmail("test-user@google.com");
         user.setPassword("myMoim@0313");
+
+        user2 = new User();
+        user2.setName("고양이");
+        user2.setEmail("test-user2@google.com");
+        user2.setPassword("myMoim@0313");
+
+        // 모임 세팅
+        newMoim = new Moim();
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+
+        // 모임일정 세팅
+        MoimDate moimDate = new MoimDate();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        moimDate.setSelected_date(LocalDate.parse("2023-03-10", formatter).atStartOfDay());
+        moimDate.setMorning(false);
+        moimDate.setAfternoon(false);
+        moimDate.setEvening(true);
+        moimdate1.add(moimDate);
 
     }
 
@@ -44,7 +76,9 @@ public class UserRepositoryTest {
 
         // then
         Optional<User> findUserByEmail = userRepository.findUserByEmail(user.getEmail());
+        User findUserById = userRepository.findUserById(saveUser.getId());
         Assertions.assertThat(findUserByEmail).isEmpty();
+        Assertions.assertThat(findUserById).isNull();
     }
 
     @Test
@@ -84,4 +118,5 @@ public class UserRepositoryTest {
         Assertions.assertThat(saveUser.getEmail()).isEqualTo("test-user@google.com");
         Assertions.assertThat(saveUser.getName()).isEqualTo("부엉이");
     }
+
 }

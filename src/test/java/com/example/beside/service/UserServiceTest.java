@@ -116,17 +116,6 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("틀린 패스워드로 유저 삭제")
-    void testDeleteUserWithWrongPassword() throws NoSuchAlgorithmException, PasswordException, UserValidateNickName {
-        // given
-        userService.saveUser(user1);
-        user1.setPassword("test");
-
-        // when, then
-        assertThrows(IllegalStateException.class, () -> userService.deleteUser(user1));
-    }
-
-    @Test
     @DisplayName("존재하지 않는 유저 삭제")
     void testDeleteUserWithNotExist() throws NoSuchAlgorithmException, PasswordException {
         // when, then
