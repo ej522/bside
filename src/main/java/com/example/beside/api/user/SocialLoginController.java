@@ -52,7 +52,7 @@ public class SocialLoginController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "정상적으로 회원 탈퇴가 되었습니다.", content = @Content(schema = @Schema(implementation = LoginResponse.class))),
     })
-    @PostMapping(value = "/v1/unlink/Kakao")
+    @DeleteMapping(value = "/v1/unlink/Kakao")
     public Response<Void> kakaoUnLink(HttpServletRequest token)
             throws SocialLoginException {
         User user = (User) token.getAttribute("user");
