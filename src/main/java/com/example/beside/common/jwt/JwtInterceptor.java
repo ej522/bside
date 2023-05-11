@@ -1,5 +1,6 @@
 package com.example.beside.common.jwt;
 
+import com.example.beside.repository.JwtRedisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -14,8 +15,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtInterceptor implements HandlerInterceptor {
 
     private UserService userService;
-
-    @Autowired
     private JwtProvider jwtProvider = new JwtProvider();
 
     public JwtInterceptor(UserService userService) {

@@ -7,10 +7,12 @@ import com.example.beside.common.response.AllUsersResponse;
 import com.example.beside.common.response.BooleanResponse;
 import com.example.beside.common.response.LoginResponse;
 import com.example.beside.common.response.MyFriendResponse;
+import com.example.beside.domain.JwtRedis;
 import com.example.beside.domain.User;
 import com.example.beside.dto.FriendDto;
 import com.example.beside.dto.UserDto;
 import com.example.beside.dto.UserTokenDto;
+import com.example.beside.repository.JwtRedisRepository;
 import com.example.beside.service.EmailService;
 import com.example.beside.service.UserService;
 import com.example.beside.util.JwtProvider;
@@ -25,6 +27,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.validation.annotation.Validated;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -44,6 +49,10 @@ public class UserController {
     private final EmailService emailService;
 
     private final UserService userService;
+
+    private final JwtRedisRepository jwtRedisRepository;
+
+    private final RedisTemplate redisTemplate;
 
     @Operation(tags = { "User" }, summary = "사용자 목록 페이지 조회")
     @ApiResponses(value = {
@@ -81,6 +90,13 @@ public class UserController {
         User userInfo = userService.loginUser(user);
         String userToken = JwtProvider.createToken(userInfo);
         response.addHeader("Authorization", "Bearer " + userToken);
+
+//        JwtRedis jwtRedis = new JwtRedis(userToken, userInfo.getEmail(), userToken);
+//        jwtRedisRepository.save(jwtRedis);
+
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        valueOperations.set("jwt:"+userInfo.getId(), userToken);
+        //valueOperations.set("jwt:"+userToken, userToken);
 
         UserTokenDto result = new UserTokenDto(userToken, new UserDto(userInfo));
         return LoginResponse.success(200, "정상 로그인 되었습니다.", result);
@@ -306,6 +322,20 @@ public class UserController {
         List<FriendDto> friendDtoList = userService.findFriendByUserId(user);
 
         return MyFriendResponse.success(200, "친구 목록이 조회되었습니다.", friendDtoList);
+    }
+
+    @Operation(tags = { "User" }, summary = "로그아웃")
+    @PostMapping("/v1/logout")
+    public Response logout(HttpServletRequest token) {
+        User user = (User) token.getAttribute("user");
+
+        System.out.println("logout="+redisTemplate.opsForValue().get("jwt:"+user.getId()));
+//        if(redisTemplate.opsForValue().get("jwt:"+user.getId())!=null) {
+//
+//            redisTemplate.delete("jwt:"+user.getId());
+//        }
+
+        return Response.success(200, "로그아웃 되었습니다.", null);
     }
 
     private String generateVerificationCode() {

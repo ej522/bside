@@ -2,6 +2,7 @@ package com.example.beside.util;
 
 import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
+import com.example.beside.repository.JwtRedisRepository;
 import io.jsonwebtoken.Claims;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -10,8 +11,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.assertj.core.api.Assertions;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class JwtProviderTest {
+
     JwtProvider jwtProvider = new JwtProvider();
 
     private long id = 777;
@@ -36,7 +39,7 @@ class JwtProviderTest {
     }
 
     @Test
-    public void valid() throws IllegalAccessException {
+    public void valid() throws Exception {
         String token = JwtProvider.createToken(user);
 
         // when
