@@ -1,7 +1,5 @@
 package com.example.beside.common.jwt;
 
-import com.example.beside.repository.JwtRedisRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.example.beside.domain.User;
@@ -12,13 +10,17 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+
 public class JwtInterceptor implements HandlerInterceptor {
 
     private UserService userService;
-    private JwtProvider jwtProvider = new JwtProvider();
+    //private JwtProvider jwtProvider = new JwtProvider();
 
-    public JwtInterceptor(UserService userService) {
+    private JwtProvider jwtProvider;
+
+    public JwtInterceptor(UserService userService, JwtProvider jwtProvider) {
         this.userService = userService;
+        this.jwtProvider = jwtProvider;
     }
 
     @Override
@@ -29,6 +31,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         String token = request.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer ")) {
             String jwtToken = token.substring(7);
+
             Claims claims = jwtProvider.validJwtToken(jwtToken);
 
             // Claim 값 복호화

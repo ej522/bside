@@ -7,12 +7,10 @@ import com.example.beside.common.response.AllUsersResponse;
 import com.example.beside.common.response.BooleanResponse;
 import com.example.beside.common.response.LoginResponse;
 import com.example.beside.common.response.MyFriendResponse;
-import com.example.beside.domain.JwtRedis;
 import com.example.beside.domain.User;
 import com.example.beside.dto.FriendDto;
 import com.example.beside.dto.UserDto;
 import com.example.beside.dto.UserTokenDto;
-import com.example.beside.repository.JwtRedisRepository;
 import com.example.beside.service.EmailService;
 import com.example.beside.service.UserService;
 import com.example.beside.util.JwtProvider;
@@ -27,7 +25,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.validation.annotation.Validated;
@@ -39,6 +37,7 @@ import jakarta.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import io.swagger.v3.oas.annotations.media.Content;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Tag(name = "User", description = "유저 API")
 @RequiredArgsConstructor
@@ -50,9 +49,12 @@ public class UserController {
 
     private final UserService userService;
 
-    private final JwtRedisRepository jwtRedisRepository;
+    private final JwtProvider jwtProvider;
 
     private final RedisTemplate redisTemplate;
+
+    @Value("${jwt.expTime}")
+    private Long tokenValidTime;
 
     @Operation(tags = { "User" }, summary = "사용자 목록 페이지 조회")
     @ApiResponses(value = {
@@ -83,20 +85,17 @@ public class UserController {
     @PostMapping(value = "/v1/login")
     public LoginResponse login(@RequestBody @Validated LoginUserRequest requset, HttpServletResponse response)
             throws PasswordException, UserNotExistException, PasswordNotCorrectException {
+
         User user = new User();
         user.setEmail(requset.email);
         user.setPassword(requset.password);
 
         User userInfo = userService.loginUser(user);
-        String userToken = JwtProvider.createToken(userInfo);
+        String userToken = jwtProvider.createToken(userInfo);
         response.addHeader("Authorization", "Bearer " + userToken);
 
-//        JwtRedis jwtRedis = new JwtRedis(userToken, userInfo.getEmail(), userToken);
-//        jwtRedisRepository.save(jwtRedis);
-
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        valueOperations.set("jwt:"+userInfo.getId(), userToken);
-        //valueOperations.set("jwt:"+userToken, userToken);
+        valueOperations.set("jwt:"+userInfo.getId(), userToken, tokenValidTime, TimeUnit.MILLISECONDS);
 
         UserTokenDto result = new UserTokenDto(userToken, new UserDto(userInfo));
         return LoginResponse.success(200, "정상 로그인 되었습니다.", result);
@@ -117,7 +116,7 @@ public class UserController {
         user.setProfile_image(requset.imgUrl);
 
         User saveUser = userService.saveUser(user);
-        String userToken = JwtProvider.createToken(saveUser);
+        String userToken = jwtProvider.createToken(saveUser);
         response.addHeader("Authorization", "Bearer " + userToken);
 
         return Response.success(201, "회원가입이 완료되었습니다.", null);
@@ -329,11 +328,9 @@ public class UserController {
     public Response logout(HttpServletRequest token) {
         User user = (User) token.getAttribute("user");
 
-        System.out.println("logout="+redisTemplate.opsForValue().get("jwt:"+user.getId()));
-//        if(redisTemplate.opsForValue().get("jwt:"+user.getId())!=null) {
-//
-//            redisTemplate.delete("jwt:"+user.getId());
-//        }
+        if(redisTemplate.opsForValue().get("jwt:"+user.getId())!=null) {
+            redisTemplate.delete("jwt:"+user.getId());
+        }
 
         return Response.success(200, "로그아웃 되었습니다.", null);
     }

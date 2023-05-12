@@ -1,5 +1,6 @@
 package com.example.beside.common.config;
 
+import com.example.beside.util.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -13,11 +14,13 @@ public class InterCeptorConfig implements WebMvcConfigurer {
 
     @Autowired
     UserService userService;
+    @Autowired
+    JwtProvider jwtProvider;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // JWT 토큰 검증을 적용할 URL 패턴 지정
-        registry.addInterceptor(new JwtInterceptor(userService))
+        registry.addInterceptor(new JwtInterceptor(userService, jwtProvider))
                 .addPathPatterns("/api/users/v1/users")
                 .addPathPatterns("/api/moim/v1/make")
                 .addPathPatterns("/api/moim/v1/participate")

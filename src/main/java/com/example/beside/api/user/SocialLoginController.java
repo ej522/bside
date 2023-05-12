@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class SocialLoginController {
 
     private final SocialLoginService socialLoginService;
+    private final JwtProvider jwtProvider;
 
     @Operation(tags = { "Social" }, summary = "카카오 로그인")
     @ApiResponses(value = {
@@ -39,7 +40,7 @@ public class SocialLoginController {
         User user = socialLoginService.loginKakao(userInfo);
 
         // jwt 토큰발급
-        String userToken = JwtProvider.createToken(user);
+        String userToken = jwtProvider.createToken(user);
         UserTokenDto result = new UserTokenDto(userToken, new UserDto(user));
         response.addHeader("Authorization", "Bearer " + userToken);
 
