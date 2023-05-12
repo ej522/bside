@@ -1,6 +1,11 @@
 package com.example.beside.repository;
 
+import com.example.beside.domain.Moim;
 import com.example.beside.domain.QFriend;
+import com.example.beside.domain.QMoim;
+import com.example.beside.domain.QMoimDate;
+import com.example.beside.domain.QMoimMember;
+import com.example.beside.domain.QMoimMemberTime;
 import com.example.beside.domain.QUser;
 import com.example.beside.domain.User;
 import com.example.beside.dto.FriendDto;
@@ -40,18 +45,38 @@ public class UserRepository {
 
     public void deleteUser(User user) {
         queryFactory = new JPAQueryFactory(em);
-        QUser qUser = new QUser("u");
+        QUser qUser = QUser.user;
+        QFriend qFriend = QFriend.friend;
+        QMoim qMoim = QMoim.moim;
+        QMoimDate qMoimDate = QMoimDate.moimDate;
+        QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
+        QMoimMember qMoimMember = QMoimMember.moimMember;
 
-        queryFactory.delete(qUser)
-                .where(qUser.email.eq(user.getEmail())
-                        .and(qUser.password.eq(user.getPassword())))
-                .execute();
+        // 모임 삭제
+        List<Moim> moimList = queryFactory.selectFrom(qMoim).where(qMoim.user.eq(user)).fetch();
+        for (var moim : moimList) {
+            // 모임날짜 삭제
+            queryFactory.delete(qMoimDate).where(qMoimDate.moim.eq(moim)).execute();
+            // 모임멤버 삭제
+            queryFactory.delete(qMoimMember).where(qMoimMember.moim.eq(moim)).execute();
+            // 모임멤버 시간 삭제
+            queryFactory.delete(qMoimMemberTime).where(qMoimMemberTime.moim.eq(moim)).execute();
+            // 모임 삭제
+            queryFactory.delete(qMoim).where(qMoim.eq(moim)).execute();
+        }
+
+        // 친구 삭제
+        queryFactory.delete(qFriend).where(qFriend.user.eq(user)).execute();
+
+        // 유저 삭제
+        queryFactory.delete(qUser).where(qUser.eq(user)).execute();
+        em.flush();
+        em.clear();
     }
 
     public Optional<User> findUserByEmailAndPassword(String email) {
         queryFactory = new JPAQueryFactory(em);
         QUser qUser = new QUser("u");
-
         User result = queryFactory.selectFrom(qUser)
                 .from(qUser)
                 .where(qUser.email.eq(email))

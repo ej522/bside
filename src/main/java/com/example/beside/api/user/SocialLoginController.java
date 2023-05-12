@@ -3,6 +3,7 @@ package com.example.beside.api.user;
 import com.example.beside.common.Exception.SocialLoginException;
 import com.example.beside.common.Exception.UserNotExistException;
 import com.example.beside.common.response.LoginResponse;
+import com.example.beside.common.response.Response;
 import com.example.beside.domain.User;
 import com.example.beside.dto.UserDto;
 import com.example.beside.dto.UserTokenDto;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -45,6 +47,18 @@ public class SocialLoginController {
         response.addHeader("Authorization", "Bearer " + userToken);
 
         return LoginResponse.success(200, "정상 로그인 되었습니다.", result);
+    }
+
+    @Operation(tags = { "Social" }, summary = "카카오 계정 제거")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정상적으로 회원 탈퇴가 되었습니다.", content = @Content(schema = @Schema(implementation = LoginResponse.class))),
+    })
+    @DeleteMapping(value = "/v1/unlink/Kakao")
+    public Response<Void> kakaoUnLink(HttpServletRequest token)
+            throws SocialLoginException {
+        User user = (User) token.getAttribute("user");
+        socialLoginService.unLinkKakao(user);
+        return Response.success(201, "회원 탈퇴가 완료되었습니다.", null);
     }
 
     @Data

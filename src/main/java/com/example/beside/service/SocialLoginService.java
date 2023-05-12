@@ -6,8 +6,9 @@ import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.dto.KakaoLoginInfoDto;
 import com.example.beside.repository.UserRepository;
-
+import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,9 @@ import com.google.gson.Gson;
 @RequiredArgsConstructor
 public class SocialLoginService {
     private final UserRepository userRepository;
+
+    @Value("${spring.kakao.admin}")
+    private String APP_ADMIN_KEY;
 
     // 카카오 유저 정보
     public User getKaKaoUserInfo(String access_token) throws SocialLoginException {
@@ -74,6 +78,36 @@ public class SocialLoginService {
             return optionalUser.get();
         } else {
             return userRepository.saveUser(user);
+        }
+    }
+
+    // 카카오 연결 해제
+    @Transactional
+    public void unLinkKakao(User user) throws SocialLoginException {
+        String reqUrl = "https://kapi.kakao.com/v1/user/unlink";
+        String user_id = user.getEmail();
+
+        try {
+            URL url = new URL(reqUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("Authorization", "KakaoAK " + APP_ADMIN_KEY);
+
+            String body = "target_id_type=user_id&target_id=" + user_id;
+            byte[] outputBytes = body.getBytes("UTF-8");
+            conn.setDoOutput(true);
+            conn.getOutputStream().write(outputBytes);
+
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                throw new SocialLoginException("카카오 연결 해제에 실패했습니다 " + conn.getResponseCode());
+            }
+
+            conn.disconnect();
+            userRepository.deleteUser(user);
+
+        } catch (Exception ex) {
+            throw new SocialLoginException("카카오 연결 해제에 실패했습니다" + ex.getMessage());
         }
     }
 }
