@@ -327,11 +327,7 @@ public class UserController {
     @PostMapping("/v1/logout")
     public Response logout(HttpServletRequest token) {
         User user = (User) token.getAttribute("user");
-
-        if(redisTemplate.opsForValue().get("jwt:"+user.getId())!=null) {
-            redisTemplate.delete("jwt:"+user.getId());
-        }
-
+        redisTemplate.delete("jwt:"+user.getId());
         return Response.success(200, "로그아웃 되었습니다.", null);
     }
 

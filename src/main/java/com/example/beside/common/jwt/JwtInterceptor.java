@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtInterceptor implements HandlerInterceptor {
 
     private UserService userService;
-    //private JwtProvider jwtProvider = new JwtProvider();
 
     private JwtProvider jwtProvider;
 
@@ -33,6 +32,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             String jwtToken = token.substring(7);
 
             Claims claims = jwtProvider.validJwtToken(jwtToken);
+
 
             // Claim 값 복호화
             String user_id = String.valueOf(claims.get("user_id"));

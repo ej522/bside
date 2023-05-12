@@ -6,6 +6,7 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import java.util.Date;
 
@@ -16,8 +17,13 @@ public class JwtProvider {
     @Value("${jwt.expTime}")
     private Long tokenValidTime;
 
-    public String createToken(User user) {
+    private RedisTemplate redisTemplate;
 
+    public JwtProvider(RedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
+    public String createToken(User user) {
         Date now = new Date();
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS512, secret_key) // 사용할 암호화 알고리즘과 signature에 들어갈 secret값 세팅
@@ -33,9 +39,15 @@ public class JwtProvider {
     // 유효성확인
     public Claims validJwtToken(String authorizationHeader) {
 
-        return Jwts.parser()
+        Claims claims = Jwts.parser()
                 .setSigningKey(secret_key)
                 .parseClaimsJws(authorizationHeader)
                 .getBody();
+
+        if(redisTemplate.opsForValue().get("jwt:"+claims.get("user_id"))==null) {
+            throw new RuntimeException("로그아웃한 아이디입니다.");
+        }
+
+        return claims;
     }
 }
