@@ -283,11 +283,12 @@ public class MoimRepositoryTest {
         // 친구등록
         moimRepository.makeFriend(findUser, newMoim);
 
+        userRepository.deleteUser(findUser);
         // when
         List<FriendDto> friendDtoList = userRepository.findFriendByUserId(findUser.getId());
 
         // then
-        Assertions.assertThat(friendDtoList.size()).isGreaterThan(0);
+        Assertions.assertThat(friendDtoList.size()).isEqualTo(0);
 
     }
 

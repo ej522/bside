@@ -69,10 +69,7 @@ public class UserService {
         Optional<User> findUserByEmail = findUserByEmail(user.getEmail());
 
         if (!findUserByEmail.isPresent())
-            throw new IllegalStateException("이미 존재하는 회원입니다");
-
-        if (!findUserByEmail.get().getPassword().toString().equals(Encrypt.getHashingPassword(user.getPassword())))
-            throw new IllegalStateException("비밀번호가 동일하지 않습니다");
+            throw new IllegalStateException("존재하지 않는 회원입니다");
 
         userRepository.deleteUser(findUserByEmail.get());
     }

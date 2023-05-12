@@ -22,16 +22,18 @@ public class InterCeptorConfig implements WebMvcConfigurer {
         // JWT 토큰 검증을 적용할 URL 패턴 지정
         registry.addInterceptor(new JwtInterceptor(userService, jwtProvider))
                 .addPathPatterns("/api/users/v1/users")
-                .addPathPatterns("/api/moim/v1/make")
-                .addPathPatterns("/api/moim/v1/participate")
                 .addPathPatterns("/api/users/v1/update/nickname")
-                .addPathPatterns("/api/moim/v1/adjust-schedule")
                 .addPathPatterns("/api/users/v1/update/profile-image")
-                .addPathPatterns("/api/moim/v1/my-moim-history")
                 .addPathPatterns("/api/users/v1/update/password")
                 .addPathPatterns("/api/users/v1/check/current-password")
                 .addPathPatterns("/api/users/v1/my-friend")
-                .addPathPatterns("/api/users/v1/logout");
+                .addPathPatterns("/api/users/v1/logout")
+                .addPathPatterns("/api/users/v1/delete")
+                .addPathPatterns("/api/moim/v1/adjust-schedule")
+                .addPathPatterns("/api/moim/v1/make")
+                .addPathPatterns("/api/moim/v1/participate")
+                .addPathPatterns("/api/moim/v1/my-moim-history")
+                .addPathPatterns("/api/social/v1/unlink/Kakao");
     }
 
 }

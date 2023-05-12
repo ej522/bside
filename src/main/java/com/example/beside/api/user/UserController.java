@@ -162,12 +162,10 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "존재하지 않는 유저입니다")
     })
     @DeleteMapping(value = "/v1/delete")
-    public Response<Void> deleteUser(@RequestBody @Validated DeleteUserRequest request)
+    public Response<Void> deleteUser(HttpServletRequest token)
             throws NoSuchAlgorithmException, UserNotExistException {
 
-        User user = new User();
-        user.setEmail(request.email);
-        user.setPassword(request.password);
+        User user = (User) token.getAttribute("user");
         userService.deleteUser(user);
 
         return Response.success(200, "유저가 삭제되었습니다.", null);
@@ -392,18 +390,6 @@ public class UserController {
 
         @Schema(description = "nickname", example = "닉네임", type = "String")
         private String name;
-    }
-
-    @Data
-    static class DeleteUserRequest {
-        @NotNull
-        @Email
-        @Schema(description = "email", example = "test@naver.com", type = "String")
-        private String email;
-
-        @NotNull
-        @Schema(description = "password", example = "password", type = "String")
-        private String password;
     }
 
     @Data
