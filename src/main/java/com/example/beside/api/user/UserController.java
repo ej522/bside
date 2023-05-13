@@ -25,6 +25,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.validation.annotation.Validated;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -34,6 +37,7 @@ import jakarta.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import io.swagger.v3.oas.annotations.media.Content;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Tag(name = "User", description = "유저 API")
 @RequiredArgsConstructor
@@ -44,6 +48,13 @@ public class UserController {
     private final EmailService emailService;
 
     private final UserService userService;
+
+    private final JwtProvider jwtProvider;
+
+    private final RedisTemplate<String, String> redisTemplate;
+
+    @Value("${jwt.expTime}")
+    private Long tokenValidTime;
 
     @Operation(tags = { "User" }, summary = "사용자 목록 페이지 조회")
     @ApiResponses(value = {
@@ -74,13 +85,17 @@ public class UserController {
     @PostMapping(value = "/v1/login")
     public LoginResponse login(@RequestBody @Validated LoginUserRequest requset, HttpServletResponse response)
             throws PasswordException, UserNotExistException, PasswordNotCorrectException {
+
         User user = new User();
         user.setEmail(requset.email);
         user.setPassword(requset.password);
 
         User userInfo = userService.loginUser(user);
-        String userToken = JwtProvider.createToken(userInfo);
+        String userToken = jwtProvider.createToken(userInfo);
         response.addHeader("Authorization", "Bearer " + userToken);
+
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        valueOperations.set("jwt:" + userInfo.getId(), userToken, tokenValidTime, TimeUnit.MILLISECONDS);
 
         UserTokenDto result = new UserTokenDto(userToken, new UserDto(userInfo));
         return LoginResponse.success(200, "정상 로그인 되었습니다.", result);
@@ -101,7 +116,7 @@ public class UserController {
         user.setProfile_image(requset.imgUrl);
 
         User saveUser = userService.saveUser(user);
-        String userToken = JwtProvider.createToken(saveUser);
+        String userToken = jwtProvider.createToken(saveUser);
         response.addHeader("Authorization", "Bearer " + userToken);
 
         return Response.success(201, "회원가입이 완료되었습니다.", null);
@@ -304,6 +319,14 @@ public class UserController {
         List<FriendDto> friendDtoList = userService.findFriendByUserId(user);
 
         return MyFriendResponse.success(200, "친구 목록이 조회되었습니다.", friendDtoList);
+    }
+
+    @Operation(tags = { "User" }, summary = "로그아웃")
+    @PostMapping("/v1/logout")
+    public Response<Void> logout(HttpServletRequest token) {
+        User user = (User) token.getAttribute("user");
+        redisTemplate.delete("jwt:" + user.getId());
+        return Response.success(200, "로그아웃 되었습니다.", null);
     }
 
     private String generateVerificationCode() {
