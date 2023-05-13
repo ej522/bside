@@ -17,9 +17,9 @@ public class JwtProvider {
     @Value("${jwt.expTime}")
     private Long tokenValidTime;
 
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
-    public JwtProvider(RedisTemplate redisTemplate) {
+    public JwtProvider(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
@@ -44,7 +44,7 @@ public class JwtProvider {
                 .parseClaimsJws(authorizationHeader)
                 .getBody();
 
-        if(redisTemplate.opsForValue().get("jwt:"+claims.get("user_id"))==null) {
+        if (redisTemplate.opsForValue().get("jwt:" + claims.get("user_id")) == null) {
             throw new RuntimeException("로그아웃한 아이디입니다.");
         }
 

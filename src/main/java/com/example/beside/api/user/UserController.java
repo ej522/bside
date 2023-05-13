@@ -51,7 +51,7 @@ public class UserController {
 
     private final JwtProvider jwtProvider;
 
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${jwt.expTime}")
     private Long tokenValidTime;
@@ -95,7 +95,7 @@ public class UserController {
         response.addHeader("Authorization", "Bearer " + userToken);
 
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        valueOperations.set("jwt:"+userInfo.getId(), userToken, tokenValidTime, TimeUnit.MILLISECONDS);
+        valueOperations.set("jwt:" + userInfo.getId(), userToken, tokenValidTime, TimeUnit.MILLISECONDS);
 
         UserTokenDto result = new UserTokenDto(userToken, new UserDto(userInfo));
         return LoginResponse.success(200, "정상 로그인 되었습니다.", result);
@@ -323,9 +323,9 @@ public class UserController {
 
     @Operation(tags = { "User" }, summary = "로그아웃")
     @PostMapping("/v1/logout")
-    public Response logout(HttpServletRequest token) {
+    public Response<Void> logout(HttpServletRequest token) {
         User user = (User) token.getAttribute("user");
-        redisTemplate.delete("jwt:"+user.getId());
+        redisTemplate.delete("jwt:" + user.getId());
         return Response.success(200, "로그아웃 되었습니다.", null);
     }
 
