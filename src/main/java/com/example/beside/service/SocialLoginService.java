@@ -29,7 +29,7 @@ public class SocialLoginService {
     private String APP_ADMIN_KEY;
 
     // 카카오 유저 정보
-    public User getKaKaoUserInfo(String access_token) throws SocialLoginException {
+    public User getKaKaoUserInfo(String access_token) throws SocialLoginException, UserNotExistException {
         User userInfo = new User();
         String reqUrl = "https://kapi.kakao.com/v2/user/me";
 
@@ -65,7 +65,7 @@ public class SocialLoginService {
             throw new SocialLoginException("로그인에 실패했습니다 " + ex.getMessage());
         }
 
-        return userInfo;
+        return loginKakao(userInfo);
     }
 
     // 로그인
@@ -79,6 +79,33 @@ public class SocialLoginService {
         } else {
             user.setProfile_image(null);
             return userRepository.saveUser(user);
+        }
+    }
+
+    // 카카오 로그아웃
+    public void logoutKakao(User user) throws SocialLoginException {
+        String reqUrl = "https://kapi.kakao.com/v1/user/logout";
+        String user_id = user.getEmail();
+
+        try {
+            URL url = new URL(reqUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("Authorization", "KakaoAK " + APP_ADMIN_KEY);
+
+            String body = "target_id_type=user_id&target_id=" + user_id;
+            byte[] outputBytes = body.getBytes("UTF-8");
+            conn.setDoOutput(true);
+            conn.getOutputStream().write(outputBytes);
+
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                throw new SocialLoginException("카카오 로그아웃에 실패했습니다 " + conn.getResponseCode());
+            }
+            conn.disconnect();
+
+        } catch (Exception ex) {
+            throw new SocialLoginException("카카오 로그아웃에 실패했습니다" + ex.getMessage());
         }
     }
 

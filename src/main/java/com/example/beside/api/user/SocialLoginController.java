@@ -49,8 +49,7 @@ public class SocialLoginController {
     public LoginResponse kakaoLogin(@RequestBody @Valid SocialUserRequest request,
             HttpServletResponse response)
             throws UserNotExistException, SocialLoginException {
-        User userInfo = socialLoginService.getKaKaoUserInfo(request.access_token);
-        User user = socialLoginService.loginKakao(userInfo);
+        User user = socialLoginService.getKaKaoUserInfo(request.access_token);
 
         // jwt 토큰발급
         String userToken = jwtProvider.createToken(user);
@@ -61,6 +60,16 @@ public class SocialLoginController {
         response.addHeader("Authorization", "Bearer " + userToken);
 
         return LoginResponse.success(200, "정상 로그인 되었습니다.", result);
+    }
+
+    @Operation(tags = { "Social" }, summary = "카카오 로그아웃")
+    @PostMapping("/v1/logout/kakao")
+    public Response<Void> kakaoLogout(HttpServletRequest token) throws SocialLoginException {
+        User user = (User) token.getAttribute("user");
+        socialLoginService.logoutKakao(user);
+        redisTemplate.delete("jwt:" + user.getId());
+
+        return Response.success(200, "정상 로그아웃 되었습니다.", null);
     }
 
     @Operation(tags = { "Social" }, summary = "카카오 계정 제거")
