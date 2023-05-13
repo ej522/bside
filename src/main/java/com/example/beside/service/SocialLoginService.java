@@ -77,6 +77,7 @@ public class SocialLoginService {
         if (optionalUser.isPresent()) {
             return optionalUser.get();
         } else {
+            user.setProfile_image(null);
             return userRepository.saveUser(user);
         }
     }
