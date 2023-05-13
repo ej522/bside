@@ -20,6 +20,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.media.Content;
+
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -29,6 +35,11 @@ public class SocialLoginController {
 
     private final SocialLoginService socialLoginService;
     private final JwtProvider jwtProvider;
+
+    private final RedisTemplate<String, String> redisTemplate;
+
+    @Value("${jwt.expTime}")
+    private Long tokenValidTime;
 
     @Operation(tags = { "Social" }, summary = "카카오 로그인")
     @ApiResponses(value = {
@@ -43,6 +54,9 @@ public class SocialLoginController {
 
         // jwt 토큰발급
         String userToken = jwtProvider.createToken(user);
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        valueOperations.set("jwt:" + user.getId(), userToken, tokenValidTime, TimeUnit.MILLISECONDS);
+
         UserTokenDto result = new UserTokenDto(userToken, new UserDto(user));
         response.addHeader("Authorization", "Bearer " + userToken);
 
@@ -58,6 +72,8 @@ public class SocialLoginController {
             throws SocialLoginException {
         User user = (User) token.getAttribute("user");
         socialLoginService.unLinkKakao(user);
+        redisTemplate.delete("jwt:" + user.getId());
+
         return Response.success(201, "회원 탈퇴가 완료되었습니다.", null);
     }
 
