@@ -30,11 +30,8 @@ public class UserRepository {
     public User saveUser(User user) {
         user.setCreated_time(LocalDateTime.now());
         em.persist(user);
-
-        queryFactory = new JPAQueryFactory(em);
-        QUser qUser = new QUser("u");
-        return queryFactory.select(qUser)
-                .from(qUser).where(qUser.email.eq(user.getEmail())).fetchOne();
+        em.flush();
+        return user;
     }
 
     public void deleteUser(User user) {
