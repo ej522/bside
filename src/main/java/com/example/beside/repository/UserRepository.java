@@ -28,19 +28,13 @@ public class UserRepository {
     private JPAQueryFactory queryFactory;
 
     public User saveUser(User user) {
+        user.setCreated_time(LocalDateTime.now());
+        em.persist(user);
+
         queryFactory = new JPAQueryFactory(em);
-
         QUser qUser = new QUser("u");
-        queryFactory.insert(qUser)
-                .columns(qUser.social_type, qUser.name, qUser.email, qUser.password, qUser.profile_image,
-                        qUser.created_time)
-                .values(user.getSocial_type(), user.getName(), user.getEmail(), user.getPassword(),
-                        user.getProfile_image(), LocalDateTime.now())
-                .execute();
-
         return queryFactory.select(qUser)
                 .from(qUser).where(qUser.email.eq(user.getEmail())).fetchOne();
-
     }
 
     public void deleteUser(User user) {
