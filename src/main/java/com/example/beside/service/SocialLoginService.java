@@ -29,6 +29,7 @@ public class SocialLoginService {
     private String APP_ADMIN_KEY;
 
     // 카카오 유저 정보
+    @Transactional
     public User getKaKaoUserInfo(String access_token) throws SocialLoginException, UserNotExistException {
         User userInfo = new User();
         String reqUrl = "https://kapi.kakao.com/v2/user/me";
@@ -65,21 +66,14 @@ public class SocialLoginService {
             throw new SocialLoginException("로그인에 실패했습니다 " + ex.getMessage());
         }
 
-        return loginKakao(userInfo);
-    }
+        Optional<User> optionalUser = userRepository
+                .findUserByEmailAndSocialType(userInfo.getEmail(), userInfo.getSocial_type());
 
-    // 로그인
-    @Transactional
-    public User loginKakao(User user) throws UserNotExistException {
-        Optional<User> optionalUser = userRepository.findUserByEmailAndSocialType(user.getEmail(),
-                user.getSocial_type());
-
-        if (optionalUser.isPresent()) {
+        if (optionalUser.isPresent())
             return optionalUser.get();
-        } else {
-            user.setProfile_image(null);
-            return userRepository.saveUser(user);
-        }
+
+        userInfo.setProfile_image(null);
+        return userRepository.saveUser(userInfo);
     }
 
     // 카카오 로그아웃

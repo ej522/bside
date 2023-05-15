@@ -84,20 +84,6 @@ public class UserServiceTest {
         user7.setProfile_image("https://moim.life/profile/yellow.jpg");
     }
 
-    @AfterEach
-    public void AfterEach() throws PasswordException, NoSuchAlgorithmException {
-        queryFactory = new JPAQueryFactory(em);
-        QUser qUser = new QUser("u");
-
-        queryFactory.delete(qUser).where(qUser.email.eq(user1.getEmail())).execute();
-        queryFactory.delete(qUser).where(qUser.email.eq(user2.getEmail())).execute();
-        queryFactory.delete(qUser).where(qUser.email.eq(user3.getEmail())).execute();
-        queryFactory.delete(qUser).where(qUser.email.eq(user4.getEmail())).execute();
-        queryFactory.delete(qUser).where(qUser.email.eq(user5.getEmail())).execute();
-        queryFactory.delete(qUser).where(qUser.email.eq(user6.getEmail())).execute();
-        queryFactory.delete(qUser).where(qUser.email.eq(user7.getEmail())).execute();
-    }
-
     @Test
     @DisplayName("유저 삭제")
     void testDeleteUser()
@@ -138,12 +124,15 @@ public class UserServiceTest {
     void testLoginUser()
             throws PasswordException, UserNotExistException, PasswordNotCorrectException, UserValidateNickName {
         // given
+        String email = user1.getEmail();
         String password = user1.getPassword();
         userService.saveUser(user1);
-        user1.setPassword(password);
 
         // when
-        User loginUser = userService.loginUser(user1);
+        User testUser = new User();
+        testUser.setEmail(email);
+        testUser.setPassword(password);
+        User loginUser = userService.loginUser(testUser);
 
         // then
         Assertions.assertThat(loginUser.getId()).isNotNull();
@@ -327,6 +316,10 @@ public class UserServiceTest {
     @DisplayName("유저 프로필 수정")
     void testUpdateProfileImg() throws Exception {
         // given
+        String nickName = user7.getName();
+        String profile_image = user7.getProfile_image();
+
+        // 유저 등록
         User saveUser = userService.saveUser(user7);
         saveUser.setName("부엉이");
         saveUser.setProfile_image("https://moim.life/profile/skyblue.jpg");
@@ -335,8 +328,8 @@ public class UserServiceTest {
         User user = userService.updateProfileImage(saveUser);
 
         // then
-        Assertions.assertThat(user7.getName()).isNotEqualTo(user.getName());
-        Assertions.assertThat(user7.getProfile_image()).isNotEqualTo(user.getProfile_image());
+        Assertions.assertThat(nickName).isNotEqualTo(user.getName());
+        Assertions.assertThat(profile_image).isNotEqualTo(user.getProfile_image());
     }
 
 }
