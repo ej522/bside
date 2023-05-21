@@ -29,8 +29,6 @@ class JwtProviderTest {
     @Value("${jwt.expTime}")
     private Long tokenValidTime;
 
-    //JwtProvider jwtProvider = new JwtProvider();
-
     @Mock
     private JwtProvider mockJwtProvider;
 
@@ -47,10 +45,11 @@ class JwtProviderTest {
 
     @Test
     public void createToken() {
+        
         // given
         when(mockJwtProvider.createToken(user)).thenReturn(testCreateToken(user));
 
-        //when
+        // when
         String token = mockJwtProvider.createToken(user);
 
         // then
@@ -59,6 +58,7 @@ class JwtProviderTest {
 
     @Test
     public void valid() throws Exception {
+
         // given
         when(mockJwtProvider.createToken(user)).thenReturn(testCreateToken(user));
         String token = mockJwtProvider.createToken(user);
