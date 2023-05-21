@@ -86,6 +86,27 @@ public class SocialLoginController {
         return Response.success(201, "회원 탈퇴가 완료되었습니다.", null);
     }
 
+    @Operation(tags = { "Social" }, summary = "애플 로그인")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다.", content = @Content(schema = @Schema(implementation = LoginResponse.class))),
+    })
+    @PostMapping(value = "/v1/login/Apple")
+    public LoginResponse appleLogin(@RequestBody @Valid SocialUserRequest request,
+            HttpServletResponse response)
+            throws Exception {
+        User user = socialLoginService.appleLogin(request.access_token);
+
+        // jwt 토큰발급
+        String userToken = jwtProvider.createToken(user);
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        valueOperations.set("jwt:" + user.getId(), userToken, tokenValidTime, TimeUnit.MILLISECONDS);
+
+        UserTokenDto result = new UserTokenDto(userToken, new UserDto(user));
+        response.addHeader("Authorization", "Bearer " + userToken);
+
+        return LoginResponse.success(200, "정상 로그인 되었습니다.", result);
+    }
+
     @Data
     static class SocialUserRequest {
         @NotNull
