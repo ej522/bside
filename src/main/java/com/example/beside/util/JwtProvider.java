@@ -26,7 +26,7 @@ public class JwtProvider {
     public String createToken(User user) {
         Date now = new Date();
         return Jwts.builder()
-                .signWith(SignatureAlgorithm.HS512, secret_key) // 사용할 암호화 알고리즘과 signature에 들어갈 secret값 세팅
+                .signWith(SignatureAlgorithm.HS256, secret_key) // 사용할 암호화 알고리즘과 signature에 들어갈 secret값 세팅
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE) // 헤더타입지정
                 .setSubject("bside_moim") // jwt인증 식별자
                 .setIssuedAt(now) // 토큰 발행 시간 정보, date 타입만 가능
