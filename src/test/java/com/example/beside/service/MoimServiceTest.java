@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.beside.common.Exception.PasswordException;
+import com.example.beside.common.Exception.UserValidateNickName;
 import com.example.beside.dto.MoimAdjustScheduleDto;
 import com.example.beside.dto.MoimParticipateInfoDto;
 import com.example.beside.dto.MyMoimDto;
@@ -417,6 +419,30 @@ public class MoimServiceTest {
         // then
         assertTrue(moimList.get(0).getMemeber_cnt() > 1);
 
+    }
+
+    @Test
+    void getHostSelectMoimDate() throws Exception {
+        // given
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(saveUser1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+        newMoim.setFixed_date("2023-03-13");
+        newMoim.setFixed_time("2");
+
+        var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        moimService.participateMoim(saveUser2, encryptedId);
+
+        // when
+        MoimParticipateInfoDto moimInfo = moimService.getHostSelectMoimDate(saveUser2, encryptedId);
+
+        // then
+        assertTrue(moimInfo.getMoim_leader_id().equals(saveUser1.getId()));
+        assertTrue(moimInfo.getDateList().size()>0);
     }
 
 }
