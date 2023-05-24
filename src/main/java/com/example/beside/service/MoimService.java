@@ -188,4 +188,14 @@ public class MoimService {
 
         return moimList;
     }
+
+    public MoimParticipateInfoDto getHostSelectMoimDate(User user, String encryptInfo) throws Exception {
+        Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
+
+        List<MoimOveralDateDto> moimInfo = moimRepository.getMoimOveralInfo(moimId);
+
+        MoimParticipateInfoDto result = new MoimParticipateInfoDto(moimInfo);
+
+        return result;
+    }
 }

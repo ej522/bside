@@ -10,10 +10,7 @@ import com.example.beside.dto.MoimAdjustScheduleDto;
 import com.example.beside.dto.MoimParticipateInfoDto;
 import com.example.beside.dto.MyMoimDto;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.beside.common.response.MoimParticipateResponse;
 import com.example.beside.common.response.MoimAdjustScheduleResponse;
@@ -156,6 +153,20 @@ public class MoimController {
         List<MyMoimDto> moimList = moimService.getMyMoimList(user.getId());
 
         return MoimHistoryResponse.success(200, "나의 모임 목록이 조회 되었습니다.", moimList);
+    }
+
+    @Operation(tags = { "Moim" }, summary = "모임 주최자가 등록한 모임 일정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "주최자가 등록한 모임일정이 조회되었습니다.", content = @Content(schema = @Schema(implementation = MoimHistoryResponse.class))),
+    })
+    @PostMapping(value = "/v1/host-select-date")
+    public MoimParticipateResponse getHostSelectMoimDate(HttpServletRequest token,
+                                                     @RequestBody @Validated MoimParticipateRequest request) throws Exception {
+        User user = (User) token.getAttribute("user");
+
+        MoimParticipateInfoDto moimInfo = moimService.getHostSelectMoimDate(user, request.encrptedInfo);
+
+        return MoimParticipateResponse.success(200, "주최자가 등록한 모임일정이 조회되었습니다.", moimInfo);
     }
 
     @Data
