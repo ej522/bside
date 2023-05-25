@@ -9,7 +9,10 @@ import java.util.List;
 import com.example.beside.dto.MoimAdjustScheduleDto;
 import com.example.beside.dto.MoimParticipateInfoDto;
 import com.example.beside.dto.MyMoimDto;
+import com.example.beside.dto.VotingMoimDto;
+
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +22,7 @@ import com.example.beside.common.response.MoimParticipateResponse;
 import com.example.beside.common.response.MoimAdjustScheduleResponse;
 import com.example.beside.common.response.MoimHistoryResponse;
 import com.example.beside.common.response.Response;
+import com.example.beside.common.response.VotingMoimResponse;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMemberTime;
@@ -145,17 +149,30 @@ public class MoimController {
         return MoimAdjustScheduleResponse.success(200, "모임 스케줄을 등록 했습니다.", adjustSchedule);
     }
 
-    @Operation(tags = { "Moim" }, summary = "마이약속 모임 목록")
+    @Operation(tags = { "Moim" }, summary = "과거 약속 모임 목록")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "나의 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MoimHistoryResponse.class))),
+            @ApiResponse(responseCode = "200", description = "과거 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MoimHistoryResponse.class))),
     })
-    @PostMapping(value = "/v1/my-moim-history")
-    public MoimHistoryResponse getMyMoimList(HttpServletRequest token) {
+    @PostMapping(value = "/v1/moim-history")
+    public MoimHistoryResponse getMoimHistoryList(HttpServletRequest token) {
         User user = (User) token.getAttribute("user");
 
-        List<MyMoimDto> moimList = moimService.getMyMoimList(user.getId());
+        List<MyMoimDto> moimList = moimService.getMoimHistoryList(user.getId());
 
-        return MoimHistoryResponse.success(200, "나의 모임 목록이 조회 되었습니다.", moimList);
+        return MoimHistoryResponse.success(200, "모임 목록이 조회 되었습니다.", moimList);
+    }
+
+    @Operation(tags = { "Moim" }, summary = "투표중인 모임 목록")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "투퓨중인 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = VotingMoimResponse.class))),
+    })
+    @GetMapping(value = "/v1/voting-moim-list")
+    public VotingMoimResponse getVotingMoimList(HttpServletRequest token) {
+        User user = (User) token.getAttribute("user");
+
+        List<VotingMoimDto> votingMoimList = moimService.getVotingMoimList(user.getId());
+
+        return VotingMoimResponse.success(200, "모임 목록이 조회 되었습니다.", votingMoimList);
     }
 
     @Data

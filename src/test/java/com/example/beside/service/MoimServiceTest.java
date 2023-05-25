@@ -383,7 +383,7 @@ public class MoimServiceTest {
     }
 
     @Test
-    void testGetMyMoimList() throws Exception {
+    void testGetMoimHistoryList() throws Exception {
         // given
         User saveUser1 = userService.saveUser(user);
         User saveUser2 = userService.saveUser(user2);
@@ -412,7 +412,7 @@ public class MoimServiceTest {
         moimService.participateMoim(saveUser3, encryptedId2);
 
         // when
-        List<MyMoimDto> moimList = moimService.getMyMoimList(saveUser1.getId());
+        List<MyMoimDto> moimList = moimService.getMoimHistoryList(saveUser1.getId());
 
         // then
         assertTrue(moimList.get(0).getMemeber_cnt() > 1);
