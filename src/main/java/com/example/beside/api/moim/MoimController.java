@@ -145,17 +145,17 @@ public class MoimController {
         return MoimAdjustScheduleResponse.success(200, "모임 스케줄을 등록 했습니다.", adjustSchedule);
     }
 
-    @Operation(tags = { "Moim" }, summary = "마이약속 모임 목록")
+    @Operation(tags = { "Moim" }, summary = "마이 과거 약속 모임 목록")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "나의 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MoimHistoryResponse.class))),
+            @ApiResponse(responseCode = "200", description = "나의 과거 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MoimHistoryResponse.class))),
     })
-    @PostMapping(value = "/v1/my-moim-history")
-    public MoimHistoryResponse getMyMoimList(HttpServletRequest token) {
+    @PostMapping(value = "/v1/moim-history")
+    public MoimHistoryResponse getMoimHistoryList(HttpServletRequest token) {
         User user = (User) token.getAttribute("user");
 
-        List<MyMoimDto> moimList = moimService.getMyMoimList(user.getId());
+        List<MyMoimDto> moimList = moimService.getMoimHistoryList(user.getId());
 
-        return MoimHistoryResponse.success(200, "나의 모임 목록이 조회 되었습니다.", moimList);
+        return MoimHistoryResponse.success(200, "과거 모임 목록이 조회 되었습니다.", moimList);
     }
 
     @Data

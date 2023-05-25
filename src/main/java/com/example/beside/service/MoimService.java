@@ -174,7 +174,7 @@ public class MoimService {
         return moimRepository.getMoimInfo(moimId);
     }
 
-    public List<MyMoimDto> getMyMoimList(Long user_id) {
+    public List<MyMoimDto> getMoimHistoryList(Long user_id) {
         List<MyMoimDto> moimList = moimRepository.findMyMoimList(user_id);
 
         for (MyMoimDto moim : moimList) {
