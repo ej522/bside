@@ -69,7 +69,7 @@ public class UserController {
         List<User> userAll = userService.findUserAll();
         userAll.forEach(s -> {
             UserDto userDto = new UserDto(s.getId(), s.getPassword(), s.getEmail(), s.getName(), s.getProfile_image(),
-                    s.getSocial_type());
+                    s.getSocial_type(), s.getPush_alarm(), s.getMarketing_alarm());
             UserDtoList.add(userDto);
         });
 
@@ -114,6 +114,8 @@ public class UserController {
         user.setPassword(requset.password);
         user.setName(requset.name);
         user.setProfile_image(requset.imgUrl);
+        user.setPush_alarm(requset.push_alarm);
+        user.setMarketing_alarm(requset.marketing_alarm);
 
         User saveUser = userService.saveUser(user);
         String userToken = jwtProvider.createToken(saveUser);
@@ -191,6 +193,26 @@ public class UserController {
         UserDto userDto = new UserDto(changUser);
 
         return UserResponse.success(200, "닉네임이 변경 되었습니다.", userDto);
+    }
+
+    @Operation(tags = { "User" }, summary = "알람 상태 변경")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "알람 상태가 변경 되었습니다.", content = @Content(schema = @Schema(implementation = UserResponse.class))) })
+    @PutMapping(value = "/v1/update/alarm-state")
+    public UserResponse updateAlarmState(HttpServletRequest token,
+            @RequestBody @Validated UpdateAlarmStateRequest request) {
+
+        User user = (User) token.getAttribute("user");
+
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setPush_alarm(request.push_alarm);
+        updateUser.setMarketing_alarm(request.marketing_alarm);
+        User changUser = userService.updateAlarmState(updateUser);
+
+        UserDto userDto = new UserDto(changUser);
+
+        return UserResponse.success(200, "알람 상태가 변경 되었습니다.", userDto);
     }
 
     @Operation(tags = { "User" }, summary = "이메일 계정 확인")
@@ -390,6 +412,12 @@ public class UserController {
 
         @Schema(description = "nickname", example = "닉네임", type = "String")
         private String name;
+
+        @Schema(description = "push_alarm", example = "푸쉬 알림 여부", type = "Boolean")
+        private Boolean push_alarm;
+
+        @Schema(description = "marketing_alarm", example = "마케팅 알림 여부", type = "Boolean")
+        private Boolean marketing_alarm;
     }
 
     @Data
@@ -397,6 +425,16 @@ public class UserController {
         @NotNull
         @Schema(description = "nickname", example = "닉네임", type = "String")
         private String name;
+    }
+
+    @Data
+    static class UpdateAlarmStateRequest {
+        @NotNull
+        @Schema(description = "push_alarm", example = "푸쉬 알림", type = "Boolean")
+        private Boolean push_alarm;
+        @NotNull
+        @Schema(description = "marketing_alarm", example = "마케팅 알림", type = "Boolean")
+        private Boolean marketing_alarm;
     }
 
     @Data
