@@ -15,8 +15,6 @@ import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
-import com.example.beside.dto.MoimOveralDateDto;
-import com.example.beside.dto.MoimOveralScheduleDto;
 import com.example.beside.repository.MoimRepository;
 import com.example.beside.util.Encrypt;
 
@@ -31,6 +29,7 @@ public class MoimService {
     @Autowired
     private Encrypt encrypt;
 
+    // #region [모임 생성]
     @Transactional
     public String makeMoim(User user, Moim moim, List<MoimDate> moim_date_list) throws Exception {
         makeMoimValidate(moim_date_list);
@@ -55,7 +54,9 @@ public class MoimService {
             selectedDates.add(selected_date);
         }
     }
+    // #endregion
 
+    // #region [모임 참여]
     @Transactional
     public MoimParticipateInfoDto participateMoim(User user, String encryptInfo) throws Exception {
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
@@ -90,7 +91,9 @@ public class MoimService {
         if (moimRepository.alreadyJoinedMoim(moimId, user.getId()))
             throw new MoimParticipateException("해당 모임에 이미 참여하고 있습니다.");
     }
+    // #endregion
 
+    // #region [모임 일정 투표]
     @Transactional
     public MoimAdjustScheduleDto adjustSchedule(User user, String encryptInfo, List<MoimMemberTime> moimTimeInfos)
             throws Exception {
@@ -156,7 +159,6 @@ public class MoimService {
             if (isValidate == false)
                 throw new AdjustScheduleException("불가능한 일자를 선택했습니다.");
         }
-
     }
 
     private String set_yyyy_mm_dd(LocalDateTime date) {
@@ -164,18 +166,11 @@ public class MoimService {
         var day = String.format("%02d", date.getDayOfMonth()); // 일 값에 대해 두 자리로 포맷팅
         return date.getYear() + "-" + month + "-" + day;
     }
+    // #endregion
 
-    public Moim getMoimInfoWithMoimId(Long moimId) {
-        return moimRepository.getMoimInfo(moimId);
-    }
-
-    public Moim getMoimInfoWithEncrypedMoimId(String encryptInfo) throws NumberFormatException, Exception {
-        Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
-        return moimRepository.getMoimInfo(moimId);
-    }
-
+    // #region [과거 모임 이력 조회]
     public List<MyMoimDto> getMoimHistoryList(Long user_id) {
-        List<MyMoimDto> moimList = moimRepository.findMyMoimList(user_id);
+        List<MyMoimDto> moimList = moimRepository.findMyMoimHistoryList(user_id);
 
         for (MyMoimDto moim : moimList) {
             Long cnt = moimRepository.findMemberCount(moim.getMoim_id());
@@ -187,5 +182,22 @@ public class MoimService {
         }
 
         return moimList;
+    }
+    // #endregion
+
+    // #region [투표중인 모임 조회]
+    public List<VotingMoimDto> getVotingMoimList(Long user_id) {
+        List<VotingMoimDto> findVotingMoimHistory = moimRepository.findVotingMoimHistory(user_id);
+        return findVotingMoimHistory;
+    }
+    // #endregion
+
+    public Moim getMoimInfoWithMoimId(Long moimId) {
+        return moimRepository.getMoimInfo(moimId);
+    }
+
+    public Moim getMoimInfoWithEncrypedMoimId(String encryptInfo) throws NumberFormatException, Exception {
+        Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
+        return moimRepository.getMoimInfo(moimId);
     }
 }

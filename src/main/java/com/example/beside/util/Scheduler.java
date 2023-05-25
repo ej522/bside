@@ -30,7 +30,7 @@ public class Scheduler {
     @Scheduled(cron = "0 */30 * * * *")
     public void fixMoimSchedulering() {
         // 일정이 확정되지 않은 모임 조회
-        List<Moim> notFixedScheduleMoims = moimRepository.getNotFixedScheduleMoims();
+        List<Moim> notFixedScheduleMoims = moimRepository.getNotFixedMoims();
 
         for (var moim : notFixedScheduleMoims) {
             // 모임 정보 조회
