@@ -28,6 +28,7 @@ import com.example.beside.dto.MoimOveralScheduleDto;
 import com.example.beside.util.Encrypt;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
@@ -178,7 +179,8 @@ public class MoimRepository {
         QUser qUser = QUser.user;
         QMoimMember qMoimMember = QMoimMember.moimMember;
 
-        List<VotingMoimDto> result = queryFactory
+        // 내가 참여한 모임
+        JPAQuery<VotingMoimDto> query1 = queryFactory
                 .select(Projections.fields(VotingMoimDto.class, qUser.id.as("user_id"),
                         qUser.name.as("user_name"),
                         qMoim.id.as("moim_id"),
@@ -191,8 +193,23 @@ public class MoimRepository {
                         JPAExpressions.select(qMoimMember.moim.id)
                                 .from(qMoimMember)
                                 .where(qMoimMember.user.id.eq(user_id)))
-                        .and(qMoim.fixed_date.isNull()))
-                .fetch();
+                        .and(qMoim.fixed_date.isNull()));
+
+        // 내가 모임장인 모임
+        JPAQuery<VotingMoimDto> query2 = queryFactory
+                .select(Projections.fields(VotingMoimDto.class, qUser.id.as("user_id"),
+                        qUser.name.as("user_name"),
+                        qMoim.id.as("moim_id"),
+                        qMoim.moim_name.as("moim_name"),
+                        qMoim.created_time.as("created_time"),
+                        qMoim.dead_line_hour.as("dead_line_hour")))
+                .from(qMoim)
+                .innerJoin(qUser).on(qUser.id.eq(qMoim.user.id))
+                .where(qMoim.user.id.eq(user_id).and(qMoim.fixed_date.isNull()));
+
+        // UINON ALL
+        List<VotingMoimDto> result = query1.fetch();
+        result.addAll(query2.fetch());
 
         // 데드라인 멤버변수 새로 할당
         List<VotingMoimDto> newResult = new ArrayList<>();
