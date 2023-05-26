@@ -203,17 +203,20 @@ public class MoimService {
     public List<VoteMoimDateDto> getVoteDateInfo(String encryptInfo) throws Exception {
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
 
-        List<VoteMoimDateDto> dateVoteUserList = new ArrayList<>();
         //모임 날짜 정보
         List<MoimOveralDateDto> dateInfo = moimRepository.getMoimOveralInfo(moimId);
 
         //투표 인원 정보
         List<MoimOveralScheduleDto> voteUserInfo = moimRepository.getMoimScheduleInfo(moimId);
 
+        List<VoteMoimDateDto> dateVoteUserList = new ArrayList<>();
+
+        VoteMoimDateDto voteMoimDateDto = new VoteMoimDateDto();
+        voteMoimDateDto.setMoim_id(moimId);
+
         for(int i=0; i<dateInfo.size(); i++) {
             LocalDateTime selected_date = dateInfo.get(i).getSelected_date();
 
-            VoteMoimDateDto voteMoimDateDto = new VoteMoimDateDto();
             voteMoimDateDto.setSelected_date(selected_date);
 
             //투표참여 인원

@@ -15,6 +15,10 @@ import java.util.Map;
 @NoArgsConstructor
 public class VoteMoimDateDto {
     @NotEmpty
+    @Schema(description = "모임 아이디", example = "1")
+    private Long moim_id;
+
+    @NotEmpty
     @Schema(description = "선택된 날짜", example = "2023-05-26")
     private LocalDateTime selected_date;
 
