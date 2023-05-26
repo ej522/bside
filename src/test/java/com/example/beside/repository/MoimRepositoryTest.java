@@ -292,4 +292,31 @@ public class MoimRepositoryTest {
 
     }
 
+    @Test
+    @DisplayName("모임날짜에 투표한 인원이 몇 명인지 알 수 있는가?")
+    void testGetDateVoteCnt() throws Exception {
+        // given
+        User findUser = userRepository.saveUser(user);
+        User findUser2 = userRepository.saveUser(user2);
+
+        newMoim.setUser(findUser);
+        // 모임 생성
+        long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
+        newMoim.setId(moimId);
+
+        // 모임 참여
+        moimRepository.makeMoimMember(findUser2, newMoim);
+
+        // 모임 멤버 조회
+        var moimMember = moimRepository.getMoimMemberByMemberId(moimId, findUser2.getId());
+
+        moimRepository.saveSchedule(moimMember, normalMoimMemberTime);
+
+        // when
+        Long cnt = moimRepository.getDateVoteCnt(moimId, normalMoimMemberTime.get(0).getSelected_date());
+
+        //then
+        Assertions.assertThat(cnt).isGreaterThan(0);
+    }
+
 }

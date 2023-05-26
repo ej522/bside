@@ -2,9 +2,10 @@ package com.example.beside.repository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
-import com.example.beside.dto.MyMoimDto;
+import com.example.beside.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -20,8 +21,6 @@ import com.example.beside.domain.QMoimMember;
 import com.example.beside.domain.QMoimMemberTime;
 import com.example.beside.domain.QUser;
 import com.example.beside.domain.User;
-import com.example.beside.dto.MoimOveralDateDto;
-import com.example.beside.dto.MoimOveralScheduleDto;
 import com.example.beside.util.Encrypt;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -223,6 +222,8 @@ public class MoimRepository {
 
         for (var tt : moimTimeInfos) {
             tt.setMoimMember(moimMember);
+            tt.setMoim(moim);
+
             em.persist(tt);
         }
 
@@ -258,6 +259,7 @@ public class MoimRepository {
         QMoim qMoim = QMoim.moim;
         QMoimMember qMoimMember = QMoimMember.moimMember;
         QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
+        QUser qUser = QUser.user;
 
         List<MoimOveralScheduleDto> result = queryFactory.select(
                 Projections.constructor(MoimOveralScheduleDto.class,
@@ -267,6 +269,7 @@ public class MoimRepository {
                         qMoim.user.name,
                         qMoim.moim_name,
                         qMoimMember.member_name,
+                        qUser.profile_image,
                         qMoimMemberTime.selected_date,
                         qMoimMemberTime.am_nine,
                         qMoimMemberTime.am_ten,
@@ -284,6 +287,7 @@ public class MoimRepository {
                 .from(qMoim)
                 .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
                 .leftJoin(qMoimMemberTime).on(qMoimMember.id.eq(qMoimMemberTime.moimMember.id))
+                .leftJoin(qUser).on(qMoimMember.user.id.eq(qUser.id))
                 .where(qMoim.id.eq(moimId))
                 .orderBy(qMoimMemberTime.selected_date.asc())
                 .fetch();
@@ -327,6 +331,22 @@ public class MoimRepository {
         Long cnt = queryFactory.select(qMoimMember.moim.id)
                 .from(qMoimMember)
                 .where(qMoimMember.moim.id.eq(moim_id))
+                .fetchCount();
+
+        return cnt;
+    }
+
+    public Long getDateVoteCnt(Long moim_id, LocalDateTime select_date) {
+        queryFactory = new JPAQueryFactory(em);
+        System.out.println("moim_id-"+moim_id);
+        System.out.println("select_date="+select_date);
+
+        QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
+
+        Long cnt = queryFactory.select(qMoimMemberTime.selected_date)
+                .from(qMoimMemberTime)
+                .where(qMoimMemberTime.moim.id.eq(moim_id).and(qMoimMemberTime.selected_date.eq(select_date)))
+                .orderBy(qMoimMemberTime.selected_date.asc())
                 .fetchCount();
 
         return cnt;

@@ -5,17 +5,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import com.example.beside.common.response.*;
 import com.example.beside.dto.MoimAdjustScheduleDto;
 import com.example.beside.dto.MoimParticipateInfoDto;
 import com.example.beside.dto.MyMoimDto;
+import com.example.beside.dto.VoteMoimDateDto;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.beside.common.response.MoimParticipateResponse;
-import com.example.beside.common.response.MoimAdjustScheduleResponse;
-import com.example.beside.common.response.MoimHistoryResponse;
-import com.example.beside.common.response.Response;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMemberTime;
@@ -167,6 +166,18 @@ public class MoimController {
         MoimParticipateInfoDto moimInfo = moimService.getHostSelectMoimDate(user, request.encrptedInfo);
 
         return MoimParticipateResponse.success(200, "주최자가 등록한 모임일정이 조회되었습니다.", moimInfo);
+    }
+
+    @Operation(tags = { "Moim" }, summary = "날짜 투표 결과")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임 날짜 투표 결과가 조회되었습니다.", content = @Content(schema = @Schema(implementation = VoteMoimDateResponse.class))),
+    })
+    @PostMapping(value = "/v1/date-vote")
+    public VoteMoimDateResponse getVoteMoimDateList(HttpServletRequest token,
+                                                    @RequestBody @Validated MoimParticipateRequest request) throws Exception {
+        List<VoteMoimDateDto> dateVoteInfo = moimService.getVoteDateInfo(request.encrptedInfo);
+
+        return VoteMoimDateResponse.success(200, "모임 날짜 투표 결과가 조회되었습니다.", dateVoteInfo);
     }
 
     @Data

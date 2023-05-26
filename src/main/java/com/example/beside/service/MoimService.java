@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import com.example.beside.dto.*;
+import com.example.beside.util.PasswordConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -198,4 +199,46 @@ public class MoimService {
 
         return result;
     }
+
+    public List<VoteMoimDateDto> getVoteDateInfo(String encryptInfo) throws Exception {
+        Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
+
+        List<VoteMoimDateDto> dateVoteUserList = new ArrayList<>();
+        //모임 날짜 정보
+        List<MoimOveralDateDto> dateInfo = moimRepository.getMoimOveralInfo(moimId);
+
+        //투표 인원 정보
+        List<MoimOveralScheduleDto> voteUserInfo = moimRepository.getMoimScheduleInfo(moimId);
+
+        for(int i=0; i<dateInfo.size(); i++) {
+            LocalDateTime selected_date = dateInfo.get(i).getSelected_date();
+
+            VoteMoimDateDto voteMoimDateDto = new VoteMoimDateDto();
+            voteMoimDateDto.setSelected_date(selected_date);
+
+            //투표참여 인원
+            Long vote_cnt = moimRepository.getDateVoteCnt(moimId, selected_date);
+            voteMoimDateDto.setVote_cnt(vote_cnt);
+
+            List<Map> userInfoList = new ArrayList<>();
+
+            for(int j=0; j<voteUserInfo.size(); j++) {
+                LocalDateTime vote_date = voteUserInfo.get(j).getSelected_date();
+                if(selected_date.equals(vote_date)) {
+                    Map<String, String> userInfo = new HashMap<>();
+                    userInfo.put("nickname", voteUserInfo.get(j).getMember_name());
+                    userInfo.put("profile_image", voteUserInfo.get(j).getProfile_image());
+                    userInfoList.add(userInfo);
+                }
+            }
+            voteMoimDateDto.setUser_info(userInfoList);
+            dateVoteUserList.add(voteMoimDateDto);
+        }
+
+        return dateVoteUserList;
+
+    }
+
+
 }
+
