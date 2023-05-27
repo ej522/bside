@@ -211,27 +211,28 @@ public class MoimService {
 
         List<VoteMoimDateDto> dateVoteUserList = new ArrayList<>();
 
-        VoteMoimDateDto voteMoimDateDto = new VoteMoimDateDto();
-        voteMoimDateDto.setMoim_id(moimId);
-
         for(int i=0; i<dateInfo.size(); i++) {
-            LocalDateTime selected_date = dateInfo.get(i).getSelected_date();
+            VoteMoimDateDto voteMoimDateDto = new VoteMoimDateDto();
+            voteMoimDateDto.setMoim_id(moimId);
 
+            LocalDateTime selected_date = dateInfo.get(i).getSelected_date();
             voteMoimDateDto.setSelected_date(selected_date);
 
             //투표참여 인원
             Long vote_cnt = moimRepository.getDateVoteCnt(moimId, selected_date);
             voteMoimDateDto.setVote_cnt(vote_cnt);
 
-            List<Map> userInfoList = new ArrayList<>();
+            List<UserDto> userInfoList = new ArrayList<>();
 
             for(int j=0; j<voteUserInfo.size(); j++) {
                 LocalDateTime vote_date = voteUserInfo.get(j).getSelected_date();
                 if(selected_date.equals(vote_date)) {
-                    Map<String, String> userInfo = new HashMap<>();
-                    userInfo.put("nickname", voteUserInfo.get(j).getMember_name());
-                    userInfo.put("profile_image", voteUserInfo.get(j).getProfile_image());
-                    userInfoList.add(userInfo);
+
+                    UserDto userDto = new UserDto();
+                    userDto.setId(voteUserInfo.get(j).getUser_id());
+                    userDto.setName(voteUserInfo.get(j).getMember_name());
+                    userDto.setProfile_image(voteUserInfo.get(j).getProfile_image());
+                    userInfoList.add(userDto);
                 }
             }
             voteMoimDateDto.setUser_info(userInfoList);

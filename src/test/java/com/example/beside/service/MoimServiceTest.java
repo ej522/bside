@@ -475,7 +475,7 @@ public class MoimServiceTest {
         //given
         assertTrue(test.get(0).getSelected_date().equals(LocalDate.parse("2023-03-10", formatter).atStartOfDay()));
         assertTrue(test.get(0).getVote_cnt().toString().equals("0"));
-        assertTrue(test.get(1).getUser_info().get(0).get("nickname").equals("다람쥐"));
+        assertTrue(test.get(1).getUser_info().get(0).getName().equals("다람쥐"));
 
     }
 

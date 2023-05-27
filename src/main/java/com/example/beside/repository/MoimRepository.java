@@ -266,6 +266,7 @@ public class MoimRepository {
                         qMoim.id,
                         qMoim.dead_line_hour,
                         qMoim.created_time,
+                        qUser.id,
                         qMoim.user.name,
                         qMoim.moim_name,
                         qMoimMember.member_name,

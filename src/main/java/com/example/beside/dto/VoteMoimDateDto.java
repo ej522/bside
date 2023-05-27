@@ -26,6 +26,6 @@ public class VoteMoimDateDto {
     @Schema(description = "투표한 인원", example = "1")
     private Long vote_cnt;
 
-    @Schema(description = "유저정보", example = "[{\"nickname\": \"닉네임\", \n \"profile_img\": \"https://www.moim.life\"}]")
-    private List<Map> user_info;
+    @Schema(description = "유저정보")//, example = "[{\"nickname\": \"닉네임\", \n \"profile_img\": \"https://www.moim.life\"}]"
+    private List<UserDto> user_info;
 }
