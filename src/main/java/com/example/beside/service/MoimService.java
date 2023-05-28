@@ -200,7 +200,6 @@ public class MoimService {
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
         return moimRepository.getMoimInfo(moimId);
     }
-}
 
     public MoimParticipateInfoDto getHostSelectMoimDate(User user, String encryptInfo) throws Exception {
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
@@ -267,10 +266,6 @@ public class MoimService {
         //인원수
         VoteMoimTimeCntDto voteTimeCnt = moimRepository.getTimeVoteCnt(moimId, selected_date);
 
-//        Map<String, Object> moimTimeInfo = new HashMap();
-//        moimTimeInfo.put("moim_id", moimId);
-//        moimTimeInfo.put("selected_date", selected_date);
-
         VoteMoimTimeDto moimTimeInfo = new VoteMoimTimeDto();
         moimTimeInfo.setMoim_id(moimId);
         moimTimeInfo.setSelected_date(selected_date);
@@ -278,20 +273,6 @@ public class MoimService {
         List<VoteMoimTimeDetailDto> timeInfoList = new ArrayList<>();
 
         //시간, 시간대 투표 인원
-//        Map<String, Object> am9Info = setTimeInfo(9, voteTimeCnt.getAm_nine_cnt());
-//        Map<String, Object> am10Info = setTimeInfo(10, voteTimeCnt.getAm_ten_cnt());
-//        Map<String, Object> am11Info = setTimeInfo(11, voteTimeCnt.getAm_eleven_cnt());
-//        Map<String, Object> pm12Info = setTimeInfo(12, voteTimeCnt.getNoon_cnt());
-//        Map<String, Object> pm1Info = setTimeInfo(13, voteTimeCnt.getPm_one_cnt());
-//        Map<String, Object> pm2Info = setTimeInfo(14, voteTimeCnt.getPm_two_cnt());
-//        Map<String, Object> pm3Info = setTimeInfo(15, voteTimeCnt.getPm_three_cnt());
-//        Map<String, Object> pm4Info = setTimeInfo(16, voteTimeCnt.getPm_four_cnt());
-//        Map<String, Object> pm5Info = setTimeInfo(17, voteTimeCnt.getPm_five_cnt());
-//        Map<String, Object> pm6Info = setTimeInfo(18, voteTimeCnt.getPm_six_cnt());
-//        Map<String, Object> pm7Info = setTimeInfo(19, voteTimeCnt.getPm_seven_cnt());
-//        Map<String, Object> pm8Info = setTimeInfo(20, voteTimeCnt.getPm_eight_cnt());
-//        Map<String, Object> pm9Info = setTimeInfo(21, voteTimeCnt.getPm_nine_cnt());
-
         VoteMoimTimeDetailDto am9Info = setTimeInfo(9, voteTimeCnt.getAm_nine_cnt());
         VoteMoimTimeDetailDto am10Info = setTimeInfo(10, voteTimeCnt.getAm_ten_cnt());
         VoteMoimTimeDetailDto am11Info = setTimeInfo(11, voteTimeCnt.getAm_eleven_cnt());
@@ -392,7 +373,6 @@ public class MoimService {
         timeInfoList = setVoteTimeInfoList(timeInfoList, pm8Info, pm8userInfoList);
         timeInfoList = setVoteTimeInfoList(timeInfoList, pm9Info, pm9userInfoList);
 
-        //moimTimeInfo.put("time_info", timeInfoList);
         moimTimeInfo.setTime_info(timeInfoList);
 
         return moimTimeInfo;
@@ -413,13 +393,11 @@ public class MoimService {
         VoteMoimTimeDetailDto timeInfo = new VoteMoimTimeDetailDto();
         timeInfo.setTime(time);
         timeInfo.setVote_cnt(cnt);
-//        timeInfo.put("time", time);
-//        timeInfo.put("vote_cnt", cnt);
+
         return timeInfo;
     }
     private List<VoteMoimTimeDetailDto> setVoteTimeInfoList(List<VoteMoimTimeDetailDto> timeInfoList, VoteMoimTimeDetailDto timeInfo, List<UserDto> useInfoList) {
         timeInfo.setUser_info(useInfoList);
-        //timeInfo.put("user_info", useInfoList);
 
         timeInfoList.add(timeInfo);
 

@@ -420,18 +420,6 @@ public class MoimRepository {
 
     }
 
-    public Long findMemberCount(Long moim_id) {
-        queryFactory = new JPAQueryFactory(em);
-
-        QMoimMember qMoimMember = QMoimMember.moimMember;
-        Long cnt = queryFactory.select(qMoimMember.moim.id)
-                .from(qMoimMember)
-                .where(qMoimMember.moim.id.eq(moim_id))
-                .fetchCount();
-
-        return cnt;
-    }
-
     public Long getDateVoteCnt(Long moim_id, LocalDateTime select_date) {
         queryFactory = new JPAQueryFactory(em);
 
