@@ -2,10 +2,11 @@ package com.example.beside.repository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 
 import com.example.beside.dto.*;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -339,8 +340,6 @@ public class MoimRepository {
 
     public Long getDateVoteCnt(Long moim_id, LocalDateTime select_date) {
         queryFactory = new JPAQueryFactory(em);
-        System.out.println("moim_id-"+moim_id);
-        System.out.println("select_date="+select_date);
 
         QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
 
@@ -353,4 +352,60 @@ public class MoimRepository {
         return cnt;
     }
 
+    public VoteMoimTimeCntDto getTimeVoteCnt(Long moim_id, LocalDateTime select_date) {
+        queryFactory = new JPAQueryFactory(em);
+
+        QMoim qMoim = QMoim.moim;
+        QMoimDate qMoimDate = QMoimDate.moimDate;
+        QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
+
+        VoteMoimTimeCntDto result = queryFactory.select(
+                        Projections.constructor(VoteMoimTimeCntDto.class,
+                                qMoimMemberTime.selected_date,
+                                getTimeCnt(qMoimMemberTime.am_nine.eq(true)),
+                                getTimeCnt(qMoimMemberTime.am_ten.eq(true)),
+                                getTimeCnt(qMoimMemberTime.am_eleven.eq(true)),
+                                getTimeCnt(qMoimMemberTime.noon.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_one.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_two.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_three.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_four.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_five.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_six.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_seven.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_eigth.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_nine.eq(true))
+                        ))
+                .from(qMoim)
+                .leftJoin(qMoimDate).on(qMoim.id.eq(qMoimDate.moim.id))
+                .leftJoin(qMoimMemberTime).on(qMoim.id.eq(qMoimMemberTime.moim.id).and(qMoimDate.selected_date.eq(qMoimMemberTime.selected_date)))
+                .where(qMoim.id.eq(moim_id).and(qMoimMemberTime.selected_date.eq(select_date)))
+                .groupBy(qMoimMemberTime.selected_date)
+                .fetchOne();
+
+        if(result==null) {
+            result = new VoteMoimTimeCntDto();
+            result.setSelected_date(select_date);
+            result.setAm_nine_cnt(0L);
+            result.setAm_ten_cnt(0L);
+            result.setAm_eleven_cnt(0L);
+            result.setNoon_cnt(0L);
+            result.setPm_one_cnt(0L);
+            result.setPm_two_cnt(0L);
+            result.setPm_three_cnt(0L);
+            result.setPm_four_cnt(0L);
+            result.setPm_five_cnt(0L);
+            result.setPm_six_cnt(0L);
+            result.setPm_seven_cnt(0L);
+            result.setPm_eight_cnt(0L);
+            result.setPm_nine_cnt(0L);
+        }
+
+        return result;
+    }
+
+    private NumberExpression<Long> getTimeCnt(Object object) {
+        return Expressions
+                .numberTemplate(Long.class, "count(case when {0} then 1 end)", object);
+    }
 }

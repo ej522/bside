@@ -23,9 +23,21 @@ public class VoteMoimDateDto {
     private LocalDateTime selected_date;
 
     @NotEmpty
+    @Schema(description = "오전", example = "true")
+    private Boolean morning;
+
+    @NotEmpty
+    @Schema(description = "오후", example = "true")
+    private Boolean afternoon;
+
+    @NotEmpty
+    @Schema(description = "저녁", example = "true")
+    private Boolean evening;
+
+    @NotEmpty
     @Schema(description = "투표한 인원", example = "1")
     private Long vote_cnt;
 
-    @Schema(description = "유저정보")//, example = "[{\"nickname\": \"닉네임\", \n \"profile_img\": \"https://www.moim.life\"}]"
+    @Schema(description = "유저정보")
     private List<UserDto> user_info;
 }

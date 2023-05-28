@@ -8,10 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.beside.common.response.*;
-import com.example.beside.dto.MoimAdjustScheduleDto;
-import com.example.beside.dto.MoimParticipateInfoDto;
-import com.example.beside.dto.MyMoimDto;
-import com.example.beside.dto.VoteMoimDateDto;
+import com.example.beside.dto.*;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -173,11 +171,23 @@ public class MoimController {
             @ApiResponse(responseCode = "200", description = "모임 날짜 투표 결과가 조회되었습니다.", content = @Content(schema = @Schema(implementation = VoteMoimDateResponse.class))),
     })
     @PostMapping(value = "/v1/date-vote")
-    public VoteMoimDateResponse getVoteMoimDateList(HttpServletRequest token,
-                                                    @RequestBody @Validated MoimParticipateRequest request) throws Exception {
+    public VoteMoimDateResponse getVoteMoimDateList(@RequestBody @Validated MoimParticipateRequest request) throws Exception {
         List<VoteMoimDateDto> dateVoteInfo = moimService.getVoteDateInfo(request.encrptedInfo);
 
         return VoteMoimDateResponse.success(200, "모임 날짜 투표 결과가 조회되었습니다.", dateVoteInfo);
+    }
+
+    @Operation(tags = { "Moim" }, summary = "시간 투표 결과")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임 시간 투표 결과가 조회되었습니다.", content = @Content(schema = @Schema(implementation = VoteMoimTimeResponse.class))),
+    })
+    @PostMapping(value = "/v1/time-vote")
+    public VoteMoimTimeResponse getVoteTimeInfo(@RequestBody @Validated TimeVoteRequest request) throws Exception {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        VoteMoimTimeDto voteTimeInfo = moimService.getVoteTimeInfo(request.moim_id, LocalDate.parse(request.selected_date, formatter).atStartOfDay());
+
+        return VoteMoimTimeResponse.success(200, "모임 시간 투표 결과가 조회되었습니다.", voteTimeInfo);
     }
 
     @Data
@@ -275,6 +285,17 @@ public class MoimController {
 
         @Schema(description = "오후 9시", example = "true", type = "Boolean")
         private boolean pmNine;
+    }
+
+    @Data
+    static class TimeVoteRequest {
+        @NotNull
+        @Schema(description = "모임 아이디", example = "1")
+        private Long moim_id;
+
+        @NotNull
+        @Schema(description = "선택된 날짜", example = "2023-03-10", type = "String")
+        private String selected_date;
     }
 
 }
