@@ -5,6 +5,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.beside.dto.*;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.example.beside.dto.MyMoimDto;
 import com.example.beside.dto.VotingMoimDto;
 
@@ -23,8 +26,6 @@ import com.example.beside.domain.QMoimMember;
 import com.example.beside.domain.QMoimMemberTime;
 import com.example.beside.domain.QUser;
 import com.example.beside.domain.User;
-import com.example.beside.dto.MoimOveralDateDto;
-import com.example.beside.dto.MoimOveralScheduleDto;
 import com.example.beside.util.Encrypt;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
@@ -316,6 +317,8 @@ public class MoimRepository {
 
         for (var tt : moimTimeInfos) {
             tt.setMoimMember(moimMember);
+            tt.setMoim(moim);
+
             em.persist(tt);
         }
 
@@ -351,15 +354,18 @@ public class MoimRepository {
         QMoim qMoim = QMoim.moim;
         QMoimMember qMoimMember = QMoimMember.moimMember;
         QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
+        QUser qUser = QUser.user;
 
         List<MoimOveralScheduleDto> result = queryFactory.select(
                 Projections.constructor(MoimOveralScheduleDto.class,
                         qMoim.id,
                         qMoim.dead_line_hour,
                         qMoim.created_time,
+                        qUser.id,
                         qMoim.user.name,
                         qMoim.moim_name,
                         qMoimMember.member_name,
+                        qUser.profile_image,
                         qMoimMemberTime.selected_date,
                         qMoimMemberTime.am_nine,
                         qMoimMemberTime.am_ten,
@@ -377,6 +383,7 @@ public class MoimRepository {
                 .from(qMoim)
                 .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
                 .leftJoin(qMoimMemberTime).on(qMoimMember.id.eq(qMoimMemberTime.moimMember.id))
+                .leftJoin(qUser).on(qMoimMember.user.id.eq(qUser.id))
                 .where(qMoim.id.eq(moimId))
                 .orderBy(qMoimMemberTime.selected_date.asc())
                 .fetch();
@@ -384,4 +391,103 @@ public class MoimRepository {
         return result;
     }
 
+    public List<MyMoimDto> findMyMoimList(Long user_id) {
+        queryFactory = new JPAQueryFactory(em);
+
+        QMoim qMoim = QMoim.moim;
+        QMoimMember qMoimMember = QMoimMember.moimMember;
+        QUser qUser = QUser.user;
+
+        List<MyMoimDto> result = queryFactory.select(
+                Projections.fields(MyMoimDto.class,
+                        qMoim.id.as("moim_id"),
+                        qMoim.moim_name.as("moim_name"),
+                        qUser.profile_image.as("host_profile_img"),
+                        qMoim.fixed_date.as("fixed_date"),
+                        qMoim.fixed_time.as("fixed_time")))
+                .from(qMoim)
+                .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
+                .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
+                    .where(qMoim.user.id.eq(user_id)
+                            .or(qMoimMember.user.id.eq(user_id))
+                            .and(qMoim.fixed_date.isNotNull())
+                        .and(qMoim.fixed_time.isNotNull()))
+                .groupBy(qMoim.id, qMoim.moim_name, qUser.profile_image, qMoim.fixed_date, qMoim.fixed_time)
+                .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc())
+                .fetch();
+
+        return result;
+
+    }
+
+    public Long getDateVoteCnt(Long moim_id, LocalDateTime select_date) {
+        queryFactory = new JPAQueryFactory(em);
+
+        QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
+
+        Long cnt = queryFactory.select(qMoimMemberTime.selected_date)
+                .from(qMoimMemberTime)
+                .where(qMoimMemberTime.moim.id.eq(moim_id).and(qMoimMemberTime.selected_date.eq(select_date)))
+                .orderBy(qMoimMemberTime.selected_date.asc())
+                .fetchCount();
+
+        return cnt;
+    }
+
+    public VoteMoimTimeCntDto getTimeVoteCnt(Long moim_id, LocalDateTime select_date) {
+        queryFactory = new JPAQueryFactory(em);
+
+        QMoim qMoim = QMoim.moim;
+        QMoimDate qMoimDate = QMoimDate.moimDate;
+        QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
+
+        VoteMoimTimeCntDto result = queryFactory.select(
+                        Projections.constructor(VoteMoimTimeCntDto.class,
+                                qMoimMemberTime.selected_date,
+                                getTimeCnt(qMoimMemberTime.am_nine.eq(true)),
+                                getTimeCnt(qMoimMemberTime.am_ten.eq(true)),
+                                getTimeCnt(qMoimMemberTime.am_eleven.eq(true)),
+                                getTimeCnt(qMoimMemberTime.noon.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_one.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_two.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_three.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_four.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_five.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_six.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_seven.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_eigth.eq(true)),
+                                getTimeCnt(qMoimMemberTime.pm_nine.eq(true))
+                        ))
+                .from(qMoim)
+                .leftJoin(qMoimDate).on(qMoim.id.eq(qMoimDate.moim.id))
+                .leftJoin(qMoimMemberTime).on(qMoim.id.eq(qMoimMemberTime.moim.id).and(qMoimDate.selected_date.eq(qMoimMemberTime.selected_date)))
+                .where(qMoim.id.eq(moim_id).and(qMoimMemberTime.selected_date.eq(select_date)))
+                .groupBy(qMoimMemberTime.selected_date)
+                .fetchOne();
+
+        if(result==null) {
+            result = new VoteMoimTimeCntDto();
+            result.setSelected_date(select_date);
+            result.setAm_nine_cnt(0L);
+            result.setAm_ten_cnt(0L);
+            result.setAm_eleven_cnt(0L);
+            result.setNoon_cnt(0L);
+            result.setPm_one_cnt(0L);
+            result.setPm_two_cnt(0L);
+            result.setPm_three_cnt(0L);
+            result.setPm_four_cnt(0L);
+            result.setPm_five_cnt(0L);
+            result.setPm_six_cnt(0L);
+            result.setPm_seven_cnt(0L);
+            result.setPm_eight_cnt(0L);
+            result.setPm_nine_cnt(0L);
+        }
+
+        return result;
+    }
+
+    private NumberExpression<Long> getTimeCnt(Object object) {
+        return Expressions
+                .numberTemplate(Long.class, "count(case when {0} then 1 end)", object);
+    }
 }

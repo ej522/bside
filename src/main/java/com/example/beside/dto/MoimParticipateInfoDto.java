@@ -16,6 +16,10 @@ public class MoimParticipateInfoDto {
     private String moim_leader;
 
     @NotEmpty
+    @Schema(description = "모임 주최자 id", example = "123")
+    private Long moim_leader_id;
+
+    @NotEmpty
     @Schema(description = "모임명", example = "작당모의")
     private String moim_name;
 
@@ -29,6 +33,7 @@ public class MoimParticipateInfoDto {
 
     public MoimParticipateInfoDto(List<MoimOveralDateDto> moimOveralInfo) {
         this.moim_leader = moimOveralInfo.get(0).getUser_name();
+        this.moim_leader_id = moimOveralInfo.get(0).getUser_id();
         this.moim_name = moimOveralInfo.get(0).getMoim_name();
         this.dead_line_hour = moimOveralInfo.get(0).getDead_line_hour();
         this.dateList = moimOveralInfo.stream().map(MoimDateDto::new).collect(Collectors.toList());

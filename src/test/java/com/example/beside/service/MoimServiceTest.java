@@ -1,13 +1,15 @@
 package com.example.beside.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import com.example.beside.dto.MoimAdjustScheduleDto;
-import com.example.beside.dto.MoimParticipateInfoDto;
-import com.example.beside.dto.MyMoimDto;
+import com.example.beside.common.Exception.PasswordException;
+import com.example.beside.common.Exception.UserValidateNickName;
+import com.example.beside.dto.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +44,8 @@ public class MoimServiceTest {
     @Value("${spring.secret.key}")
     private String secret_key;
 
-    @Mock
+    //@Mock
+    @Autowired
     private Encrypt mockEncrypt;
 
     @Autowired
@@ -416,6 +419,91 @@ public class MoimServiceTest {
 
         // then
         assertTrue(moimList.get(0).getMemeber_cnt() > 1);
+
+    }
+
+    @Test
+    @DisplayName("주최자가 선택한 모임 날짜")
+    void testGetHostSelectMoimDate() throws Exception {
+        // given
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(saveUser1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+        newMoim.setFixed_date("2023-03-13");
+        newMoim.setFixed_time("2");
+
+        var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        moimService.participateMoim(saveUser2, encryptedId);
+
+        // when
+        MoimParticipateInfoDto moimInfo = moimService.getHostSelectMoimDate(saveUser2, encryptedId);
+
+        // then
+        assertTrue(moimInfo.getMoim_leader_id().equals(saveUser1.getId()));
+        assertTrue(moimInfo.getDateList().size()>0);
+    }
+
+    @Test
+    @DisplayName("주최자가 선택한 날짜에 투표한 모임원 정보")
+    void getVoteDateInfo() throws Exception {
+        // given
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(saveUser1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+        newMoim.setFixed_date("2023-03-13");
+        newMoim.setFixed_time("2");
+
+        var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        moimService.participateMoim(saveUser2, encryptedId);
+        moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        //when
+        List<VoteMoimDateDto> test = moimService.getVoteDateInfo(encryptedId);
+
+        //given
+        assertTrue(test.get(0).getSelected_date().equals(LocalDate.parse("2023-03-10", formatter).atStartOfDay()));
+        assertTrue(test.get(0).getVote_cnt().toString().equals("0"));
+        assertTrue(test.get(1).getUser_info().get(0).getName().equals("다람쥐"));
+
+    }
+
+    @Test
+    void test() throws Exception {
+        // given
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(saveUser1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+        newMoim.setFixed_date("2023-03-13");
+        newMoim.setFixed_time("2");
+
+        var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        moimService.participateMoim(saveUser2, encryptedId);
+        MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        Long moimId = Long.parseLong(mockEncrypt.decrypt(encryptedId));
+
+        //when
+        VoteMoimTimeDto test = moimService.getVoteTimeInfo(moimId, LocalDate.parse("2023-03-13", formatter).atStartOfDay());
+
+        //then
+        assertTrue(test.getTime_info().get(0).getVote_cnt()==0); //am_9
+        assertTrue(test.getTime_info().get(4).getVote_cnt()==1); //pm_1
 
     }
 
