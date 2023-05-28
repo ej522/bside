@@ -128,6 +128,17 @@ public class UserRepository {
         return queryFactory.selectFrom(qUser).where(qUser.id.eq(user.getId())).fetchOne();
     }
 
+    public User UpdateAlarmState(User user) {
+        queryFactory = new JPAQueryFactory(em);
+        QUser qUser = new QUser("u");
+
+        queryFactory.update(qUser).set(qUser.push_alarm, user.getPush_alarm())
+                .set(qUser.marketing_alarm, user.getMarketing_alarm())
+                .where(qUser.id.eq(user.getId())).execute();
+
+        return queryFactory.selectFrom(qUser).where(qUser.id.eq(user.getId())).fetchOne();
+    }
+
     public Optional<User> findUserNickname(String nickname) {
         queryFactory = new JPAQueryFactory(em);
         QUser qUser = new QUser("u");

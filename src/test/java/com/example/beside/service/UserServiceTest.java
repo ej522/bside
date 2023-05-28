@@ -219,6 +219,20 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("알림 상태 변경")
+    void testUpdateAlarmState() throws Exception {
+        // given
+        User saveUser = userService.saveUser(user5);
+        saveUser.setPush_alarm(false);
+
+        // when
+        User updateUser = userService.updateAlarmState(saveUser);
+
+        // then
+        Assertions.assertThat(updateUser.getPush_alarm()).isFalse();
+    }
+
+    @Test
     @DisplayName("8자 이상 닉네임 변경")
     void testUpdateNickNameWithMore8letter() throws PasswordException, UserValidateNickName {
         // given

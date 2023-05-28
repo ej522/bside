@@ -37,11 +37,21 @@ public class UserDto {
     @Schema(description = "소셜 타입", example = "MOIM")
     private String social_type;
 
+    @NotEmpty
+    @Schema(description = "푸쉬 알림", example = "False")
+    private Boolean push_alarm;
+
+    @NotEmpty
+    @Schema(description = "마케팅 알림", example = "False")
+    private Boolean marketing_alarm;
+
     public UserDto(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.name = user.getName();
         this.profile_image = user.getProfile_image();
         this.social_type = user.getSocial_type();
+        this.push_alarm = user.getPush_alarm();
+        this.marketing_alarm = user.getMarketing_alarm();
     }
 }

@@ -97,6 +97,13 @@ public class UserService {
     }
 
     @Transactional
+    public User updateAlarmState(User user) {
+        User updateAlarmState = userRepository.UpdateAlarmState(user);
+
+        return updateAlarmState;
+    }
+
+    @Transactional
     public User updateProfileImage(User user) throws Exception {
         User updateUserInfo = userRepository.updateProfileImage(user);
 

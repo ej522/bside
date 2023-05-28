@@ -41,4 +41,8 @@ public class User {
     private String profile_image;
 
     private LocalDateTime created_time;
+
+    private Boolean push_alarm;
+
+    private Boolean marketing_alarm;
 }
