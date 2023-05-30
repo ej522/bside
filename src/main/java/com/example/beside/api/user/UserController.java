@@ -103,11 +103,12 @@ public class UserController {
 
     @Operation(tags = { "User" }, summary = "회원가입")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "회원가입이 완료되었습니다.", content = @Content(schema = @Schema(implementation = Response.class))),
+            @ApiResponse(responseCode = "201", description = "회원가입이 완료되었습니다.", content = @Content(schema = @Schema(implementation = LoginResponse.class))),
             @ApiResponse(responseCode = "400", description = "올바른 형식의 이메일, 패스워드야 합니다")
     })
     @PostMapping(value = "/v1/signup")
-    public Response<Void> createUser(@RequestBody @Validated CreateUserRequest requset, HttpServletResponse response)
+    public LoginResponse createUser(@RequestBody @Validated CreateUserRequest requset,
+            HttpServletResponse response)
             throws PasswordException, UserNotExistException, UserValidateNickName, PasswordNotCorrectException {
         User user = new User();
         user.setEmail(requset.email);
@@ -121,7 +122,12 @@ public class UserController {
         String userToken = jwtProvider.createToken(saveUser);
         response.addHeader("Authorization", "Bearer " + userToken);
 
-        return Response.success(201, "회원가입이 완료되었습니다.", null);
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        valueOperations.set("jwt:" + saveUser.getId(), userToken, tokenValidTime, TimeUnit.MILLISECONDS);
+
+        UserTokenDto result = new UserTokenDto(userToken, new UserDto(saveUser));
+
+        return LoginResponse.success(201, "회원가입이 완료되었습니다.", result);
     }
 
     @Operation(tags = { "User" }, summary = "이메일 인증번호 전송")
@@ -324,6 +330,10 @@ public class UserController {
             @RequestBody @Validated PasswordRequest passwordRequest)
             throws PasswordException, PasswordNotCorrectException, CurrentPasswordEqualNewPassword {
         User user = (User) token.getAttribute("user");
+
+        String social_type = user.getSocial_type();
+        if (social_type != "MOIM")
+            return Response.fail(400, social_type + " 소셜 계정은 비밀번호 변경이 불가능합니다", null);
         user.setPassword(passwordRequest.current_password);
 
         userService.updatePassword(user, passwordRequest.new_password);
