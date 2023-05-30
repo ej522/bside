@@ -69,7 +69,7 @@ public class UserController {
         List<User> userAll = userService.findUserAll();
         userAll.forEach(s -> {
             UserDto userDto = new UserDto(s.getId(), s.getPassword(), s.getEmail(), s.getName(), s.getProfile_image(),
-                    s.getSocial_type(), s.getPush_alarm(), s.getMarketing_alarm());
+                    s.getSocial_type(), s.getPush_alarm(), s.getMarketing_alarm(), s.getFcm());
             UserDtoList.add(userDto);
         });
 
@@ -117,6 +117,7 @@ public class UserController {
         user.setProfile_image(requset.imgUrl);
         user.setPush_alarm(requset.push_alarm);
         user.setMarketing_alarm(requset.marketing_alarm);
+        user.setFcm(requset.fcm);
 
         User saveUser = userService.saveUser(user);
         String userToken = jwtProvider.createToken(saveUser);
@@ -428,6 +429,9 @@ public class UserController {
 
         @Schema(description = "marketing_alarm", example = "마케팅 알림 여부", type = "Boolean")
         private Boolean marketing_alarm;
+
+        @Schema(description = "fcm", example = "esZVkMAAYUrzi9-40UVPDL:APA91bHQPgHFfbo-dZojoJk2-RT4_EVVfP0njfGhFHAZmYIXWbbjBE", type = "String")
+        private String fcm;
     }
 
     @Data
