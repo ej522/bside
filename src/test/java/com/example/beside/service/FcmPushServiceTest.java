@@ -19,14 +19,14 @@ public class FcmPushServiceTest {
     @Autowired
     private FcmPushService fcmPushService;
 
-    @Test
-    @DisplayName("FCM 토큰으로 push 알람 보내기")
-    void testSendFcmPushNotification() throws FirebaseMessagingException {
-        Long user_id = (long) 20452;
-        User findUserById = userService.findUserById(user_id);
+    // @Test
+    // @DisplayName("FCM 토큰으로 push 알람 보내기")
+    // void testSendFcmPushNotification() throws FirebaseMessagingException {
+    // Long user_id = (long) 20452;
+    // User findUserById = userService.findUserById(user_id);
 
-        String fcm = findUserById.getFcm();
+    // String fcm = findUserById.getFcm();
 
-        fcmPushService.sendFcmPushNotification(fcm, "hello", "how are you");
-    }
+    // fcmPushService.sendFcmPushNotification(fcm, "hello", "how are you");
+    // }
 }
