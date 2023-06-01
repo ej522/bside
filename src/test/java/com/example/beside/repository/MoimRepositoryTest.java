@@ -6,9 +6,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.beside.dto.FriendDto;
-import com.example.beside.dto.VoteMoimTimeCntDto;
+import com.example.beside.dto.*;
 import com.querydsl.core.Tuple;
+import org.assertj.core.api.Assert;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,8 +20,6 @@ import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
-import com.example.beside.dto.MoimOveralDateDto;
-import com.example.beside.dto.VotingMoimDto;
 
 import jakarta.transaction.Transactional;
 
@@ -350,7 +348,8 @@ public class MoimRepositoryTest {
     }
 
     @Test
-    void test() throws Exception {
+    @DisplayName("시간을 투표한 인원이 몇 명인지 알 수 있는가?")
+    void testGetTimeVoteCnt() throws Exception {
         // given
         User findUser = userRepository.saveUser(user);
         User findUser2 = userRepository.saveUser(user2);
@@ -377,6 +376,37 @@ public class MoimRepositoryTest {
         Assertions.assertThat(test.getAm_ten_cnt()).isEqualTo(0);
         Assertions.assertThat(test.getPm_eight_cnt()).isEqualTo(1);
         Assertions.assertThat(test.getPm_nine_cnt()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("과거 모임 목록을 조회할 수 있는가?")
+    void getFindMyMoimHistoryList() throws Exception {
+        // given
+        User findUser = userRepository.saveUser(user);
+        User findUser2 = userRepository.saveUser(user2);
+
+        newMoim.setUser(findUser);
+        // 모임 생성
+        long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
+        newMoim.setId(moimId);
+
+        // 모임 참여
+        moimRepository.makeMoimMember(findUser2, newMoim);
+
+        // 모임 멤버 조회
+        var moimMember = moimRepository.getMoimMemberByMemberId(moimId, findUser2.getId());
+
+        moimRepository.saveSchedule(moimMember, normalMoimMemberTime);
+
+        LocalDateTime dateTime = LocalDateTime.now(); // 예시로 현재 시간을 사용
+        moimRepository.fixMoimDate(newMoim, dateTime, 12);
+
+        // when
+        List<MyMoimDto> result = moimRepository.findMyMoimHistoryList(findUser2.getId());
+
+        //then
+        Assertions.assertThat(result.get(0).getFixed_date()).isLessThanOrEqualTo(dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        Assertions.assertThat(result.get(0).getFixed_time()).isLessThanOrEqualTo("12");
     }
 
 }
