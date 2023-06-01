@@ -378,6 +378,20 @@ public class MoimService {
         return moimTimeInfo;
     }
 
+    @Transactional
+    public List<MyMoimDto> deleteMoimHistory(Long moim_id, Long host_id, Long user_id) {
+
+        if(user_id.equals(host_id)) {
+            moimRepository.deleteHostHistory(user_id, moim_id);
+        } else {
+            moimRepository.deleteGusetHistory(user_id, moim_id);
+        }
+
+        List<MyMoimDto> result = moimRepository.findMyMoimHistoryList(user_id);
+
+        return result;
+    }
+
     private List<UserDto> setTimeUserInfo(MoimOveralScheduleDto voteUserInfo, List<UserDto> voteUserInfoList) {
         UserDto userDto = new UserDto();
         userDto.setId(voteUserInfo.getUser_id());
@@ -404,7 +418,5 @@ public class MoimService {
         return timeInfoList;
 
     }
-
-
 }
 

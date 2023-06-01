@@ -10,6 +10,7 @@ import java.util.Map;
 import com.example.beside.common.Exception.PasswordException;
 import com.example.beside.common.Exception.UserValidateNickName;
 import com.example.beside.dto.*;
+import com.example.beside.repository.MoimRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -53,6 +54,9 @@ public class MoimServiceTest {
 
     @Autowired
     private MoimService moimService;
+
+    @Autowired
+    private MoimRepository moimRepository;
 
     private List<MoimDate> normalMoimDates = new ArrayList<>();
     private List<MoimDate> wrongMoimDates = new ArrayList<>();
@@ -478,7 +482,8 @@ public class MoimServiceTest {
     }
 
     @Test
-    void test() throws Exception {
+    @DisplayName("주최자가 선택한 시간에 투표한 모임원 정보")
+    void testGetVoteTimeInfo() throws Exception {
         // given
         User saveUser1 = userService.saveUser(user);
         User saveUser2 = userService.saveUser(user2);
@@ -506,5 +511,38 @@ public class MoimServiceTest {
         assertTrue(test.getTime_info().get(4).getVote_cnt()==1); //pm_1
 
     }
+
+    @Test
+    @DisplayName("과거 모임 목록 삭제")
+    void testDeleteMoimHistory() throws Exception {
+        // given
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(saveUser1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+        newMoim.setFixed_date("2023-03-13");
+        newMoim.setFixed_time("2");
+
+        var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        moimService.participateMoim(saveUser2, encryptedId);
+        MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
+
+        moimRepository.fixMoimDate(newMoim, LocalDateTime.now(), 12);   //예시로 현재시간 이용
+
+        Long moimId = Long.parseLong(mockEncrypt.decrypt(encryptedId));
+
+        //when
+        List<MyMoimDto> hostResult = moimService.deleteMoimHistory(moimId, newMoim.getUser().getId(), saveUser1.getId());
+
+        //then
+        assertTrue(hostResult.size()==0);
+
+        List<MyMoimDto> guestResult = moimService.getMoimHistoryList(saveUser2.getId());
+        assertTrue(guestResult.size()!=0);
+    }
+
 
 }

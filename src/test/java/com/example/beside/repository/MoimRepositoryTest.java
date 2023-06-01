@@ -380,7 +380,7 @@ public class MoimRepositoryTest {
 
     @Test
     @DisplayName("과거 모임 목록을 조회할 수 있는가?")
-    void getFindMyMoimHistoryList() throws Exception {
+    void testGetFindMyMoimHistoryList() throws Exception {
         // given
         User findUser = userRepository.saveUser(user);
         User findUser2 = userRepository.saveUser(user2);

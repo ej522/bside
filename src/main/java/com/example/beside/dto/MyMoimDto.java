@@ -40,7 +40,7 @@ public class MyMoimDto {
     private Long memeber_cnt;
 
     @NotEmpty
-    @Schema(description = "모임 주최자 회원번호", example = "1")
+    @Schema(description = "모임 주최자 ID", example = "1")
     private Long host_id;
 
     public MyMoimDto(Moim moim, User user, Long memeber_cnt) {
