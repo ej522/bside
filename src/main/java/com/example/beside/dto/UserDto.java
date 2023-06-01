@@ -45,6 +45,10 @@ public class UserDto {
     @Schema(description = "마케팅 알림", example = "False")
     private Boolean marketing_alarm;
 
+    @NotEmpty
+    @Schema(description = "FCM 토큰", example = "esZVkMAAYUrzi9-40UVPDL:APA91bHQPgHFfbo-dZojoJk2-RT4_EVVfP0njfGhFHAZmYIXWbbjBE")
+    private String fcm;
+
     public UserDto(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
@@ -53,5 +57,6 @@ public class UserDto {
         this.social_type = user.getSocial_type();
         this.push_alarm = user.getPush_alarm();
         this.marketing_alarm = user.getMarketing_alarm();
+        this.fcm = user.getFcm();
     }
 }

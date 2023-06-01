@@ -36,6 +36,8 @@ public class User {
     @Column(length = 30)
     private String email;
 
+    private String fcm;
+
     private String password;
 
     private String profile_image;
