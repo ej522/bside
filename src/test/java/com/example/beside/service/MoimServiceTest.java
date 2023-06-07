@@ -407,16 +407,7 @@ public class MoimServiceTest {
         moimService.participateMoim(saveUser2, encryptedId);
         moimService.participateMoim(saveUser3, encryptedId);
 
-        Moim newMoim2 = new Moim();
-        newMoim2.setUser(saveUser2);
-        newMoim2.setMoim_name("테스트 모임2");
-        newMoim2.setDead_line_hour(5);
-        newMoim2.setFixed_date("2023-03-14");
-        newMoim2.setFixed_time("2");
-
-        var encryptedId2 = moimService.makeMoim(user2, newMoim2, normalMoimDates);
-        moimService.participateMoim(saveUser1, encryptedId2);
-        moimService.participateMoim(saveUser3, encryptedId2);
+        moimRepository.fixMoimDate(newMoim, LocalDateTime.now().minusDays(1), 12);
 
         // when
         List<MyMoimDto> moimList = moimService.getMoimHistoryList(saveUser1.getId());
@@ -530,7 +521,7 @@ public class MoimServiceTest {
         moimService.participateMoim(saveUser2, encryptedId);
         MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
 
-        moimRepository.fixMoimDate(newMoim, LocalDateTime.now(), 12);   //예시로 현재시간 이용
+        moimRepository.fixMoimDate(newMoim, LocalDateTime.now().minusDays(1), 12);
 
         Long moimId = Long.parseLong(mockEncrypt.decrypt(encryptedId));
 

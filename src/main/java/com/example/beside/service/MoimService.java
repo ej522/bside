@@ -172,7 +172,21 @@ public class MoimService {
     public List<MyMoimDto> getMoimHistoryList(Long user_id) {
         List<MyMoimDto> moimList = moimRepository.findMyMoimHistoryList(user_id);
 
-        for (MyMoimDto moim : moimList) {
+        for (int i=0; i<moimList.size(); i++) {
+            MyMoimDto moim = moimList.get(i);
+
+            String date = moim.getFixed_date();
+            String[] dateList = date.split("-");
+            String time = moim.getFixed_time();
+
+            //쿼리에서 날짜와 시간을 같이 비교할 수 없어서 서비스 단에서 비교후 오늘 이후의 날짜는 제거
+            LocalDateTime dateTime = LocalDateTime.of(Integer.parseInt(dateList[0]),Integer.parseInt(dateList[1]),Integer.parseInt(dateList[2]),Integer.parseInt(time),0);
+
+            if(dateTime.isAfter(LocalDateTime.now())) {
+                moimList.remove(i);
+                continue;
+            }
+
             Long cnt = moimRepository.findMemberCount(moim.getMoim_id());
 
             // 주최자도 더해줌

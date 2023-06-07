@@ -398,7 +398,7 @@ public class MoimRepositoryTest {
 
         moimRepository.saveSchedule(moimMember, normalMoimMemberTime);
 
-        LocalDateTime dateTime = LocalDateTime.now(); // 예시로 현재 시간을 사용
+        LocalDateTime dateTime = LocalDateTime.now().minusDays(1);
         moimRepository.fixMoimDate(newMoim, dateTime, 12);
 
         // when
