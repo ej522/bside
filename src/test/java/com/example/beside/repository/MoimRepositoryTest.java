@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.beside.dto.*;
-import com.querydsl.core.Tuple;
-import org.assertj.core.api.Assert;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,18 +26,16 @@ import jakarta.transaction.Transactional;
 public class MoimRepositoryTest {
 
     @Autowired
-    private MoimRepository moimRepository;
+    private MoimRepositoryImpl moimRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepositoryImpl userRepository;
 
     private User user;
     private User user2;
     private Moim newMoim;
     private List<MoimDate> moimdate1 = new ArrayList<>();
     private List<MoimMemberTime> normalMoimMemberTime = new ArrayList<>();
-
-    private List<VotingMoimDto> findVotingMoimHistory;
 
     @BeforeEach
     void settingEntity() {
@@ -341,9 +337,9 @@ public class MoimRepositoryTest {
         moimRepository.saveSchedule(moimMember, normalMoimMemberTime);
 
         // when
-        Long cnt = moimRepository.getDateVoteCnt(moimId, normalMoimMemberTime.get(0).getSelected_date());
+        int cnt = moimRepository.getDateVoteCnt(moimId, normalMoimMemberTime.get(0).getSelected_date());
 
-        //then
+        // then
         Assertions.assertThat(cnt).isGreaterThan(0);
     }
 
@@ -369,9 +365,10 @@ public class MoimRepositoryTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         // when
-        VoteMoimTimeCntDto test = moimRepository.getTimeVoteCnt(moimId, LocalDate.parse("2023-03-10", formatter).atStartOfDay());
+        VoteMoimTimeCntDto test = moimRepository.getTimeVoteCnt(moimId,
+                LocalDate.parse("2023-03-10", formatter).atStartOfDay());
 
-        //then
+        // then
         Assertions.assertThat(test.getAm_nine_cnt()).isEqualTo(0);
         Assertions.assertThat(test.getAm_ten_cnt()).isEqualTo(0);
         Assertions.assertThat(test.getPm_eight_cnt()).isEqualTo(1);
@@ -404,8 +401,9 @@ public class MoimRepositoryTest {
         // when
         List<MyMoimDto> result = moimRepository.findMyMoimHistoryList(findUser2.getId());
 
-        //then
-        Assertions.assertThat(result.get(0).getFixed_date()).isLessThanOrEqualTo(dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        // then
+        Assertions.assertThat(result.get(0).getFixed_date())
+                .isLessThanOrEqualTo(dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         Assertions.assertThat(result.get(0).getFixed_time()).isLessThanOrEqualTo("12");
     }
 

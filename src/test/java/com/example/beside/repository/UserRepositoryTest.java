@@ -24,10 +24,7 @@ import jakarta.transaction.Transactional;
 public class UserRepositoryTest {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private MoimRepository moimRepository;
+    private UserRepositoryImpl userRepository;
 
     private User user;
     private User user2;

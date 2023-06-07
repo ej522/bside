@@ -15,7 +15,7 @@ import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
-import com.example.beside.repository.MoimRepository;
+import com.example.beside.repository.MoimRepositoryImpl;
 import com.example.beside.util.Encrypt;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MoimService {
-    private final MoimRepository moimRepository;
+    private final MoimRepositoryImpl moimRepository;
 
     @Autowired
     private Encrypt encrypt;
@@ -172,22 +172,23 @@ public class MoimService {
     public List<MyMoimDto> getMoimHistoryList(Long user_id) {
         List<MyMoimDto> moimList = moimRepository.findMyMoimHistoryList(user_id);
 
-        for (int i=0; i<moimList.size(); i++) {
+        for (int i = 0; i < moimList.size(); i++) {
             MyMoimDto moim = moimList.get(i);
 
             String date = moim.getFixed_date();
             String[] dateList = date.split("-");
             String time = moim.getFixed_time();
 
-            //쿼리에서 날짜와 시간을 같이 비교할 수 없어서 서비스 단에서 비교후 오늘 이후의 날짜는 제거
-            LocalDateTime dateTime = LocalDateTime.of(Integer.parseInt(dateList[0]),Integer.parseInt(dateList[1]),Integer.parseInt(dateList[2]),Integer.parseInt(time),0);
+            // 쿼리에서 날짜와 시간을 같이 비교할 수 없어서 서비스 단에서 비교후 오늘 이후의 날짜는 제거
+            LocalDateTime dateTime = LocalDateTime.of(Integer.parseInt(dateList[0]), Integer.parseInt(dateList[1]),
+                    Integer.parseInt(dateList[2]), Integer.parseInt(time), 0);
 
-            if(dateTime.isAfter(LocalDateTime.now())) {
+            if (dateTime.isAfter(LocalDateTime.now())) {
                 moimList.remove(i);
                 continue;
             }
 
-            Long cnt = moimRepository.findMemberCount(moim.getMoim_id());
+            int cnt = moimRepository.findMemberCount(moim.getMoim_id());
 
             // 주최자도 더해줌
             cnt += 1;
@@ -228,15 +229,15 @@ public class MoimService {
     public List<VoteMoimDateDto> getVoteDateInfo(String encryptInfo) throws Exception {
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
 
-        //모임 날짜 정보
+        // 모임 날짜 정보
         List<MoimOveralDateDto> dateInfo = moimRepository.getMoimOveralInfo(moimId);
 
-        //투표 인원 정보
+        // 투표 인원 정보
         List<MoimOveralScheduleDto> voteUserInfo = moimRepository.getMoimScheduleInfo(moimId);
 
         List<VoteMoimDateDto> dateVoteUserList = new ArrayList<>();
 
-        for(int i=0; i<dateInfo.size(); i++) {
+        for (int i = 0; i < dateInfo.size(); i++) {
             VoteMoimDateDto voteMoimDateDto = new VoteMoimDateDto();
             voteMoimDateDto.setMoim_id(moimId);
 
@@ -247,16 +248,15 @@ public class MoimService {
             voteMoimDateDto.setAfternoon(dateInfo.get(i).getAfternoon());
             voteMoimDateDto.setEvening(dateInfo.get(i).getEvening());
 
-
-            //투표참여 인원
-            Long vote_cnt = moimRepository.getDateVoteCnt(moimId, selected_date);
+            // 투표참여 인원
+            int vote_cnt = moimRepository.getDateVoteCnt(moimId, selected_date);
             voteMoimDateDto.setVote_cnt(vote_cnt);
 
             List<UserDto> userInfoList = new ArrayList<>();
 
-            for(int j=0; j<voteUserInfo.size(); j++) {
+            for (int j = 0; j < voteUserInfo.size(); j++) {
                 LocalDateTime vote_date = voteUserInfo.get(j).getSelected_date();
-                if(selected_date.equals(vote_date)) {
+                if (selected_date.equals(vote_date)) {
 
                     UserDto userDto = new UserDto();
                     userDto.setId(voteUserInfo.get(j).getUser_id());
@@ -274,10 +274,10 @@ public class MoimService {
     }
 
     public VoteMoimTimeDto getVoteTimeInfo(Long moimId, LocalDateTime selected_date) throws Exception {
-        //투표 인원 정보
+        // 투표 인원 정보
         List<MoimOveralScheduleDto> voteUserInfoList = moimRepository.getMoimScheduleInfo(moimId);
 
-        //인원수
+        // 인원수
         VoteMoimTimeCntDto voteTimeCnt = moimRepository.getTimeVoteCnt(moimId, selected_date);
 
         VoteMoimTimeDto moimTimeInfo = new VoteMoimTimeDto();
@@ -286,7 +286,7 @@ public class MoimService {
 
         List<VoteMoimTimeDetailDto> timeInfoList = new ArrayList<>();
 
-        //시간, 시간대 투표 인원
+        // 시간, 시간대 투표 인원
         VoteMoimTimeDetailDto am9Info = setTimeInfo(9, voteTimeCnt.getAm_nine_cnt());
         VoteMoimTimeDetailDto am10Info = setTimeInfo(10, voteTimeCnt.getAm_ten_cnt());
         VoteMoimTimeDetailDto am11Info = setTimeInfo(11, voteTimeCnt.getAm_eleven_cnt());
@@ -301,7 +301,7 @@ public class MoimService {
         VoteMoimTimeDetailDto pm8Info = setTimeInfo(20, voteTimeCnt.getPm_eight_cnt());
         VoteMoimTimeDetailDto pm9Info = setTimeInfo(21, voteTimeCnt.getPm_nine_cnt());
 
-        //해당시간에 투표한 유저 리스트
+        // 해당시간에 투표한 유저 리스트
         List<UserDto> am9userInfoList = new ArrayList<>();
         List<UserDto> am10userInfoList = new ArrayList<>();
         List<UserDto> am11userInfoList = new ArrayList<>();
@@ -316,59 +316,59 @@ public class MoimService {
         List<UserDto> pm8userInfoList = new ArrayList<>();
         List<UserDto> pm9userInfoList = new ArrayList<>();
 
-        for(MoimOveralScheduleDto voteUserInfo : voteUserInfoList) {
-            if(selected_date.equals(voteUserInfo.getSelected_date())) {
-                //해당시간에 투표한 유저 정보 입력
-                if(voteUserInfo.getAm_nine()) {
-                    am9userInfoList= setTimeUserInfo(voteUserInfo, am9userInfoList);
+        for (MoimOveralScheduleDto voteUserInfo : voteUserInfoList) {
+            if (selected_date.equals(voteUserInfo.getSelected_date())) {
+                // 해당시간에 투표한 유저 정보 입력
+                if (voteUserInfo.getAm_nine()) {
+                    am9userInfoList = setTimeUserInfo(voteUserInfo, am9userInfoList);
                 }
 
-                if(voteUserInfo.getAm_ten()) {
-                    am10userInfoList= setTimeUserInfo(voteUserInfo, am10userInfoList);
+                if (voteUserInfo.getAm_ten()) {
+                    am10userInfoList = setTimeUserInfo(voteUserInfo, am10userInfoList);
                 }
 
-                if(voteUserInfo.getAm_eleven()) {
-                    am11userInfoList= setTimeUserInfo(voteUserInfo, am11userInfoList);
+                if (voteUserInfo.getAm_eleven()) {
+                    am11userInfoList = setTimeUserInfo(voteUserInfo, am11userInfoList);
                 }
 
-                if(voteUserInfo.getNoon()) {
-                    pm12userInfoList= setTimeUserInfo(voteUserInfo, pm12userInfoList);
+                if (voteUserInfo.getNoon()) {
+                    pm12userInfoList = setTimeUserInfo(voteUserInfo, pm12userInfoList);
                 }
 
-                if(voteUserInfo.getPm_one()) {
-                    pm1userInfoList= setTimeUserInfo(voteUserInfo, pm1userInfoList);
+                if (voteUserInfo.getPm_one()) {
+                    pm1userInfoList = setTimeUserInfo(voteUserInfo, pm1userInfoList);
                 }
 
-                if(voteUserInfo.getPm_two()) {
-                    pm2userInfoList= setTimeUserInfo(voteUserInfo, pm2userInfoList);
+                if (voteUserInfo.getPm_two()) {
+                    pm2userInfoList = setTimeUserInfo(voteUserInfo, pm2userInfoList);
                 }
 
-                if(voteUserInfo.getPm_three()) {
-                    pm3userInfoList= setTimeUserInfo(voteUserInfo, pm3userInfoList);
+                if (voteUserInfo.getPm_three()) {
+                    pm3userInfoList = setTimeUserInfo(voteUserInfo, pm3userInfoList);
                 }
 
-                if(voteUserInfo.getPm_four()) {
-                    pm4userInfoList= setTimeUserInfo(voteUserInfo, pm4userInfoList);
+                if (voteUserInfo.getPm_four()) {
+                    pm4userInfoList = setTimeUserInfo(voteUserInfo, pm4userInfoList);
                 }
 
-                if(voteUserInfo.getPm_five()) {
-                    pm5userInfoList= setTimeUserInfo(voteUserInfo, pm5userInfoList);
+                if (voteUserInfo.getPm_five()) {
+                    pm5userInfoList = setTimeUserInfo(voteUserInfo, pm5userInfoList);
                 }
 
-                if(voteUserInfo.getPm_six()) {
-                    pm6userInfoList= setTimeUserInfo(voteUserInfo, pm6userInfoList);
+                if (voteUserInfo.getPm_six()) {
+                    pm6userInfoList = setTimeUserInfo(voteUserInfo, pm6userInfoList);
                 }
 
-                if(voteUserInfo.getPm_seven()) {
-                    pm7userInfoList= setTimeUserInfo(voteUserInfo, pm7userInfoList);
+                if (voteUserInfo.getPm_seven()) {
+                    pm7userInfoList = setTimeUserInfo(voteUserInfo, pm7userInfoList);
                 }
 
-                if(voteUserInfo.getPm_eight()) {
-                    pm8userInfoList= setTimeUserInfo(voteUserInfo, pm8userInfoList);
+                if (voteUserInfo.getPm_eight()) {
+                    pm8userInfoList = setTimeUserInfo(voteUserInfo, pm8userInfoList);
                 }
 
-                if(voteUserInfo.getPm_nine()) {
-                    pm9userInfoList= setTimeUserInfo(voteUserInfo, pm9userInfoList);
+                if (voteUserInfo.getPm_nine()) {
+                    pm9userInfoList = setTimeUserInfo(voteUserInfo, pm9userInfoList);
                 }
             }
         }
@@ -395,7 +395,7 @@ public class MoimService {
     @Transactional
     public List<MyMoimDto> deleteMoimHistory(Long moim_id, Long host_id, Long user_id) {
 
-        if(user_id.equals(host_id)) {
+        if (user_id.equals(host_id)) {
             moimRepository.deleteHostHistory(user_id, moim_id);
         } else {
             moimRepository.deleteGusetHistory(user_id, moim_id);
@@ -424,7 +424,9 @@ public class MoimService {
 
         return timeInfo;
     }
-    private List<VoteMoimTimeDetailDto> setVoteTimeInfoList(List<VoteMoimTimeDetailDto> timeInfoList, VoteMoimTimeDetailDto timeInfo, List<UserDto> useInfoList) {
+
+    private List<VoteMoimTimeDetailDto> setVoteTimeInfoList(List<VoteMoimTimeDetailDto> timeInfoList,
+            VoteMoimTimeDetailDto timeInfo, List<UserDto> useInfoList) {
         timeInfo.setUser_info(useInfoList);
 
         timeInfoList.add(timeInfo);
@@ -433,4 +435,3 @@ public class MoimService {
 
     }
 }
-

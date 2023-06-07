@@ -4,7 +4,7 @@ import com.example.beside.common.Exception.*;
 import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.dto.FriendDto;
-import com.example.beside.repository.UserRepository;
+import com.example.beside.repository.UserRepositoryImpl;
 import com.example.beside.util.Common;
 import com.example.beside.util.Encrypt;
 import com.example.beside.util.PasswordConverter;
@@ -24,7 +24,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
+    private final UserRepositoryImpl userRepository;
 
     @Transactional
     public User saveUser(User user) throws PasswordException, UserValidateNickName {
@@ -52,7 +52,7 @@ public class UserService {
         Common.PasswordValidate(password);
 
         Optional<User> OptionalUser = userRepository
-                .findUserByEmailAndPassword(user.getEmail());
+                .findUserByEmail(user.getEmail());
 
         OptionalUser.orElseThrow(() -> new UserNotExistException("해당 계정이 존재하지 않습니다"));
         User userInfo = OptionalUser.get();

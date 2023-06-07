@@ -37,13 +37,13 @@ public class MyMoimDto {
 
     @NotEmpty
     @Schema(description = "모임 인원", example = "6")
-    private Long memeber_cnt;
+    private Integer memeber_cnt;
 
     @NotEmpty
     @Schema(description = "모임 주최자 ID", example = "1")
     private Long host_id;
 
-    public MyMoimDto(Moim moim, User user, Long memeber_cnt) {
+    public MyMoimDto(Moim moim, User user, int memeber_cnt) {
         this.moim_id = moim.getId();
         this.moim_name = moim.getMoim_name();
         this.host_profile_img = user.getProfile_image();
