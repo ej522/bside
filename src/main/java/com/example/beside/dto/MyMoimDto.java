@@ -39,6 +39,10 @@ public class MyMoimDto {
     @Schema(description = "모임 인원", example = "6")
     private Long memeber_cnt;
 
+    @NotEmpty
+    @Schema(description = "모임 주최자 ID", example = "1")
+    private Long host_id;
+
     public MyMoimDto(Moim moim, User user, Long memeber_cnt) {
         this.moim_id = moim.getId();
         this.moim_name = moim.getMoim_name();
@@ -46,6 +50,7 @@ public class MyMoimDto {
         this.fixed_date = moim.getFixed_date();
         this.fixed_time = moim.getFixed_time();
         this.memeber_cnt = memeber_cnt;
+        this.host_id = moim.getUser().getId();
     }
 
 }

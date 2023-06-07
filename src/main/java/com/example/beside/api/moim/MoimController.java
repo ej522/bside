@@ -218,6 +218,21 @@ public class MoimController {
         return VoteMoimTimeResponse.success(200, "모임 시간 투표 결과가 조회되었습니다.", voteTimeInfo);
     }
 
+    @Operation(tags = { "Moim" }, summary = "과거 모임 목록 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "과거 모임이 삭제되었습니다.", content = @Content(schema = @Schema(implementation = MoimHistoryResponse.class))),
+    })
+    @PostMapping(value = "/v1/delete/moim-history")
+    public MoimHistoryResponse deleteMoimHistory(HttpServletRequest token,
+                                                 @RequestBody @Validated MoimHistoryRequest request) {
+        User user = (User) token.getAttribute("user");
+
+        List<MyMoimDto> result = moimService.deleteMoimHistory(request.moim_id, request.host_id, user.getId());
+
+        return MoimHistoryResponse.success(200, "과거 모임이 삭제되었습니다.", result);
+
+    }
+
     @Data
     static class MoimParticipateRequest {
         @NotNull
@@ -324,6 +339,17 @@ public class MoimController {
         @NotNull
         @Schema(description = "선택된 날짜", example = "2023-03-10", type = "String")
         private String selected_date;
+    }
+
+    @Data
+    static class MoimHistoryRequest {
+        @NotNull
+        @Schema(description = "모임 아이디", example = "1")
+        private Long moim_id;
+
+        @NotNull
+        @Schema(description = "호스트 아이디", example = "1")
+        private Long host_id;
     }
 
 }

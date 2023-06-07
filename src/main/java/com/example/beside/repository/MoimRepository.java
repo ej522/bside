@@ -1,8 +1,11 @@
 package com.example.beside.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.example.beside.dto.*;
@@ -11,6 +14,7 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.example.beside.dto.MyMoimDto;
 import com.example.beside.dto.VotingMoimDto;
 
+import com.querydsl.jpa.JPQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -77,6 +81,7 @@ public class MoimRepository {
 
     public long makeMoim(User user, Moim moim, List<MoimDate> moim_date_list) throws Exception {
         // 모임 생성
+        moim.setHistory_view_yn(true);
         moim.setCreated_time(LocalDateTime.now());
         moim.setNobody_schedule_selected(true);
         em.persist(moim);
@@ -152,23 +157,54 @@ public class MoimRepository {
         QMoimMember qMoimMember = QMoimMember.moimMember;
         QUser qUser = QUser.user;
 
-        List<MyMoimDto> result = queryFactory.select(
+        LocalDateTime today = LocalDateTime.now();
+
+        String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String formattedTime = String.valueOf(today.toLocalTime().getHour());
+
+        //주최한 모임
+        JPQLQuery<MyMoimDto> hostQuery = queryFactory.select(
                 Projections.fields(MyMoimDto.class,
-                        qMoim.id.as("moim_id"),
-                        qMoim.moim_name.as("moim_name"),
-                        qUser.profile_image.as("host_profile_img"),
-                        qMoim.fixed_date.as("fixed_date"),
-                        qMoim.fixed_time.as("fixed_time")))
+                                qMoim.id.as("moim_id"),
+                                qMoim.moim_name.as("moim_name"),
+                                qUser.profile_image.as("host_profile_img"),
+                                qMoim.fixed_date.as("fixed_date"),
+                                qMoim.fixed_time.as("fixed_time"),
+                                qMoim.user.id.as("host_id")))
+                .from(qMoim)
+                .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
+                .where(qMoim.user.id.eq(user_id)
+                        .and(qMoim.fixed_date.loe(formattedDate))
+                        .and(qMoim.fixed_date.isNotNull())
+                        .and(qMoim.fixed_time.isNotNull())
+                        .and(qMoim.history_view_yn.eq(true)))
+                .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc());
+
+        //초대된 모임
+        JPQLQuery<MyMoimDto> guestQuery = queryFactory.select(
+                        Projections.fields(MyMoimDto.class,
+                                qMoim.id.as("moim_id"),
+                                qMoim.moim_name.as("moim_name"),
+                                qUser.profile_image.as("host_profile_img"),
+                                qMoim.fixed_date.as("fixed_date"),
+                                qMoim.fixed_time.as("fixed_time"),
+                                qMoim.user.id.as("host_id")))
                 .from(qMoim)
                 .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
                 .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
-                .where(qMoim.user.id.eq(user_id)
-                        .or(qMoimMember.user.id.eq(user_id))
+                .where(qMoim.user.id.ne(user_id)
+                        .and(qMoim.fixed_date.loe(formattedDate))
+                        .and(qMoimMember.user.id.eq(user_id))
                         .and(qMoim.fixed_date.isNotNull())
-                        .and(qMoim.fixed_time.isNotNull()))
-                .groupBy(qMoim.id, qMoim.moim_name, qUser.profile_image, qMoim.fixed_date, qMoim.fixed_time)
-                .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc())
-                .fetch();
+                        .and(qMoim.fixed_time.isNotNull())
+                        .and(qMoimMember.history_view_yn.eq(true)))
+                .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc());
+
+        // UINON ALL
+        List<MyMoimDto> result = hostQuery.fetch();
+        result.addAll(guestQuery.fetch());
+
+        result.sort(Comparator.comparing(MyMoimDto::getFixed_date).thenComparing(MyMoimDto::getFixed_time).reversed());
 
         return result;
     }
@@ -231,6 +267,7 @@ public class MoimRepository {
         moimMember.setMember_name(user.getName());
         moimMember.setMoim(moim);
         moimMember.setJoin_time(LocalDateTime.now());
+        moimMember.setHistory_view_yn(true);
 
         em.persist(moimMember);
         em.flush();
@@ -271,6 +308,36 @@ public class MoimRepository {
                 .fetchCount();
 
         return cnt;
+    }
+
+    @Transactional
+    public long deleteHostHistory(Long user_id, Long moim_id) {
+        queryFactory = new JPAQueryFactory(em);
+
+        QMoim qMoim = QMoim.moim;
+
+        queryFactory.update(qMoim)
+                .set(qMoim.history_view_yn, false)
+                .where(qMoim.user.id.eq(user_id)
+                        .and(qMoim.id.eq(moim_id)))
+                .execute();
+
+        return 0;
+    }
+
+    @Transactional
+    public long deleteGusetHistory(Long user_id, Long moim_id) {
+        queryFactory = new JPAQueryFactory(em);
+
+        QMoimMember qMoimMember = QMoimMember.moimMember;
+
+        queryFactory.update(qMoimMember)
+                .set(qMoimMember.history_view_yn, false)
+                .where(qMoimMember.user.id.eq(user_id)
+                        .and(qMoimMember.moim.id.eq(moim_id)))
+                .execute();
+
+        return 0;
     }
 
     /**

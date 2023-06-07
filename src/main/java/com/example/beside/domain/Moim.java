@@ -7,6 +7,7 @@ import java.util.List;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -42,5 +43,8 @@ public class Moim {
     private String encrypted_id;
 
     private Boolean nobody_schedule_selected;
+
+    @ColumnDefault("true")
+    private Boolean history_view_yn;
 
 }

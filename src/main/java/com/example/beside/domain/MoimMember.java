@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -30,5 +31,8 @@ public class MoimMember {
     private String member_name;
 
     private LocalDateTime join_time;
+
+    @ColumnDefault("true")
+    private Boolean history_view_yn;
 
 }
