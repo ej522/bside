@@ -24,7 +24,7 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class MailRepositoryTest {
     @Autowired
-    private MailRepository mailRepository;
+    private MailRepositoryImpl mailRepository;
 
     @Autowired
     private EntityManager em;

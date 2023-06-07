@@ -10,7 +10,7 @@ import java.util.Map;
 import com.example.beside.common.Exception.PasswordException;
 import com.example.beside.common.Exception.UserValidateNickName;
 import com.example.beside.dto.*;
-import com.example.beside.repository.MoimRepository;
+import com.example.beside.repository.MoimRepositoryImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +45,7 @@ public class MoimServiceTest {
     @Value("${spring.secret.key}")
     private String secret_key;
 
-    //@Mock
+    // @Mock
     @Autowired
     private Encrypt mockEncrypt;
 
@@ -56,7 +56,7 @@ public class MoimServiceTest {
     private MoimService moimService;
 
     @Autowired
-    private MoimRepository moimRepository;
+    private MoimRepositoryImpl moimRepository;
 
     private List<MoimDate> normalMoimDates = new ArrayList<>();
     private List<MoimDate> wrongMoimDates = new ArrayList<>();
@@ -439,7 +439,7 @@ public class MoimServiceTest {
 
         // then
         assertTrue(moimInfo.getMoim_leader_id().equals(saveUser1.getId()));
-        assertTrue(moimInfo.getDateList().size()>0);
+        assertTrue(moimInfo.getDateList().size() > 0);
     }
 
     @Test
@@ -462,12 +462,12 @@ public class MoimServiceTest {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        //when
+        // when
         List<VoteMoimDateDto> test = moimService.getVoteDateInfo(encryptedId);
 
-        //given
+        // given
         assertTrue(test.get(0).getSelected_date().equals(LocalDate.parse("2023-03-10", formatter).atStartOfDay()));
-        assertTrue(test.get(0).getVote_cnt().toString().equals("0"));
+        assertTrue(test.get(0).getVote_cnt().equals(0));
         assertTrue(test.get(1).getUser_info().get(0).getName().equals("다람쥐"));
 
     }
@@ -494,12 +494,13 @@ public class MoimServiceTest {
 
         Long moimId = Long.parseLong(mockEncrypt.decrypt(encryptedId));
 
-        //when
-        VoteMoimTimeDto test = moimService.getVoteTimeInfo(moimId, LocalDate.parse("2023-03-13", formatter).atStartOfDay());
+        // when
+        VoteMoimTimeDto test = moimService.getVoteTimeInfo(moimId,
+                LocalDate.parse("2023-03-13", formatter).atStartOfDay());
 
-        //then
-        assertTrue(test.getTime_info().get(0).getVote_cnt()==0); //am_9
-        assertTrue(test.getTime_info().get(4).getVote_cnt()==1); //pm_1
+        // then
+        assertTrue(test.getTime_info().get(0).getVote_cnt() == 0); // am_9
+        assertTrue(test.getTime_info().get(4).getVote_cnt() == 1); // pm_1
 
     }
 
@@ -525,15 +526,15 @@ public class MoimServiceTest {
 
         Long moimId = Long.parseLong(mockEncrypt.decrypt(encryptedId));
 
-        //when
-        List<MyMoimDto> hostResult = moimService.deleteMoimHistory(moimId, newMoim.getUser().getId(), saveUser1.getId());
+        // when
+        List<MyMoimDto> hostResult = moimService.deleteMoimHistory(moimId, newMoim.getUser().getId(),
+                saveUser1.getId());
 
-        //then
-        assertTrue(hostResult.size()==0);
+        // then
+        assertTrue(hostResult.size() == 0);
 
         List<MyMoimDto> guestResult = moimService.getMoimHistoryList(saveUser2.getId());
-        assertTrue(guestResult.size()!=0);
+        assertTrue(guestResult.size() != 0);
     }
-
 
 }

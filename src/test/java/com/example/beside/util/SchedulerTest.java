@@ -15,8 +15,8 @@ import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
-import com.example.beside.repository.MoimRepository;
-import com.example.beside.repository.UserRepository;
+import com.example.beside.repository.MoimRepositoryImpl;
+import com.example.beside.repository.UserRepositoryImpl;
 
 import jakarta.transaction.Transactional;
 
@@ -25,10 +25,10 @@ import jakarta.transaction.Transactional;
 public class SchedulerTest {
 
     @Autowired
-    private MoimRepository moimRepository;
+    private MoimRepositoryImpl moimRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepositoryImpl userRepository;
 
     private User user;
     private User user2;

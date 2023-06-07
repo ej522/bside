@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.beside.domain.Moim;
 import com.example.beside.dto.MoimOveralScheduleDto;
-import com.example.beside.repository.MoimRepository;
+import com.example.beside.repository.MoimRepositoryImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class Scheduler {
 
-    private final MoimRepository moimRepository;
+    private final MoimRepositoryImpl moimRepository;
 
     // 초, 분, 시, 일, 월, 주 순서
     @Scheduled(cron = "0 */30 * * * *")

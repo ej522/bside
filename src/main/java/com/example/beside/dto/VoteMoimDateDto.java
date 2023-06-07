@@ -36,7 +36,7 @@ public class VoteMoimDateDto {
 
     @NotEmpty
     @Schema(description = "투표한 인원", example = "1")
-    private Long vote_cnt;
+    private Integer vote_cnt;
 
     @Schema(description = "유저정보")
     private List<UserDto> user_info;
