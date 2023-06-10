@@ -367,6 +367,23 @@ public class UserController {
         return Response.success(200, "로그아웃 되었습니다.", null);
     }
 
+    @Operation(tags = { "User" }, summary = "사용자정보 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 정보가 조회되었습니다.", content = @Content(schema = @Schema(implementation = UserResponse.class))), })
+    @GetMapping("/v1/user-info")
+    public UserResponse getUserInfo(HttpServletRequest token, HttpServletResponse response) {
+        User user = (User) token.getAttribute("user");
+
+        User userInfo = userService.findUserById(user.getId());
+
+        UserDto userDto = new UserDto(userInfo);
+
+        String userToken = redisTemplate.opsForValue().get("jwt:" + user.getId());
+        response.addHeader("Authorization", "Bearer " + userToken);
+
+        return UserResponse.success(200, "사용자 정보가 조회되었습니다.", userDto);
+    }
+
     private String generateVerificationCode() {
         String numbers = "";
         Random random = new Random();
