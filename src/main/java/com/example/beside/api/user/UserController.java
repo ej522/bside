@@ -210,13 +210,18 @@ public class UserController {
             @RequestBody @Validated UpdateAlarmStateRequest request) {
 
         User user = (User) token.getAttribute("user");
-
         User updateUser = new User();
+
         updateUser.setId(user.getId());
         updateUser.setPush_alarm(request.push_alarm);
         updateUser.setMarketing_alarm(request.marketing_alarm);
-        User changUser = userService.updateAlarmState(updateUser);
 
+        if (request.push_alarm == null)
+            updateUser.setPush_alarm(user.getPush_alarm());
+        if (request.marketing_alarm == null)
+            updateUser.setMarketing_alarm(user.getMarketing_alarm());
+
+        User changUser = userService.updateAlarmState(updateUser);
         UserDto userDto = new UserDto(changUser);
 
         return UserResponse.success(200, "알람 상태가 변경 되었습니다.", userDto);
@@ -443,10 +448,9 @@ public class UserController {
 
     @Data
     static class UpdateAlarmStateRequest {
-        @NotNull
         @Schema(description = "push_alarm", example = "푸쉬 알림", type = "Boolean")
         private Boolean push_alarm;
-        @NotNull
+
         @Schema(description = "marketing_alarm", example = "마케팅 알림", type = "Boolean")
         private Boolean marketing_alarm;
     }
