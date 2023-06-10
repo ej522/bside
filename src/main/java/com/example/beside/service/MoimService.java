@@ -64,7 +64,10 @@ public class MoimService {
         participateMoimValidate(user, moimId, moim);
 
         // 친구 추가
-        moimRepository.makeFriend(user, moim);
+        // 주최자
+        moimRepository.makeFriend(user.getId(), moimId, moim.getUser());
+        // 초대자
+        moimRepository.makeFriend(moim.getUser().getId(), moimId, user);
 
         // 모임 멤버 추가
         moimRepository.makeMoimMember(user, moim);
