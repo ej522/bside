@@ -18,7 +18,7 @@ public class VoteMoimTimeDetailDto {
 
     @NotEmpty
     @Schema(description = "선택한 인원", example = "1")
-    private Long vote_cnt;
+    private int vote_cnt;
 
     @Schema(description = "유저정보")
     private List<UserDto> user_info;

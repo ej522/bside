@@ -417,7 +417,7 @@ public class MoimService {
         return voteUserInfoList;
     }
 
-    private VoteMoimTimeDetailDto setTimeInfo(int time, Long cnt) {
+    private VoteMoimTimeDetailDto setTimeInfo(int time, int cnt) {
         VoteMoimTimeDetailDto timeInfo = new VoteMoimTimeDetailDto();
         timeInfo.setTime(time);
         timeInfo.setVote_cnt(cnt);

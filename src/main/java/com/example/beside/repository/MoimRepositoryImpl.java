@@ -555,26 +555,26 @@ public class MoimRepositoryImpl implements MoimRepository {
                 if (result == null) {
                         result = new VoteMoimTimeCntDto();
                         result.setSelected_date(select_date);
-                        result.setAm_nine_cnt(0L);
-                        result.setAm_ten_cnt(0L);
-                        result.setAm_eleven_cnt(0L);
-                        result.setNoon_cnt(0L);
-                        result.setPm_one_cnt(0L);
-                        result.setPm_two_cnt(0L);
-                        result.setPm_three_cnt(0L);
-                        result.setPm_four_cnt(0L);
-                        result.setPm_five_cnt(0L);
-                        result.setPm_six_cnt(0L);
-                        result.setPm_seven_cnt(0L);
-                        result.setPm_eight_cnt(0L);
-                        result.setPm_nine_cnt(0L);
+                        result.setAm_nine_cnt(0);
+                        result.setAm_ten_cnt(0);
+                        result.setAm_eleven_cnt(0);
+                        result.setNoon_cnt(0);
+                        result.setPm_one_cnt(0);
+                        result.setPm_two_cnt(0);
+                        result.setPm_three_cnt(0);
+                        result.setPm_four_cnt(0);
+                        result.setPm_five_cnt(0);
+                        result.setPm_six_cnt(0);
+                        result.setPm_seven_cnt(0);
+                        result.setPm_eight_cnt(0);
+                        result.setPm_nine_cnt(0);
                 }
 
                 return result;
         }
 
-        private NumberExpression<Long> getTimeCnt(Object object) {
+        private NumberExpression<Integer> getTimeCnt(Object object) {
                 return Expressions
-                                .numberTemplate(Long.class, "count(case when {0} then 1 end)", object);
+                                .numberTemplate(Integer.class, "count(case when {0} then 1 end)", object);
         }
 }
