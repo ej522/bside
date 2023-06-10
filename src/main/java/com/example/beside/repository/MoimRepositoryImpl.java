@@ -355,15 +355,13 @@ public class MoimRepositoryImpl implements MoimRepository {
          */
 
         @Override
-        public long makeFriend(User user, Moim moim) {
-                Long user_id = moim.getUser().getId();
-                Long friend_id = user.getId();
+        public long makeFriend(Long friend_id, Long moim_id, User user) {
 
                 queryFactory = new JPAQueryFactory(em);
                 QFriend qFriend = QFriend.friend;
                 // 친구 확인
                 List<Friend> result = queryFactory.selectFrom(qFriend)
-                                .where(qFriend.user.id.eq(user_id)
+                                .where(qFriend.user.id.eq(user.getId())
                                                 .and(qFriend.member_id.eq(friend_id)))
                                 .fetch();
 
@@ -373,9 +371,9 @@ public class MoimRepositoryImpl implements MoimRepository {
 
                 // 친구 등록
                 Friend friend = new Friend();
-                friend.setFirst_moim_id(moim.getId());
-                friend.setUser(moim.getUser());
-                friend.setMember_id(user.getId());
+                friend.setFirst_moim_id(moim_id);
+                friend.setUser(user);
+                friend.setMember_id(friend_id);
                 friend.setCreate_time(LocalDateTime.now());
 
                 em.persist(friend);

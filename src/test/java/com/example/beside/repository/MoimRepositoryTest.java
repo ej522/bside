@@ -181,7 +181,7 @@ public class MoimRepositoryTest {
         moimRepository.makeMoim(savedUser, newMoim, moimdate1);
 
         // when
-        long makeFriend = moimRepository.makeFriend(savedUser, newMoim);
+        long makeFriend = moimRepository.makeFriend(savedUser.getId(), newMoim.getId(), newMoim.getUser());
 
         // then
         Assertions.assertThat(makeFriend).isGreaterThan(0);
@@ -305,7 +305,7 @@ public class MoimRepositoryTest {
         moimRepository.makeMoimMember(savedUser2, newMoim);
 
         // 친구등록
-        moimRepository.makeFriend(savedUser, newMoim);
+        moimRepository.makeFriend(savedUser2.getId(), newMoim.getId(), newMoim.getUser());
         userRepository.deleteUser(savedUser);
 
         // when
