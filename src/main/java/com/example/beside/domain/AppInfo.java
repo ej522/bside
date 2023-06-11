@@ -21,5 +21,6 @@ public class AppInfo {
 
     private String version;
 
+    @Column(columnDefinition = "TEXT")
     private String detail;
 }
