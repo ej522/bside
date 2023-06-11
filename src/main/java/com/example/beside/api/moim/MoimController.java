@@ -5,11 +5,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.example.beside.common.response.*;
 import com.example.beside.dto.*;
-import jakarta.validation.constraints.NotEmpty;
 import com.example.beside.dto.MoimAdjustScheduleDto;
 import com.example.beside.dto.MoimParticipateInfoDto;
 import com.example.beside.dto.MyMoimDto;
@@ -158,7 +156,7 @@ public class MoimController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "과거 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MoimHistoryResponse.class))),
     })
-    @PostMapping(value = "/v1/moim-history")
+    @GetMapping(value = "/v1/moim-history")
     public MoimHistoryResponse getMoimHistoryList(HttpServletRequest token) {
         User user = (User) token.getAttribute("user");
 
@@ -186,7 +184,7 @@ public class MoimController {
     })
     @PostMapping(value = "/v1/host-select-date")
     public MoimParticipateResponse getHostSelectMoimDate(HttpServletRequest token,
-                                                     @RequestBody @Validated MoimParticipateRequest request) throws Exception {
+            @RequestBody @Validated MoimParticipateRequest request) throws Exception {
         User user = (User) token.getAttribute("user");
 
         MoimParticipateInfoDto moimInfo = moimService.getHostSelectMoimDate(user, request.encrptedInfo);
@@ -199,7 +197,8 @@ public class MoimController {
             @ApiResponse(responseCode = "200", description = "모임 날짜 투표 결과가 조회되었습니다.", content = @Content(schema = @Schema(implementation = VoteMoimDateResponse.class))),
     })
     @PostMapping(value = "/v1/date-vote")
-    public VoteMoimDateResponse getVoteMoimDateList(@RequestBody @Validated MoimParticipateRequest request) throws Exception {
+    public VoteMoimDateResponse getVoteMoimDateList(@RequestBody @Validated MoimParticipateRequest request)
+            throws Exception {
         List<VoteMoimDateDto> dateVoteInfo = moimService.getVoteDateInfo(request.encrptedInfo);
 
         return VoteMoimDateResponse.success(200, "모임 날짜 투표 결과가 조회되었습니다.", dateVoteInfo);
@@ -213,18 +212,19 @@ public class MoimController {
     public VoteMoimTimeResponse getVoteTimeInfo(@RequestBody @Validated TimeVoteRequest request) throws Exception {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        VoteMoimTimeDto voteTimeInfo = moimService.getVoteTimeInfo(request.moim_id, LocalDate.parse(request.selected_date, formatter).atStartOfDay());
+        VoteMoimTimeDto voteTimeInfo = moimService.getVoteTimeInfo(request.moim_id,
+                LocalDate.parse(request.selected_date, formatter).atStartOfDay());
 
         return VoteMoimTimeResponse.success(200, "모임 시간 투표 결과가 조회되었습니다.", voteTimeInfo);
     }
 
-    @Operation(tags = { "Moim" }, summary = "과거 모임 목록 삭제")
+    @Operation(tags = { "Moim" }, summary = "특정 모임 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "과거 모임이 삭제되었습니다.", content = @Content(schema = @Schema(implementation = MoimHistoryResponse.class))),
     })
-    @PostMapping(value = "/v1/delete/moim-history")
+    @DeleteMapping(value = "/v1/delete/moim-history")
     public MoimHistoryResponse deleteMoimHistory(HttpServletRequest token,
-                                                 @RequestBody @Validated MoimHistoryRequest request) {
+            @RequestBody @Validated MoimHistoryRequest request) {
         User user = (User) token.getAttribute("user");
 
         List<MyMoimDto> result = moimService.deleteMoimHistory(request.moim_id, request.host_id, user.getId());
