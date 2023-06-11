@@ -1,9 +1,6 @@
 package com.example.beside.api.appInfo;
 
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,10 +9,7 @@ import com.example.beside.domain.AppInfo;
 import com.example.beside.service.AppInfoService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "App Info", description = "앱 정보 API")
@@ -24,15 +18,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class AppInfoController {
     private final AppInfoService appInfoService;
-
-    @Operation(tags = { "App Info" }, summary = "약관 정보")
-    @GetMapping("/v1/get-term")
-    public Response<String> getAppTermInfo() {
-        AppInfo appTermInfo = appInfoService.getAppTermInfo();
-        String content = appTermInfo.getDetail();
-
-        return Response.success(200, "약관 정보를 정상 조회했습니다 ", content);
-    }
 
     @Operation(tags = { "App Info" }, summary = "앱 버전 정보")
     @GetMapping("/v1/get-version")
@@ -43,25 +28,39 @@ public class AppInfoController {
         return Response.success(200, "앱 버전을 정상 조회했습니다 ", version);
     }
 
-    @Operation(tags = { "App Info" }, summary = "앱 버전, 약관 정보 이력")
-    @PostMapping("/v1/save-app-info")
-    public Response<String> saveTermInformation(@RequestBody @Validated AppInfoRequest appInfoRequest) {
+    @Operation(tags = { "App Info" }, summary = "약관 정보")
+    @GetMapping("/v1/get-terms")
+    public Response<String> getAppTermInfo() {
+        AppInfo appTermInfo = appInfoService.getAppTermInfo();
+        String content = appTermInfo.getTerms();
 
-        String version = appInfoRequest.getVersion();
-        String content = appInfoRequest.getContent();
-        appInfoService.saveAppTermInfo(version, content);
-
-        return Response.success(200, "서비스 약관 정보를 저장했습니다, ", null);
+        return Response.success(200, "약관 정보를 정상 조회했습니다 ", content);
     }
 
-    @Data
-    static class AppInfoRequest {
-        @NotNull
-        @Schema(description = "version", example = "1.0", type = "String")
-        private String version;
+    @Operation(tags = { "App Info" }, summary = "개인정보 처리방침")
+    @GetMapping("/v1/get-privacy_policy")
+    public Response<String> getPrivacyPolicy() {
+        AppInfo appTermInfo = appInfoService.getAppTermInfo();
+        String content = appTermInfo.getPrivacy_policy();
 
-        @NotNull
-        @Schema(description = "content", example = "내용", type = "String")
-        private String content;
+        return Response.success(200, "개인정보 처리방침을 정상 조회했습니다 ", content);
+    }
+
+    @Operation(tags = { "App Info" }, summary = "마케팅 정보 수신 동의")
+    @GetMapping("/v1/get-marketing_info")
+    public Response<String> getMarketingInfo() {
+        AppInfo appTermInfo = appInfoService.getAppTermInfo();
+        String content = appTermInfo.getPrivacy_policy();
+
+        return Response.success(200, "마케팅 정보 수신 동의를 정상 조회했습니다 ", content);
+    }
+
+    @Operation(tags = { "App Info" }, summary = "탈퇴 약관")
+    @GetMapping("/v1/get-withdraw_terms")
+    public Response<String> getWithDrawTerms() {
+        AppInfo appTermInfo = appInfoService.getAppTermInfo();
+        String content = appTermInfo.getWithdraw_terms();
+
+        return Response.success(200, "탈퇴약관을 정상 조회했습니다 ", content);
     }
 }
