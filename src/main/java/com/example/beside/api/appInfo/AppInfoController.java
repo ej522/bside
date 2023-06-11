@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class AppInfoController {
     private final AppInfoService appInfoService;
 
-    @Operation(tags = { "APP Info" }, summary = "약관 정보")
+    @Operation(tags = { "App Info" }, summary = "약관 정보")
     @GetMapping("/v1/get-term")
     public Response<String> getAppTermInfo() {
         AppInfo appTermInfo = appInfoService.getAppTermInfo();
@@ -34,7 +34,7 @@ public class AppInfoController {
         return Response.success(200, "약관 정보를 정상 조회했습니다 ", content);
     }
 
-    @Operation(tags = { "APP Info" }, summary = "앱 버전 정보")
+    @Operation(tags = { "App Info" }, summary = "앱 버전 정보")
     @GetMapping("/v1/get-version")
     public Response<String> getAppVersionInfo() {
         AppInfo appTermInfo = appInfoService.getAppTermInfo();
@@ -43,7 +43,7 @@ public class AppInfoController {
         return Response.success(200, "앱 버전을 정상 조회했습니다 ", version);
     }
 
-    @Operation(tags = { "APP Info" }, summary = "앱 버전, 약관 정보 이력")
+    @Operation(tags = { "App Info" }, summary = "앱 버전, 약관 정보 이력")
     @PostMapping("/v1/save-app-info")
     public Response<String> saveTermInformation(@RequestBody @Validated AppInfoRequest appInfoRequest) {
 
