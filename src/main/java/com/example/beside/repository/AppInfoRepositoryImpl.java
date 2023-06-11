@@ -30,13 +30,8 @@ public class AppInfoRepositoryImpl implements AppInfoRepository {
 
     @Override
     @Transactional
-    public void saveAppTermInfo(String version, String content) {
-        AppInfo appinfo = new AppInfo();
-
-        appinfo.setVersion(version);
-        appinfo.setDetail(content);
-
-        em.persist(appinfo);
+    public void saveAppTermInfo(AppInfo newAppInfo) {
+        em.persist(newAppInfo);
         em.flush();
     }
 
