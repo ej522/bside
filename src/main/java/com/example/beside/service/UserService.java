@@ -169,8 +169,23 @@ public class UserService {
         return true;
     }
 
+//    public List<FriendDto> findFriendByUserId(User user) {
+//        List<FriendDto> friendDtoList = userRepository.findFriendByUserId(user.getId());
+//        int friend_cnt = friendDtoList.size();
+//        for(FriendDto friendDto : friendDtoList) {
+//            friendDto.setFriend_cnt(friend_cnt);
+//        }
+//        return friendDtoList;
+//    }
+
     public List<FriendDto> findFriendByUserId(User user) {
-        return userRepository.findFriendByUserId(user.getId());
+        List<FriendDto> friendDtoList = userRepository.findFriendByUserId(user.getId());
+        int friend_cnt = friendDtoList.size();
+        for(FriendDto friendDto : friendDtoList) {
+            friendDto.setFriend_cnt(friend_cnt);
+        }
+
+        return friendDtoList;
     }
 
 }

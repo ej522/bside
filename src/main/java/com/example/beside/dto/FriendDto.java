@@ -9,26 +9,28 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class FriendDto {
     @NotEmpty
     @Schema(description = "처음 만난 모임 ID", example = "7979")
-    public Long first_moim_id;
+    private Long first_moim_id;
 
     @NotEmpty
     @Schema(description = "친구 ID", example = "232")
-    public Long friend_id;
+    private Long friend_id;
 
     @NotEmpty
     @Schema(description = "친구 이름", example = "다람쥐")
-    public String friend_name;
+    private String friend_name;
 
-    public FriendDto(Friend friend, User user) {
-        this.first_moim_id = friend.getFirst_moim_id();
-        this.friend_id = friend.getMember_id();
-        friend_name = user.getName();
+    @Schema(description = "친구 프로필", example = "https://moim.life/profile/green.jpg")
+    private String profile_image;
 
-    }
+    @Schema(description = "총 친구수", example = "1")
+    private int friend_cnt;
+    
 }

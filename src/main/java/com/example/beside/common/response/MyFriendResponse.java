@@ -37,7 +37,7 @@ public class MyFriendResponse {
         return new MyFriendResponse(httpStatusCode, errorMessage, null);
     }
 
-    public static MyFriendResponse fail(int httpStatusCode, String errorMessage, List<FriendDto> data) {
+    public static MyFriendResponse fail(int httpStatusCode, String errorMessage,List<FriendDto> data) {
         return new MyFriendResponse(httpStatusCode, errorMessage, data);
     }
 }
