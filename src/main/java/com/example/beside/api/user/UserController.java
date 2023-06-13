@@ -353,7 +353,6 @@ public class UserController {
     @GetMapping("/v1/my-friend")
     public MyFriendResponse getMyfriendList(HttpServletRequest token) {
         User user = (User) token.getAttribute("user");
-
         List<FriendDto> friendDtoList = userService.findFriendByUserId(user);
 
         return MyFriendResponse.success(200, "친구 목록이 조회되었습니다.", friendDtoList);

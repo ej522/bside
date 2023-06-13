@@ -2,6 +2,7 @@ package com.example.beside.service;
 
 import com.example.beside.common.Exception.*;
 import com.example.beside.domain.LoginType;
+import com.example.beside.repository.MoimRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,6 +33,9 @@ public class UserServiceTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private MoimRepository moimRepository;
 
     @Autowired
     private EntityManager em;
@@ -68,7 +72,7 @@ public class UserServiceTest {
         user4.setProfile_image("https://moim.life/profile/yellow.jpg");
 
         user5.setEmail("test_5678@naver.com");
-        user5.setName("은지");
+        user5.setName("은지2");
         user5.setPassword("wd!2awQWDas!@");
         user5.setProfile_image("https://moim.life/profile/yellow.jpg");
 
@@ -344,6 +348,20 @@ public class UserServiceTest {
         // then
         Assertions.assertThat(nickName).isNotEqualTo(user.getName());
         Assertions.assertThat(profile_image).isNotEqualTo(user.getProfile_image());
+    }
+
+    @Test
+    @DisplayName("친구 목록 조회")
+    void testFindFriendByUserId() throws PasswordException, UserValidateNickName {
+        //given
+        User saveUser1 = userService.saveUser(user1);
+        User saveUser2 = userService.saveUser(user5);
+        System.out.println("saveUSer2="+saveUser2);
+
+        moimRepository.makeFriend(saveUser2.getId(), 1L, saveUser1);
+        moimRepository.makeFriend(saveUser1.getId(), 1L, saveUser2);
+
+        System.out.println(userService.findFriendByUserId(saveUser1));
     }
 
 }

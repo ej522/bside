@@ -1,13 +1,6 @@
 package com.example.beside.repository;
 
-import com.example.beside.domain.Moim;
-import com.example.beside.domain.QFriend;
-import com.example.beside.domain.QMoim;
-import com.example.beside.domain.QMoimDate;
-import com.example.beside.domain.QMoimMember;
-import com.example.beside.domain.QMoimMemberTime;
-import com.example.beside.domain.QUser;
-import com.example.beside.domain.User;
+import com.example.beside.domain.*;
 import com.example.beside.dto.FriendDto;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -177,10 +170,11 @@ public class UserRepositoryImpl implements UserRepository {
         QUser qUser = QUser.user;
 
         List<FriendDto> result = queryFactory.select(
-                Projections.constructor(FriendDto.class,
-                        qFriend.first_moim_id,
-                        qFriend.member_id,
-                        qUser.name))
+                        Projections.fields(FriendDto.class,
+                                qFriend.first_moim_id.as("first_moim_id"),
+                                qFriend.member_id.as("friend_id"),
+                                qUser.name.as("friend_name"),
+                                qUser.profile_image.as("profile_image")))
                 .from(qFriend)
                 .leftJoin(qUser)
                 .on(qFriend.member_id.eq(qUser.id))

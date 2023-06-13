@@ -26,9 +26,9 @@ public class Friend {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private User user;  //내 정보
 
-    private long member_id;
+    private long member_id; //친구회원번호
 
     private Long first_moim_id;
 
