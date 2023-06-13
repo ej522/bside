@@ -338,7 +338,7 @@ public class UserController {
         User user = (User) token.getAttribute("user");
 
         String social_type = user.getSocial_type();
-        if (social_type != "MOIM")
+        if (!social_type.equals("MOIM"))
             return Response.fail(400, social_type + " 소셜 계정은 비밀번호 변경이 불가능합니다", null);
         user.setPassword(passwordRequest.current_password);
 
