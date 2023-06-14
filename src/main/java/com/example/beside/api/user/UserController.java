@@ -349,13 +349,16 @@ public class UserController {
 
     @Operation(tags = { "User" }, summary = "친구 목록 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "친구 목록이 조회되었습니다.", content = @Content(schema = @Schema(implementation = MyFriendResponse.class))), })
+            @ApiResponse(responseCode = "200", description = "친구 목록이 조회되었습니다.",
+                    content = @Content(schema = @Schema(implementation = MyFriendResponse.class))),
+            @ApiResponse(responseCode = "404", description = "친구 목록이 없습니다.")})
     @GetMapping("/v1/my-friend")
-    public MyFriendResponse getMyfriendList(HttpServletRequest token) {
+    public MyFriendResponse getMyfriendList(HttpServletRequest token) throws NoResultListException {
         User user = (User) token.getAttribute("user");
-        List<FriendDto> friendDtoList = userService.findFriendByUserId(user);
+        //List<FriendDto> friendDtoList = userService.findFriendByUserId(user);
+        FriendDto friendDto = userService.findFriendByUserId(user);
 
-        return MyFriendResponse.success(200, "친구 목록이 조회되었습니다.", friendDtoList);
+        return MyFriendResponse.success(200, "친구 목록이 조회되었습니다.", friendDto);
     }
 
     @Operation(tags = { "User" }, summary = "로그아웃")
