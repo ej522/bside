@@ -137,4 +137,14 @@ public class ApiExceptionHandler {
 
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
+
+    @ExceptionHandler(NoResultListException.class)
+    public ResponseEntity<?> handleNoResultList(NoResultListException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add(ex.getMessage());
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, "No results were found", errors);
+
+        return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
 }

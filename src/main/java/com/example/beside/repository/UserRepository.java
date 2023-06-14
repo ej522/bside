@@ -34,4 +34,6 @@ public interface UserRepository {
 
     // DELETE
     void deleteUser(User user);
+
+    List<FriendDto.FriendInfo> test(Long user_id);
 }

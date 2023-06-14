@@ -169,23 +169,22 @@ public class UserService {
         return true;
     }
 
-//    public List<FriendDto> findFriendByUserId(User user) {
-//        List<FriendDto> friendDtoList = userRepository.findFriendByUserId(user.getId());
-//        int friend_cnt = friendDtoList.size();
-//        for(FriendDto friendDto : friendDtoList) {
-//            friendDto.setFriend_cnt(friend_cnt);
-//        }
-//        return friendDtoList;
-//    }
+    public FriendDto findFriendByUserId(User user) throws NoResultListException {
+        FriendDto friendDto = new FriendDto();
 
-    public List<FriendDto> findFriendByUserId(User user) {
-        List<FriendDto> friendDtoList = userRepository.findFriendByUserId(user.getId());
-        int friend_cnt = friendDtoList.size();
-        for(FriendDto friendDto : friendDtoList) {
-            friendDto.setFriend_cnt(friend_cnt);
+        List<FriendDto.FriendInfo> friendInfo = userRepository.test(user.getId());
+
+        int friend_cnt = friendInfo.size();
+
+        if(friend_cnt < 1) {
+            throw new NoResultListException("친구 목록이 없습니다.");
         }
 
-        return friendDtoList;
+        friendDto.setFriend_cnt(friend_cnt);
+        friendDto.setFriendInfo(friendInfo);
+
+
+        return friendDto;
     }
 
 }

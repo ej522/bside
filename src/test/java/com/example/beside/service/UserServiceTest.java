@@ -2,6 +2,7 @@ package com.example.beside.service;
 
 import com.example.beside.common.Exception.*;
 import com.example.beside.domain.LoginType;
+import com.example.beside.dto.FriendDto;
 import com.example.beside.repository.MoimRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -352,16 +353,31 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("친구 목록 조회")
-    void testFindFriendByUserId() throws PasswordException, UserValidateNickName {
+    void testFindFriendByUserId() throws PasswordException, UserValidateNickName, NoResultListException {
         //given
         User saveUser1 = userService.saveUser(user1);
         User saveUser2 = userService.saveUser(user5);
-        System.out.println("saveUSer2="+saveUser2);
 
         moimRepository.makeFriend(saveUser2.getId(), 1L, saveUser1);
         moimRepository.makeFriend(saveUser1.getId(), 1L, saveUser2);
 
-        System.out.println(userService.findFriendByUserId(saveUser1));
+        //when
+        FriendDto result = userService.findFriendByUserId(saveUser1);
+
+        //then
+        Assertions.assertThat(result.getFriendInfo().size()).isGreaterThan(0);
+    }
+
+    @Test
+    @DisplayName("친구가 없는 경우")
+    void testNofriend() throws PasswordException, UserValidateNickName {
+        //given
+        User saveUser1 = userService.saveUser(user1);
+        User saveUser2 = userService.saveUser(user5);
+
+        //when, then
+        assertThrows(NoResultListException.class,
+                () -> userService.findFriendByUserId(saveUser1));
     }
 
 }

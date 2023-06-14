@@ -20,16 +20,16 @@ public class MyFriendResponse {
     private String msg;
 
     @Schema(description = "데이터", nullable = true)
-    private List<FriendDto> data;
+    private FriendDto data;
 
     @Builder
-    public MyFriendResponse(int httpStatusCode, String msg, List<FriendDto> data) {
+    public MyFriendResponse(int httpStatusCode, String msg, FriendDto data) {
         this.httpStatusCode = httpStatusCode;
         this.msg = msg;
         this.data = data;
     }
 
-    public static MyFriendResponse success(int httpStatusCode, String msg, List<FriendDto> data) {
+    public static MyFriendResponse success(int httpStatusCode, String msg, FriendDto data) {
         return new MyFriendResponse(httpStatusCode, msg, data);
     }
 
@@ -37,7 +37,7 @@ public class MyFriendResponse {
         return new MyFriendResponse(httpStatusCode, errorMessage, null);
     }
 
-    public static MyFriendResponse fail(int httpStatusCode, String errorMessage,List<FriendDto> data) {
+    public static MyFriendResponse fail(int httpStatusCode, String errorMessage, FriendDto data) {
         return new MyFriendResponse(httpStatusCode, errorMessage, data);
     }
 }
