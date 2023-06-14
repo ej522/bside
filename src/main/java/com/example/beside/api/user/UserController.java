@@ -330,7 +330,8 @@ public class UserController {
     @Operation(tags = { "User" }, summary = "비밀번호 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "비밀번호가 변경되었습니다.", content = @Content(schema = @Schema(implementation = Response.class))),
-            @ApiResponse(responseCode = "400", description = "현재 비밀번호와 새 비밀번호가 일치합니다.") })
+            @ApiResponse(responseCode = "400", description = "현재 비밀번호와 새 비밀번호가 일치합니다."),
+            @ApiResponse(responseCode = "400", description = "소셜 계정은 비밀번호 변경이 불가능합니다.")})
     @PutMapping("/v1/update/password")
     public Response<Void> updatePassword(HttpServletRequest token,
             @RequestBody @Validated PasswordRequest passwordRequest)
@@ -338,8 +339,8 @@ public class UserController {
         User user = (User) token.getAttribute("user");
 
         String social_type = user.getSocial_type();
-        if (social_type != "MOIM")
-            return Response.fail(400, social_type + " 소셜 계정은 비밀번호 변경이 불가능합니다", null);
+        if (!social_type.equals("MOIM"))
+            throw new PasswordException(social_type + "소셜 계정은 비밀번호 변경이 불가능합니다.");
         user.setPassword(passwordRequest.current_password);
 
         userService.updatePassword(user, passwordRequest.new_password);
