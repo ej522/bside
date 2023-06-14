@@ -8,14 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.beside.common.Exception.AdjustScheduleException;
-import com.example.beside.common.Exception.MoimParticipateException;
+import com.example.beside.common.Exception.ExceptionDetail.AdjustScheduleException;
+import com.example.beside.common.Exception.ExceptionDetail.InviteMyMoimException;
+import com.example.beside.common.Exception.ExceptionDetail.MoimParticipateException;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
 import com.example.beside.repository.MoimRepositoryImpl;
+import com.example.beside.repository.UserRepositoryImpl;
 import com.example.beside.util.Encrypt;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MoimService {
     private final MoimRepositoryImpl moimRepository;
+    private final UserRepositoryImpl userRepository;
 
     @Autowired
     private Encrypt encrypt;
@@ -56,14 +59,13 @@ public class MoimService {
     }
     // #endregion
 
-    // #region [모임 참여]
+    // #region [딥링크 모임 참여]
     @Transactional
     public MoimParticipateInfoDto participateMoim(User user, String encryptInfo) throws Exception {
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
         Moim moim = getMoimInfoWithMoimId(moimId);
         participateMoimValidate(user, moimId, moim);
 
-        // 친구 추가
         // 주최자
         moimRepository.makeFriend(user.getId(), moimId, moim.getUser());
         // 초대자
@@ -93,6 +95,49 @@ public class MoimService {
 
         if (moimRepository.alreadyJoinedMoim(moimId, user.getId()))
             throw new MoimParticipateException("해당 모임에 이미 참여하고 있습니다.");
+    }
+    // #endregion
+
+    // #region [모임에 친구 초대]
+    @Transactional
+    public MoimParticipateInfoDto inviteMyMoim(User user, String encryptInfo, List<String> friendList)
+            throws NumberFormatException, Exception {
+        Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
+        Moim moim = getMoimInfoWithMoimId(moimId);
+        inviteMoimValidate(user, friendList, moimId);
+
+        // 친구 중복 제거
+        Set<String> friendSet = new HashSet<>(friendList);
+        // 모임 멤버 추가
+        for (var friend : friendSet)
+            moimRepository.makeMoimMember(friend, moim);
+
+        // 모임 종합 정보 조회
+        List<MoimOveralDateDto> moimOveralInfo = moimRepository.getMoimOveralInfo(moimId);
+        // 데이터 결과 가공
+        MoimParticipateInfoDto result = new MoimParticipateInfoDto(moimOveralInfo);
+
+        return result;
+
+    }
+
+    public void inviteMoimValidate(User user, List<String> friendList, Long moimId)
+            throws InviteMyMoimException {
+        Moim moimInfo = moimRepository.getMoimInfo(moimId);
+
+        if (moimInfo == null)
+            throw new InviteMyMoimException("해당 모임이 존재하지 않습니다");
+
+        if (moimInfo.getUser().getId() == user.getId())
+            throw new InviteMyMoimException("모임장만 친구 초대가 가능합니다");
+
+        for (String friend_id : friendList) {
+            User friend = userRepository.findUserById(Long.parseLong(friend_id));
+            if (friend == null)
+                throw new InviteMyMoimException("해당 유저가 존재하지 않습니다. user_id: " + String.valueOf(friend_id));
+            if (Long.parseLong(friend_id) == user.getId())
+                throw new InviteMyMoimException("모임장만 친구 초대가 가능합니다");
+        }
     }
     // #endregion
 

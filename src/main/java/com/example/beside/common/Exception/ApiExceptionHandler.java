@@ -8,6 +8,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.example.beside.common.Exception.ExceptionDetail.AdjustScheduleException;
+import com.example.beside.common.Exception.ExceptionDetail.CurrentPasswordEqualNewPassword;
+import com.example.beside.common.Exception.ExceptionDetail.EmailValidateException;
+import com.example.beside.common.Exception.ExceptionDetail.InviteMyMoimException;
+import com.example.beside.common.Exception.ExceptionDetail.MoimMakeException;
+import com.example.beside.common.Exception.ExceptionDetail.MoimParticipateException;
+import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
+import com.example.beside.common.Exception.ExceptionDetail.PasswordException;
+import com.example.beside.common.Exception.ExceptionDetail.PasswordNotCorrectException;
+import com.example.beside.common.Exception.ExceptionDetail.SocialLoginException;
+import com.example.beside.common.Exception.ExceptionDetail.UserAlreadyExistException;
+import com.example.beside.common.Exception.ExceptionDetail.UserNotExistException;
+import com.example.beside.common.Exception.ExceptionDetail.UserValidateNickName;
+
 import jakarta.mail.MessagingException;
 
 // 전역 Exception Handler
@@ -88,6 +102,16 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
 
+    @ExceptionHandler(InviteMyMoimException.class)
+    public ResponseEntity<?> handleInviteMyMoimException(InviteMyMoimException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add(ex.getMessage());
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, "Can't invite moim", errors);
+
+        return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
+
     @ExceptionHandler(MoimMakeException.class)
     public ResponseEntity<?> handleMoimMakeException(MoimMakeException ex) {
         List<String> errors = new ArrayList<>();
@@ -133,7 +157,8 @@ public class ApiExceptionHandler {
         List<String> errors = new ArrayList<>();
         errors.add(ex.getMessage());
 
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "The current password and the new password are the same", errors);
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST,
+                "The current password and the new password are the same", errors);
 
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
@@ -147,4 +172,5 @@ public class ApiExceptionHandler {
 
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
+
 }

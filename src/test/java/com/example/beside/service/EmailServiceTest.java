@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.example.beside.common.Exception.EmailValidateException;
+import com.example.beside.common.Exception.ExceptionDetail.EmailValidateException;
 import com.example.beside.domain.QEmailValidate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 

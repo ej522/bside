@@ -1,7 +1,7 @@
 package com.example.beside.service;
 
-import com.example.beside.common.Exception.SocialLoginException;
-import com.example.beside.common.Exception.UserNotExistException;
+import com.example.beside.common.Exception.ExceptionDetail.SocialLoginException;
+import com.example.beside.common.Exception.ExceptionDetail.UserNotExistException;
 import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.dto.KakaoLoginInfoDto;
