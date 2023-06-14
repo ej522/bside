@@ -8,24 +8,10 @@ import java.util.List;
 
 import com.example.beside.common.response.*;
 import com.example.beside.dto.*;
-import com.example.beside.dto.MoimAdjustScheduleDto;
-import com.example.beside.dto.MoimParticipateInfoDto;
-import com.example.beside.dto.MyMoimDto;
-import com.example.beside.dto.VotingMoimDto;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-import com.example.beside.common.response.MoimParticipateResponse;
-import com.example.beside.common.response.MoimAdjustScheduleResponse;
-import com.example.beside.common.response.MoimHistoryResponse;
-import com.example.beside.common.response.Response;
-import com.example.beside.common.response.VotingMoimResponse;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMemberTime;
@@ -52,24 +38,6 @@ import lombok.RequiredArgsConstructor;
 public class MoimController {
 
     private final MoimService moimService;
-
-    @Operation(tags = { "Moim" }, summary = "모임 참여하기")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "모임에 참여 됐습니다.", content = @Content(schema = @Schema(implementation = MoimParticipateResponse.class))),
-            @ApiResponse(responseCode = "400", description = "모임은 최대 10명 까지 가능합니다."),
-            @ApiResponse(responseCode = "400_1", description = "모임 주최자는 모임 멤버로 참여할 수 없습니다."),
-            @ApiResponse(responseCode = "400_2", description = "해당 모임에 이미 참여하고 있습니다.")
-    })
-    @PostMapping(value = "/v1/participate")
-    public MoimParticipateResponse participateMoim(HttpServletRequest token,
-            @RequestBody @Validated MoimParticipateRequest request) throws Exception {
-        User user_ = (User) token.getAttribute("user");
-        String encrptedInfo = request.getEncrptedInfo();
-
-        MoimParticipateInfoDto participateMoim = moimService.participateMoim(user_, encrptedInfo);
-
-        return MoimParticipateResponse.success(200, "모임에 참여 됐습니다.", participateMoim);
-    }
 
     @Operation(tags = { "Moim" }, summary = "모임 생성하기")
     @ApiResponses(value = {
@@ -106,6 +74,41 @@ public class MoimController {
 
         String encryptedMoimId = moimService.makeMoim(user_, newMoim, moimDates);
         return Response.success(200, "모임 생성을 완료했습니다", encryptedMoimId);
+    }
+
+    @Operation(tags = { "Moim" }, summary = "딥링크 모임 참여하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임에 참여 됐습니다.", content = @Content(schema = @Schema(implementation = MoimParticipateResponse.class))),
+            @ApiResponse(responseCode = "400", description = "모임은 최대 10명 까지 가능합니다."),
+            @ApiResponse(responseCode = "400_1", description = "모임 주최자는 모임 멤버로 참여할 수 없습니다."),
+            @ApiResponse(responseCode = "400_2", description = "해당 모임에 이미 참여하고 있습니다.")
+    })
+    @PostMapping(value = "/v1/participate")
+    public MoimParticipateResponse participateMoim(HttpServletRequest token,
+            @RequestBody @Validated MoimParticipateRequest request) throws Exception {
+        User user_ = (User) token.getAttribute("user");
+        String encrptedInfo = request.getEncrptedInfo();
+
+        MoimParticipateInfoDto participateMoim = moimService.participateMoim(user_, encrptedInfo);
+
+        return MoimParticipateResponse.success(200, "모임에 참여 됐습니다.", participateMoim);
+    }
+
+    @Operation(tags = { "Moim" }, summary = "내 모임 친구 초대하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임을 초대 했습니다", content = @Content(schema = @Schema(implementation = MoimParticipateResponse.class))),
+    })
+    @PostMapping(value = "/v1/invite-my-moim")
+    public MoimParticipateResponse inviteMyMoim(HttpServletRequest token,
+            @RequestBody @Validated InviteMyMoimRequest request)
+            throws NumberFormatException, Exception {
+        User user_ = (User) token.getAttribute("user");
+
+        String encrptedMoimInfo = request.getEncrptedInfo();
+        List<String> friend_id_list = request.getFriend_id_list();
+
+        MoimParticipateInfoDto participateMoim = moimService.inviteMyMoim(user_, encrptedMoimInfo, friend_id_list);
+        return MoimParticipateResponse.success(200, "모임에 참여 됐습니다.", participateMoim);
     }
 
     @Operation(tags = { "Moim" }, summary = "참여 모임 일정 정하기")
@@ -270,6 +273,17 @@ public class MoimController {
 
         @Schema(description = "저녁", example = "true", type = "Boolean")
         private boolean evening;
+    }
+
+    @Data
+    static class InviteMyMoimRequest {
+        @NotNull
+        @Schema(description = "모임방 정보", example = "CbXrx470K6OcAZWiy94SPw==", type = "String")
+        private String encrptedInfo;
+
+        @NotNull
+        @Schema(description = "friend_id 리스트", example = "[8652,8653,14452,1445]", type = "List<String>")
+        private List<String> friend_id_list;
     }
 
     @Data
