@@ -1,6 +1,11 @@
 package com.example.beside.service;
 
-import com.example.beside.common.Exception.*;
+import com.example.beside.common.Exception.ExceptionDetail.CurrentPasswordEqualNewPassword;
+import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
+import com.example.beside.common.Exception.ExceptionDetail.PasswordException;
+import com.example.beside.common.Exception.ExceptionDetail.PasswordNotCorrectException;
+import com.example.beside.common.Exception.ExceptionDetail.UserNotExistException;
+import com.example.beside.common.Exception.ExceptionDetail.UserValidateNickName;
 import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.dto.FriendDto;
@@ -176,13 +181,12 @@ public class UserService {
 
         int friend_cnt = friendInfo.size();
 
-        if(friend_cnt < 1) {
+        if (friend_cnt < 1) {
             throw new NoResultListException("친구 목록이 없습니다.");
         }
 
         friendDto.setFriend_cnt(friend_cnt);
         friendDto.setFriendInfo(friendInfo);
-
 
         return friendDto;
     }

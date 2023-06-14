@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Repository;
 
-import com.example.beside.common.Exception.EmailValidateException;
+import com.example.beside.common.Exception.ExceptionDetail.EmailValidateException;
 import com.example.beside.domain.EmailValidate;
 import com.example.beside.domain.QEmailValidate;
 import com.querydsl.jpa.impl.JPAQueryFactory;

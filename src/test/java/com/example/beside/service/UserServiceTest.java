@@ -1,6 +1,12 @@
 package com.example.beside.service;
 
 import com.example.beside.common.Exception.*;
+import com.example.beside.common.Exception.ExceptionDetail.CurrentPasswordEqualNewPassword;
+import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
+import com.example.beside.common.Exception.ExceptionDetail.PasswordException;
+import com.example.beside.common.Exception.ExceptionDetail.PasswordNotCorrectException;
+import com.example.beside.common.Exception.ExceptionDetail.UserNotExistException;
+import com.example.beside.common.Exception.ExceptionDetail.UserValidateNickName;
 import com.example.beside.domain.LoginType;
 import com.example.beside.dto.FriendDto;
 import com.example.beside.repository.MoimRepository;
@@ -354,28 +360,28 @@ public class UserServiceTest {
     @Test
     @DisplayName("친구 목록 조회")
     void testFindFriendByUserId() throws PasswordException, UserValidateNickName, NoResultListException {
-        //given
+        // given
         User saveUser1 = userService.saveUser(user1);
         User saveUser2 = userService.saveUser(user5);
 
         moimRepository.makeFriend(saveUser2.getId(), 1L, saveUser1);
         moimRepository.makeFriend(saveUser1.getId(), 1L, saveUser2);
 
-        //when
+        // when
         FriendDto result = userService.findFriendByUserId(saveUser1);
 
-        //then
+        // then
         Assertions.assertThat(result.getFriendInfo().size()).isGreaterThan(0);
     }
 
     @Test
     @DisplayName("친구가 없는 경우")
     void testNofriend() throws PasswordException, UserValidateNickName {
-        //given
+        // given
         User saveUser1 = userService.saveUser(user1);
         User saveUser2 = userService.saveUser(user5);
 
-        //when, then
+        // when, then
         assertThrows(NoResultListException.class,
                 () -> userService.findFriendByUserId(saveUser1));
     }

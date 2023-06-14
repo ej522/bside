@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.example.beside.common.Exception.PasswordException;
-import com.example.beside.common.Exception.UserValidateNickName;
+import com.example.beside.common.Exception.ExceptionDetail.PasswordException;
+import com.example.beside.common.Exception.ExceptionDetail.UserValidateNickName;
 
 public class Common {
 
@@ -43,7 +43,7 @@ public class Common {
     }
 
     public static Boolean NicknameValidate(String nickname) throws UserValidateNickName {
-        if(nickname.length()>8) {
+        if (nickname.length() > 8) {
             throw new UserValidateNickName("닉네임은 8자 이내여야 합니다.");
         }
 
@@ -62,7 +62,7 @@ public class Common {
 
         Collections.shuffle(pswList);
         StringBuilder password = new StringBuilder();
-        for(String psw: pswList) {
+        for (String psw : pswList) {
             password.append(psw);
         }
 
@@ -73,7 +73,7 @@ public class Common {
         SecureRandom random = new SecureRandom();
 
         List<String> randomList = new ArrayList<>();
-        while (randomList.size()<len) {
+        while (randomList.size() < len) {
             int randomIdx = random.nextInt(str.length());
 
             randomList.add(String.valueOf(str.charAt(randomIdx)));

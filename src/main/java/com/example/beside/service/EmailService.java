@@ -5,7 +5,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.example.beside.common.Exception.EmailValidateException;
+import com.example.beside.common.Exception.ExceptionDetail.EmailValidateException;
 import com.example.beside.repository.MailRepositoryImpl;
 
 import jakarta.mail.MessagingException;

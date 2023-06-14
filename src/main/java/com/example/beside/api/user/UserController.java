@@ -1,6 +1,12 @@
 package com.example.beside.api.user;
 
-import com.example.beside.common.Exception.*;
+import com.example.beside.common.Exception.ExceptionDetail.CurrentPasswordEqualNewPassword;
+import com.example.beside.common.Exception.ExceptionDetail.EmailValidateException;
+import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
+import com.example.beside.common.Exception.ExceptionDetail.PasswordException;
+import com.example.beside.common.Exception.ExceptionDetail.PasswordNotCorrectException;
+import com.example.beside.common.Exception.ExceptionDetail.UserNotExistException;
+import com.example.beside.common.Exception.ExceptionDetail.UserValidateNickName;
 import com.example.beside.common.response.Response;
 import com.example.beside.common.response.UserResponse;
 import com.example.beside.common.response.AllUsersResponse;
@@ -331,7 +337,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "비밀번호가 변경되었습니다.", content = @Content(schema = @Schema(implementation = Response.class))),
             @ApiResponse(responseCode = "400", description = "현재 비밀번호와 새 비밀번호가 일치합니다."),
-            @ApiResponse(responseCode = "400", description = "소셜 계정은 비밀번호 변경이 불가능합니다.")})
+            @ApiResponse(responseCode = "400", description = "소셜 계정은 비밀번호 변경이 불가능합니다.") })
     @PutMapping("/v1/update/password")
     public Response<Void> updatePassword(HttpServletRequest token,
             @RequestBody @Validated PasswordRequest passwordRequest)
@@ -350,13 +356,12 @@ public class UserController {
 
     @Operation(tags = { "User" }, summary = "친구 목록 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "친구 목록이 조회되었습니다.",
-                    content = @Content(schema = @Schema(implementation = MyFriendResponse.class))),
-            @ApiResponse(responseCode = "404", description = "친구 목록이 없습니다.")})
+            @ApiResponse(responseCode = "200", description = "친구 목록이 조회되었습니다.", content = @Content(schema = @Schema(implementation = MyFriendResponse.class))),
+            @ApiResponse(responseCode = "404", description = "친구 목록이 없습니다.") })
     @GetMapping("/v1/my-friend")
     public MyFriendResponse getMyfriendList(HttpServletRequest token) throws NoResultListException {
         User user = (User) token.getAttribute("user");
-        //List<FriendDto> friendDtoList = userService.findFriendByUserId(user);
+        // List<FriendDto> friendDtoList = userService.findFriendByUserId(user);
         FriendDto friendDto = userService.findFriendByUserId(user);
 
         return MyFriendResponse.success(200, "친구 목록이 조회되었습니다.", friendDto);

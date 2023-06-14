@@ -279,6 +279,21 @@ public class MoimRepositoryImpl implements MoimRepository {
                 return moimMember.getId();
         }
 
+        public long makeMoimMember(String user_id, Moim moim) {
+                User user = em.find(User.class, user_id);
+
+                MoimMember moimMember = new MoimMember();
+                moimMember.setUser(user);
+                moimMember.setMember_name(user.getName());
+                moimMember.setMoim(moim);
+                moimMember.setJoin_time(LocalDateTime.now());
+                moimMember.setHistory_view_yn(true);
+
+                em.persist(moimMember);
+                em.flush();
+                return moimMember.getId();
+        }
+
         @Override
         public List<MoimMember> getMoimMembers(Long moimId) {
                 queryFactory = new JPAQueryFactory(em);

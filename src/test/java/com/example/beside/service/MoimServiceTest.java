@@ -5,24 +5,20 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import com.example.beside.common.Exception.PasswordException;
-import com.example.beside.common.Exception.UserValidateNickName;
+import com.example.beside.common.Exception.ExceptionDetail.AdjustScheduleException;
+import com.example.beside.common.Exception.ExceptionDetail.MoimParticipateException;
 import com.example.beside.dto.*;
 import com.example.beside.repository.MoimRepositoryImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import com.example.beside.common.Exception.AdjustScheduleException;
-import com.example.beside.common.Exception.MoimParticipateException;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMemberTime;
@@ -241,6 +237,31 @@ public class MoimServiceTest {
         // then
         Assertions.assertThat(participateMoim.getMoim_name()).isEqualTo("테스트 모임");
         Assertions.assertThat(participateMoim.getDead_line_hour()).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("내 모임 친구 초대하기")
+    void testInviteMyMoim() throws Exception {
+        // given
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
+        User saveUser3 = userService.saveUser(user3);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(saveUser1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+        String encryptMoimID = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+
+        List<String> friendList = new ArrayList();
+        friendList.add(String.valueOf(user2.getId()));
+        friendList.add(String.valueOf(user3.getId()));
+
+        // when
+        MoimParticipateInfoDto participateMoim = moimService.inviteMyMoim(saveUser1, encryptMoimID, friendList);
+
+        // then
+        Assertions.assertThat(participateMoim.getMoim_name()).isEqualTo("테스트 모임");
     }
 
     @Test
