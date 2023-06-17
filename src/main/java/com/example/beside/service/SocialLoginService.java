@@ -72,7 +72,9 @@ public class SocialLoginService {
             KakaoLoginInfoDto kakaoLoginInfo = gson.fromJson(response.toString(), KakaoLoginInfoDto.class);
 
             var kakao_id = String.valueOf(kakaoLoginInfo.getId());
-            var nickname = kakaoLoginInfo.getKakao_account().profile.nickname;
+            var nickname = "";
+            if (kakaoLoginInfo.getKakao_account().profile != null)
+                nickname = kakaoLoginInfo.getKakao_account().profile.nickname;
 
             userInfo.setEmail(kakao_id);
             userInfo.setName(nickname);
