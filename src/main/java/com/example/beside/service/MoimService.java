@@ -1,5 +1,6 @@
 package com.example.beside.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -222,26 +223,17 @@ public class MoimService {
 
         for (int i = 0; i < moimList.size(); i++) {
             MyMoimDto moim = moimList.get(i);
+            LocalDate compareDate = LocalDate.parse(moim.getFixed_date());
 
-            String date = moim.getFixed_date();
-            String[] dateList = date.split("-");
-            String time = moim.getFixed_time();
-
-            // 쿼리에서 날짜와 시간을 같이 비교할 수 없어서 서비스 단에서 비교후 오늘 이후의 날짜는 제거
-            LocalDateTime dateTime = LocalDateTime.of(Integer.parseInt(dateList[0]), Integer.parseInt(dateList[1]),
-                    Integer.parseInt(dateList[2]), Integer.parseInt(time), 0);
-
-            if (dateTime.isAfter(LocalDateTime.now())) {
+            if (compareDate.isAfter(LocalDate.now())) {
                 moimList.remove(i);
                 continue;
             }
 
-            int cnt = moimRepository.findMemberCount(moim.getMoim_id());
+            int memeberCnt = moimRepository.findMemberCount(moim.getMoim_id());
+            memeberCnt += 1;
 
-            // 주최자도 더해줌
-            cnt += 1;
-
-            moim.setMemeber_cnt(cnt);
+            moim.setMemeber_cnt(memeberCnt);
         }
 
         return moimList;
