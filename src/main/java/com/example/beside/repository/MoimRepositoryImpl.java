@@ -156,13 +156,11 @@ public class MoimRepositoryImpl implements MoimRepository {
                 queryFactory = new JPAQueryFactory(em);
 
                 QMoim qMoim = QMoim.moim;
-                QMoimMember qMoimMember = QMoimMember.moimMember;
                 QUser qUser = QUser.user;
+                QMoimMember qMoimMember = QMoimMember.moimMember;
 
                 LocalDateTime today = LocalDateTime.now();
-
                 String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                String formattedTime = String.valueOf(today.toLocalTime().getHour());
 
                 // 주최한 모임
                 JPQLQuery<MyMoimDto> hostQuery = queryFactory.select(
