@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.HandlerMethod;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,9 +24,6 @@ public class SwaggerConfig {
         @Bean
         public OpenAPI customOpenAPI() {
                 return new OpenAPI()
-                                .servers(Arrays.asList(
-                                                new Server().url("https://moim.life/").description("Production server"),
-                                                new Server().url("http://localhost:8081").description("local server")))
                                 .info(new Info().title("b-side")
                                                 .description("API documentation using springdoc-openapi and OpenAPI 3.0")
                                                 .version("1.0.0")

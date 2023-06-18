@@ -46,7 +46,7 @@ public class UserRepositoryImpl implements UserRepository {
             // 모임멤버 삭제
             queryFactory.delete(qMoimMember).where(qMoimMember.moim.eq(moim)).execute();
             // 모임멤버 시간 삭제
-            queryFactory.delete(qMoimMemberTime).where(qMoimMemberTime.moim.eq(moim)).execute();
+            queryFactory.delete(qMoimMemberTime).where(qMoimMemberTime.moim_id.eq(moim.getId())).execute();
             // 모임 삭제
             queryFactory.delete(qMoim).where(qMoim.eq(moim)).execute();
         }
@@ -170,11 +170,11 @@ public class UserRepositoryImpl implements UserRepository {
         QUser qUser = QUser.user;
 
         List<FriendDto> result = queryFactory.select(
-                        Projections.fields(FriendDto.class,
-                                qFriend.first_moim_id.as("first_moim_id"),
-                                qFriend.member_id.as("friend_id"),
-                                qUser.name.as("friend_name"),
-                                qUser.profile_image.as("profile_image")))
+                Projections.fields(FriendDto.class,
+                        qFriend.first_moim_id.as("first_moim_id"),
+                        qFriend.member_id.as("friend_id"),
+                        qUser.name.as("friend_name"),
+                        qUser.profile_image.as("profile_image")))
                 .from(qFriend)
                 .leftJoin(qUser)
                 .on(qFriend.member_id.eq(qUser.id))
@@ -191,11 +191,11 @@ public class UserRepositoryImpl implements UserRepository {
         QUser qUser = QUser.user;
 
         List<FriendDto.FriendInfo> result = queryFactory.select(
-                        Projections.constructor(FriendDto.FriendInfo.class,
-                                qFriend.first_moim_id.as("first_moim_id"),
-                                qFriend.member_id.as("friend_id"),
-                                qUser.name.as("friend_name"),
-                                qUser.profile_image.as("profile_image")))
+                Projections.constructor(FriendDto.FriendInfo.class,
+                        qFriend.first_moim_id.as("first_moim_id"),
+                        qFriend.member_id.as("friend_id"),
+                        qUser.name.as("friend_name"),
+                        qUser.profile_image.as("profile_image")))
                 .from(qFriend)
                 .leftJoin(qUser)
                 .on(qFriend.member_id.eq(qUser.id))

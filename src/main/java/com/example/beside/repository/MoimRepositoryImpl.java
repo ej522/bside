@@ -143,7 +143,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                 MoimMember fetchOne = queryFactory.selectFrom(qMoimMember)
                                 .from(qMoimMember)
                                 .where(qMoimMember.moim.id.eq(moimId)
-                                                .and(qMoimMember.user.id.eq(userId)))
+                                                .and(qMoimMember.user_id.eq(userId)))
                                 .fetchOne();
 
                 if (fetchOne == null)
@@ -196,7 +196,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
                                 .where(qMoim.user.id.ne(user_id)
                                                 .and(qMoim.fixed_date.loe(formattedDate))
-                                                .and(qMoimMember.user.id.eq(user_id))
+                                                .and(qMoimMember.user_id.eq(user_id))
                                                 .and(qMoim.fixed_date.isNotNull())
                                                 .and(qMoim.fixed_time.isNotNull())
                                                 .and(qMoimMember.history_view_yn.eq(true)))
@@ -233,7 +233,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .where(qMoim.id.in(
                                                 JPAExpressions.select(qMoimMember.moim.id)
                                                                 .from(qMoimMember)
-                                                                .where(qMoimMember.user.id.eq(user_id)))
+                                                                .where(qMoimMember.user_id.eq(user_id)))
                                                 .and(qMoim.fixed_date.isNull()));
 
                 // 내가 모임장인 모임
@@ -268,8 +268,8 @@ public class MoimRepositoryImpl implements MoimRepository {
         @Override
         public long makeMoimMember(User user, Moim moim) {
                 MoimMember moimMember = new MoimMember();
-                moimMember.setUser(user);
-                moimMember.setMember_name(user.getName());
+                moimMember.setUser_id(user.getId());
+                moimMember.setUser_name(user.getName());
                 moimMember.setMoim(moim);
                 moimMember.setJoin_time(LocalDateTime.now());
                 moimMember.setHistory_view_yn(true);
@@ -283,8 +283,8 @@ public class MoimRepositoryImpl implements MoimRepository {
                 User user = em.find(User.class, user_id);
 
                 MoimMember moimMember = new MoimMember();
-                moimMember.setUser(user);
-                moimMember.setMember_name(user.getName());
+                moimMember.setUser_id(user.getId());
+                moimMember.setUser_name(user.getName());
                 moimMember.setMoim(moim);
                 moimMember.setJoin_time(LocalDateTime.now());
                 moimMember.setHistory_view_yn(true);
@@ -314,7 +314,7 @@ public class MoimRepositoryImpl implements MoimRepository {
 
                 MoimMember result = queryFactory.selectFrom(qMoimMember)
                                 .where(qMoimMember.moim.id.eq(moimId)
-                                                .and(qMoimMember.user.id.eq(memberId)))
+                                                .and(qMoimMember.user_id.eq(memberId)))
                                 .fetchOne();
 
                 return result;
@@ -358,7 +358,7 @@ public class MoimRepositoryImpl implements MoimRepository {
 
                 queryFactory.update(qMoimMember)
                                 .set(qMoimMember.history_view_yn, false)
-                                .where(qMoimMember.user.id.eq(user_id)
+                                .where(qMoimMember.user_id.eq(user_id)
                                                 .and(qMoimMember.moim.id.eq(moim_id)))
                                 .execute();
 
@@ -408,8 +408,8 @@ public class MoimRepositoryImpl implements MoimRepository {
                 em.persist(moim);
 
                 for (var tt : moimTimeInfos) {
-                        tt.setMoimMember(moimMember);
-                        tt.setMoim(moim);
+                        tt.setMoim_member(moimMember);
+                        tt.setMoim_id(moim.getId());
 
                         em.persist(tt);
                 }
@@ -427,12 +427,12 @@ public class MoimRepositoryImpl implements MoimRepository {
                 // 모임 멤버 조회
                 MoimMember moimMember = queryFactory.selectFrom(qMoimMember)
                                 .where(qMoimMember.moim.id.eq(moimId)
-                                                .and(qMoimMember.user.id.eq(user.getId())))
+                                                .and(qMoimMember.user_id.eq(user.getId())))
                                 .fetchOne();
 
                 // 기존에 모임 일정 등록 여부 확인
                 List<MoimMemberTime> result = queryFactory.selectFrom(qMoimMemberTime)
-                                .where(qMoimMemberTime.moimMember.eq(moimMember))
+                                .where(qMoimMemberTime.moim_member.eq(moimMember))
                                 .fetch();
 
                 if (result.size() > 0) {
@@ -458,7 +458,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                                                 qUser.id,
                                                 qMoim.user.name,
                                                 qMoim.moim_name,
-                                                qMoimMember.member_name,
+                                                qMoimMember.user_name,
                                                 qUser.profile_image,
                                                 qMoimMemberTime.selected_date,
                                                 qMoimMemberTime.am_nine,
@@ -476,8 +476,8 @@ public class MoimRepositoryImpl implements MoimRepository {
                                                 qMoimMemberTime.pm_nine))
                                 .from(qMoim)
                                 .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
-                                .leftJoin(qMoimMemberTime).on(qMoimMember.id.eq(qMoimMemberTime.moimMember.id))
-                                .leftJoin(qUser).on(qMoimMember.user.id.eq(qUser.id))
+                                .leftJoin(qMoimMemberTime).on(qMoimMember.id.eq(qMoimMemberTime.moim_member.id))
+                                .leftJoin(qUser).on(qMoimMember.user_id.eq(qUser.id))
                                 .where(qMoim.id.eq(moimId))
                                 .orderBy(qMoimMemberTime.selected_date.asc())
                                 .fetch();
@@ -504,7 +504,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
                                 .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
                                 .where(qMoim.user.id.eq(user_id)
-                                                .or(qMoimMember.user.id.eq(user_id))
+                                                .or(qMoimMember.user_id.eq(user_id))
                                                 .and(qMoim.fixed_date.isNotNull())
                                                 .and(qMoim.fixed_time.isNotNull()))
                                 .groupBy(qMoim.id, qMoim.moim_name, qUser.profile_image, qMoim.fixed_date,
@@ -524,7 +524,7 @@ public class MoimRepositoryImpl implements MoimRepository {
 
                 int cnt = (int) queryFactory.select(qMoimMemberTime.selected_date)
                                 .from(qMoimMemberTime)
-                                .where(qMoimMemberTime.moim.id.eq(moim_id)
+                                .where(qMoimMemberTime.moim_id.eq(moim_id)
                                                 .and(qMoimMemberTime.selected_date.eq(select_date)))
                                 .orderBy(qMoimMemberTime.selected_date.asc())
                                 .fetchCount();
@@ -559,7 +559,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .from(qMoim)
                                 .leftJoin(qMoimDate).on(qMoim.id.eq(qMoimDate.moim.id))
                                 .leftJoin(qMoimMemberTime)
-                                .on(qMoim.id.eq(qMoimMemberTime.moim.id)
+                                .on(qMoim.id.eq(qMoimMemberTime.moim_id)
                                                 .and(qMoimDate.selected_date.eq(qMoimMemberTime.selected_date)))
                                 .where(qMoim.id.eq(moim_id).and(qMoimMemberTime.selected_date.eq(select_date)))
                                 .groupBy(qMoimMemberTime.selected_date)

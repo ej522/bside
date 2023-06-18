@@ -164,7 +164,7 @@ public class MoimService {
 
         validateMoimTime(moimMemberTimes, moimOveralInfo);
 
-        if (moimMembers.stream().noneMatch(tt -> tt.getUser().getId().equals(user.getId()))) {
+        if (moimMembers.stream().noneMatch(tt -> tt.getUser_id().equals(user.getId()))) {
             throw new AdjustScheduleException("해당 모임에 참여되지 않았습니다.");
         }
 
