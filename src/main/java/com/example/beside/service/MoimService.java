@@ -128,9 +128,6 @@ public class MoimService {
         if (moimInfo == null)
             throw new InviteMyMoimException("해당 모임이 존재하지 않습니다");
 
-        if (moimInfo.getUser().getId() != user.getId())
-            throw new InviteMyMoimException("모임장만 친구 초대가 가능합니다");
-
         for (String friend_id : friendList) {
             User friend = userRepository.findUserById(Long.parseLong(friend_id));
             if (friend == null)
