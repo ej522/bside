@@ -24,8 +24,11 @@ public class Moim {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "moim", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "moim", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<MoimMember> moim_member = new ArrayList<>();
+
+    @OneToMany(mappedBy = "moim", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<MoimDate> moim_date = new ArrayList<>();
 
     @Column(length = 20)
     private String moim_name;

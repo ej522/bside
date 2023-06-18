@@ -24,9 +24,6 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Friend> friend;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<MoimMember> moimMember;
-
     @Column(length = 10)
     private String social_type;
 
