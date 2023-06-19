@@ -411,6 +411,7 @@ public class MoimServiceTest {
     }
 
     @Test
+    @DisplayName("과거 모임 목록 조회")
     void testGetMoimHistoryList() throws Exception {
         // given
         User saveUser1 = userService.saveUser(user);
@@ -558,4 +559,31 @@ public class MoimServiceTest {
         assertTrue(guestResult.size() != 0);
     }
 
+    @Test
+    @DisplayName("미래 모임 목록 조회")
+    public void testGetMoimFutureList() throws Exception {
+        // given
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
+        User saveUser3 = userService.saveUser(user3);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(saveUser1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+        newMoim.setFixed_date("2024-03-13");
+        newMoim.setFixed_time("2");
+
+        var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        moimService.participateMoim(saveUser2, encryptedId);
+        moimService.participateMoim(saveUser3, encryptedId);
+
+        moimRepository.fixMoimDate(newMoim, LocalDateTime.now().plusDays(2), 12);
+
+        // when
+        List<MyMoimDto> moimList = moimService.getMoimFutureList(saveUser1.getId());
+
+        // then
+        assertTrue(moimList.get(0).getMemeber_cnt() > 1);
+    }
 }
