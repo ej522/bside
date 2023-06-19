@@ -9,7 +9,7 @@ import com.example.beside.common.Exception.ExceptionDetail.UserValidateNickName;
 import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.dto.FriendDto;
-import com.example.beside.repository.UserRepositoryImpl;
+import com.example.beside.repository.UserRepository;
 import com.example.beside.util.Common;
 import com.example.beside.util.Encrypt;
 import com.example.beside.util.PasswordConverter;
@@ -29,7 +29,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepositoryImpl userRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public User saveUser(User user) throws PasswordException, UserValidateNickName {

@@ -12,13 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.beside.common.Exception.ExceptionDetail.AdjustScheduleException;
 import com.example.beside.common.Exception.ExceptionDetail.InviteMyMoimException;
 import com.example.beside.common.Exception.ExceptionDetail.MoimParticipateException;
+import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
-import com.example.beside.repository.MoimRepositoryImpl;
-import com.example.beside.repository.UserRepositoryImpl;
+import com.example.beside.repository.MoimRepository;
+import com.example.beside.repository.UserRepository;
 import com.example.beside.util.Encrypt;
 
 import lombok.RequiredArgsConstructor;
@@ -27,8 +28,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MoimService {
-    private final MoimRepositoryImpl moimRepository;
-    private final UserRepositoryImpl userRepository;
+    private final MoimRepository moimRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     private Encrypt encrypt;
@@ -230,7 +231,8 @@ public class MoimService {
             String time = moim.getFixed_time();
 
             // 쿼리에서 날짜와 시간을 같이 비교할 수 없어서 서비스 단에서 비교후 오늘 이후의 날짜는 제거
-            LocalDateTime dateTime = LocalDateTime.of(Integer.parseInt(dateList[0]), Integer.parseInt(dateList[1]),
+            LocalDateTime dateTime = LocalDateTime.of(Integer.parseInt(dateList[0]),
+                    Integer.parseInt(dateList[1]),
                     Integer.parseInt(dateList[2]), Integer.parseInt(time), 0);
 
             if (dateTime.isAfter(LocalDateTime.now())) {
@@ -254,6 +256,16 @@ public class MoimService {
     public List<VotingMoimDto> getVotingMoimList(Long user_id) {
         List<VotingMoimDto> findVotingMoimHistory = moimRepository.findVotingMoimHistory(user_id);
         return findVotingMoimHistory;
+    }
+    // #endregion
+
+    // #region [초대받은 모임 목록 조회]
+    public List<InvitedMoimListDto> getInvitedMoimList(Long user_id) throws NoResultListException {
+        List<InvitedMoimListDto> invitedMoimList = moimRepository.getInvitedMoimList(user_id);
+        if (invitedMoimList.size() == 0)
+            throw new NoResultListException("초대 받은 모임이 없습니다");
+
+        return invitedMoimList;
     }
     // #endregion
 
