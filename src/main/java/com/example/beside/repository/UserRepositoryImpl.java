@@ -164,28 +164,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<FriendDto> findFriendByUserId(Long user_id) {
-        queryFactory = new JPAQueryFactory(em);
-        QFriend qFriend = QFriend.friend;
-        QUser qUser = QUser.user;
-
-        List<FriendDto> result = queryFactory.select(
-                Projections.fields(FriendDto.class,
-                        qFriend.first_moim_id.as("first_moim_id"),
-                        qFriend.member_id.as("friend_id"),
-                        qUser.name.as("friend_name"),
-                        qUser.profile_image.as("profile_image")))
-                .from(qFriend)
-                .leftJoin(qUser)
-                .on(qFriend.member_id.eq(qUser.id))
-                .where(qFriend.user.id.eq(user_id))
-                .fetch();
-
-        return result;
-    }
-
-    @Override
-    public List<FriendDto.FriendInfo> test(Long user_id) {
+    public List<FriendDto.FriendInfo> findFriendByUserId(Long user_id) {
         queryFactory = new JPAQueryFactory(em);
         QFriend qFriend = QFriend.friend;
         QUser qUser = QUser.user;

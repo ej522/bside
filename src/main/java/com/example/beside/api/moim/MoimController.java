@@ -9,6 +9,7 @@ import java.util.List;
 import com.example.beside.common.response.*;
 import com.example.beside.dto.*;
 
+import com.example.beside.service.FcmPushService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 public class MoimController {
 
     private final MoimService moimService;
+    private final FcmPushService fcmPushService;
 
     @Operation(tags = { "Moim" }, summary = "모임 생성하기")
     @ApiResponses(value = {
