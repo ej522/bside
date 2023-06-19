@@ -3,6 +3,7 @@ package com.example.beside.service;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
 import com.example.beside.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -214,8 +215,12 @@ public class MoimService {
     // #endregion
 
     // #region [과거 모임 이력 조회]
-    public List<MyMoimDto> getMoimHistoryList(Long user_id) {
+    public List<MyMoimDto> getMoimHistoryList(Long user_id) throws NoResultListException {
         List<MyMoimDto> moimList = moimRepository.findMyMoimHistoryList(user_id);
+
+        if(moimList.isEmpty()) {
+            throw new NoResultListException("과거 모임 목록이 없습니다.");
+        }
 
         for (int i = 0; i < moimList.size(); i++) {
             MyMoimDto moim = moimList.get(i);
@@ -449,6 +454,27 @@ public class MoimService {
         List<MyMoimDto> result = moimRepository.findMyMoimHistoryList(user_id);
 
         return result;
+    }
+
+    //미래 모임 목록
+    public List<MyMoimDto> getMoimFutureList(Long user_id) throws NoResultListException {
+        List<MyMoimDto> moimList = moimRepository.findMyMoimFutureList(user_id);
+
+        if(moimList.isEmpty()) {
+            throw new NoResultListException("예정 모임 목록이 없습니다.");
+        }
+
+        for(MyMoimDto moim : moimList) {
+            int cnt = moimRepository.findMemberCount(moim.getMoim_id());
+
+            // 주최자도 더해줌
+            cnt += 1;
+
+            moim.setMemeber_cnt(cnt);
+        }
+
+
+        return moimList;
     }
 
     private List<UserDto> setTimeUserInfo(MoimOveralScheduleDto voteUserInfo, List<UserDto> voteUserInfoList) {

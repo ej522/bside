@@ -51,6 +51,8 @@ public interface MoimRepository {
 
     VoteMoimTimeCntDto getTimeVoteCnt(Long moimId, LocalDateTime selectedDate);
 
+    List<MyMoimDto> findMyMoimFutureList(Long userId);
+
     // UPDATE
     long deleteHostHistory(Long userId, Long moimId);
 
