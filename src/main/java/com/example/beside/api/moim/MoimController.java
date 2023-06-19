@@ -10,6 +10,7 @@ import com.example.beside.common.response.*;
 import com.example.beside.dto.*;
 
 import com.example.beside.service.FcmPushService;
+import com.example.beside.service.UserService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +41,7 @@ public class MoimController {
 
     private final MoimService moimService;
     private final FcmPushService fcmPushService;
+    private final UserService userService;
 
     @Operation(tags = { "Moim" }, summary = "모임 생성하기")
     @ApiResponses(value = {
@@ -110,6 +112,17 @@ public class MoimController {
         List<String> friend_id_list = request.getFriend_id_list();
 
         MoimParticipateInfoDto participateMoim = moimService.inviteMyMoim(user_, encrptedMoimInfo, friend_id_list);
+
+        for(String friend_id : friend_id_list) {
+            User msgUserInfo = userService.chkPushAgree(Long.valueOf(friend_id));
+
+            if(msgUserInfo != null) {
+                fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), "모임 초대", "띵동! " + msgUserInfo.getName() + "님,\n"
+                        + user_.getName() + "에게 MOIM 초대장이 왔어요");
+            }
+
+        }
+
         return MoimParticipateResponse.success(200, "모임에 참여 됐습니다.", participateMoim);
     }
 
