@@ -117,8 +117,10 @@ public class MoimController {
             User msgUserInfo = userService.chkPushAgree(Long.valueOf(friend_id));
 
             if(msgUserInfo != null) {
-                fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), "모임 초대", "띵동! " + msgUserInfo.getName() + "님,\n"
-                        + user_.getName() + "에게 MOIM 초대장이 왔어요");
+                if(msgUserInfo.getFcm()!=null) {
+                    fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), "모임 초대", "띵동! " + msgUserInfo.getName() + "님,\n"
+                            + user_.getName() + "에게 MOIM 초대장이 왔어요");
+                }
             }
 
         }

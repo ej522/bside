@@ -11,6 +11,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.example.beside.domain.MoimMember;
+import com.example.beside.domain.User;
+import com.example.beside.service.FcmPushService;
+import com.example.beside.service.UserService;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -25,10 +30,12 @@ import lombok.RequiredArgsConstructor;
 public class Scheduler {
 
     private final MoimRepositoryImpl moimRepository;
+    private final UserService userService;
+    private final FcmPushService fcmPushService;
 
     // 초, 분, 시, 일, 월, 주 순서
     @Scheduled(cron = "0 */30 * * * *")
-    public void fixMoimSchedulering() {
+    public void fixMoimSchedulering() throws FirebaseMessagingException {
         // 일정이 확정되지 않은 모임 조회
         List<Moim> notFixedScheduleMoims = moimRepository.getNotFixedMoims();
 
@@ -56,6 +63,18 @@ public class Scheduler {
             int fixedTime = getPriorityTime(maxSelectedTime);
 
             moimRepository.fixMoimDate(moim, fixedDate, fixedTime);
+
+            //주최자
+            User host = userService.chkPushAgree(moim.getUser().getId());
+            sendFixMoimMessage(host, moim.getMoim_name());
+
+            User guest = new User();
+            //참여자
+            List<MoimMember> moimMemberList = moim.getMoim_member();
+            for(MoimMember moimMember : moimMemberList) {
+                guest = userService.chkPushAgree(moimMember.getUser_id());
+            }
+            sendFixMoimMessage(guest, moim.getMoim_name());
         }
 
     }
@@ -151,6 +170,14 @@ public class Scheduler {
             }
         }
         return maxSelectedTime.get(0);
+    }
+
+    private void sendFixMoimMessage(User user, String moim_name) throws FirebaseMessagingException {
+        if(user != null) {
+            if(user.getFcm()!=null) {
+                fcmPushService.sendFcmPushNotification(user.getFcm(), "일정 확인", "띵동! " + moim_name + "MOIM의 정해진 날짜와 시간을 확인하세요!");
+            }
+        }
     }
 
 }
