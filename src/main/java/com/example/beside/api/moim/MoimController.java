@@ -253,6 +253,10 @@ public class MoimController {
     }
 
     @Operation(tags = { "Moim" }, summary = "초대된 모임 모록 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "초대 모임이 조회되었습니다", content = @Content(schema = @Schema(implementation = InvitedMoimResponse.class))),
+            @ApiResponse(responseCode = "404", description = "초대 모임 목록이 없습니다.")
+    })
     @GetMapping(value = "/v1/invited-moim-list")
     public InvitedMoimResponse getInvitedMoimList(HttpServletRequest token) throws NoResultListException {
         User user = (User) token.getAttribute("user");
