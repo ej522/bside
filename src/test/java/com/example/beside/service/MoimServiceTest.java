@@ -558,4 +558,10 @@ public class MoimServiceTest {
         assertTrue(guestResult.size() != 0);
     }
 
+    @Test
+    public void test() {
+        System.out.println("test::::"+moimRepository.findMyMoimList(103L));
+
+    }
+
 }
