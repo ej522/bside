@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.example.beside.common.Exception.ExceptionDetail.AdjustScheduleException;
 import com.example.beside.common.Exception.ExceptionDetail.MoimParticipateException;
+
 import com.example.beside.dto.*;
 import com.example.beside.repository.MoimRepositoryImpl;
 import org.assertj.core.api.Assertions;
@@ -240,7 +241,7 @@ public class MoimServiceTest {
     }
 
     @Test
-    @DisplayName("내 모임 친구 초대하기")
+    @DisplayName("내 모임에 친구 초대하기")
     void testInviteMyMoim() throws Exception {
         // given
         User saveUser1 = userService.saveUser(user);
@@ -411,7 +412,7 @@ public class MoimServiceTest {
     }
 
     @Test
-    @DisplayName("과거 모임 목록 조회")
+    @DisplayName("과거 확정된 모임 목록 조회")
     void testGetMoimHistoryList() throws Exception {
         // given
         User saveUser1 = userService.saveUser(user);
@@ -436,7 +437,40 @@ public class MoimServiceTest {
 
         // then
         assertTrue(moimList.get(0).getMemeber_cnt() > 1);
+    }
 
+    @Test
+    @DisplayName("초대 받은 모임 목록 조회")
+    void testGetInvitedMoimList() throws Exception {
+        // given
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(saveUser1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+
+        Moim newMoim2 = new Moim();
+        newMoim.setUser(saveUser1);
+        newMoim.setMoim_name("테스트 모임2");
+        newMoim.setDead_line_hour(5);
+
+        // 친구 생성
+        String encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        moimService.participateMoim(saveUser2, encryptedId);
+
+        // 모임 초대
+        String encryptedId2 = moimService.makeMoim(saveUser1, newMoim2, normalMoimDates);
+        List<String> friendIdList = new ArrayList<>();
+        friendIdList.add(String.valueOf(saveUser2.getId()));
+        moimService.inviteMyMoim(saveUser1, encryptedId2, friendIdList);
+
+        // when
+        List<InvitedMoimListDto> invitedMoimList = moimService.getInvitedMoimList(saveUser2.getId());
+
+        // then
+        assertTrue(invitedMoimList.get(0).getMoim_name().equals("테스트 모임2"));
     }
 
     @Test
@@ -510,7 +544,7 @@ public class MoimServiceTest {
 
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
         moimService.participateMoim(saveUser2, encryptedId);
-        MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
+        moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -542,7 +576,7 @@ public class MoimServiceTest {
 
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
         moimService.participateMoim(saveUser2, encryptedId);
-        MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
+        moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
 
         moimRepository.fixMoimDate(newMoim, LocalDateTime.now().minusDays(1), 12);
 
