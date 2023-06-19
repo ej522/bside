@@ -197,7 +197,7 @@ public class MoimController {
         return MoimParticipateResponse.success(200, "주최자가 등록한 모임일정이 조회되었습니다.", moimInfo);
     }
 
-    @Operation(tags = { "Moim" }, summary = "날짜 투표 결과")
+    @Operation(tags = { "Moim" }, summary = "날짜 투표 결과 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "모임 날짜 투표 결과가 조회되었습니다.", content = @Content(schema = @Schema(implementation = VoteMoimDateResponse.class))),
     })
@@ -209,7 +209,7 @@ public class MoimController {
         return VoteMoimDateResponse.success(200, "모임 날짜 투표 결과가 조회되었습니다.", dateVoteInfo);
     }
 
-    @Operation(tags = { "Moim" }, summary = "시간 투표 결과")
+    @Operation(tags = { "Moim" }, summary = "시간 투표 결과 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "모임 시간 투표 결과가 조회되었습니다.", content = @Content(schema = @Schema(implementation = VoteMoimTimeResponse.class))),
     })
@@ -229,7 +229,7 @@ public class MoimController {
     })
     @DeleteMapping(value = "/v1/delete/moim-history")
     public MoimListResponse deleteMoimHistory(HttpServletRequest token,
-                                              @RequestBody @Validated MoimHistoryRequest request) {
+            @RequestBody @Validated MoimHistoryRequest request) {
         User user = (User) token.getAttribute("user");
 
         List<MyMoimDto> result = moimService.deleteMoimHistory(request.moim_id, request.host_id, user.getId());
@@ -250,6 +250,21 @@ public class MoimController {
         List<MyMoimDto> moimList = moimService.getMoimFutureList(user.getId());
 
         return MoimListResponse.success(200, "예정 모임 목록이 조회 되었습니다.", moimList);
+    }
+
+    @Operation(tags = { "Moim" }, summary = "초대된 모임 모록 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "초대 모임이 조회되었습니다", content = @Content(schema = @Schema(implementation = InvitedMoimResponse.class))),
+            @ApiResponse(responseCode = "404", description = "초대 모임 목록이 없습니다.")
+    })
+    @GetMapping(value = "/v1/invited-moim-list")
+    public InvitedMoimResponse getInvitedMoimList(HttpServletRequest token) throws NoResultListException {
+        User user = (User) token.getAttribute("user");
+
+        List<InvitedMoimListDto> invitedMoimList = moimService.getInvitedMoimList(user.getId());
+
+        return InvitedMoimResponse.success(200, "초대 모임이 조회되었습니다.", invitedMoimList);
+
     }
 
     @Data

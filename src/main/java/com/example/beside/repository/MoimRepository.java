@@ -8,6 +8,7 @@ import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
+import com.example.beside.dto.InvitedMoimListDto;
 import com.example.beside.dto.MoimOveralDateDto;
 import com.example.beside.dto.MoimOveralScheduleDto;
 import com.example.beside.dto.MyMoimDto;
@@ -19,6 +20,8 @@ public interface MoimRepository {
     long makeMoim(User user, Moim moim, List<MoimDate> moim_date_list) throws Exception;
 
     long makeMoimMember(User user, Moim moim);
+
+    long makeMoimMember(String friend, Moim moim);
 
     long makeFriend(Long friend_id, Long moim_id, User user);
 
@@ -36,6 +39,8 @@ public interface MoimRepository {
     List<VotingMoimDto> findVotingMoimHistory(Long user_id);
 
     List<MoimMember> getMoimMembers(Long moimId);
+
+    List<InvitedMoimListDto> getInvitedMoimList(Long user_id);
 
     MoimMember getMoimMemberByMemberId(Long moimId, Long memberId);
 

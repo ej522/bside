@@ -5,7 +5,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import com.example.beside.domain.AppInfo;
-import com.example.beside.repository.AppInfoRepositoryImpl;
+import com.example.beside.repository.AppInfoRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AppInfoService {
 
-    private final AppInfoRepositoryImpl appInfoRepository;
+    private final AppInfoRepository appInfoRepository;
 
     private final RedisTemplate<String, String> redisTemplate;
 

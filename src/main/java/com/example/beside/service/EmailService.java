@@ -6,7 +6,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.example.beside.common.Exception.ExceptionDetail.EmailValidateException;
-import com.example.beside.repository.MailRepositoryImpl;
+import com.example.beside.repository.MailRepository;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -16,12 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class EmailService {
 
-    private final MailRepositoryImpl mailRepository;
+    private final MailRepository mailRepository;
 
     private final JavaMailSender javaMailSender;
 
     @Autowired
-    public EmailService(JavaMailSender javaMailSender, MailRepositoryImpl mailRepository) {
+    public EmailService(JavaMailSender javaMailSender, MailRepository mailRepository) {
         this.javaMailSender = javaMailSender;
         this.mailRepository = mailRepository;
     }
