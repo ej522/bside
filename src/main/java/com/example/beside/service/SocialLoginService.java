@@ -48,7 +48,7 @@ public class SocialLoginService {
 
     // 카카오 유저 정보
     @Transactional
-    public User getKaKaoUserInfo(String access_token) throws SocialLoginException, UserNotExistException {
+    public User getKaKaoUserInfo(String access_token, String fcm) throws SocialLoginException, UserNotExistException {
         User userInfo = new User();
         String reqUrl = "https://kapi.kakao.com/v2/user/me";
 
@@ -87,8 +87,15 @@ public class SocialLoginService {
         Optional<User> optionalUser = userRepository
                 .findUserByEmailAndSocialType(userInfo.getEmail(), userInfo.getSocial_type());
 
-        if (optionalUser.isPresent())
-            return optionalUser.get();
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            // fcm 갱신
+            if (!user.getFcm().equals(fcm)) {
+                user.setFcm(fcm);
+                userRepository.updateFcmToken(user);
+            }
+            return user;
+        }
 
         userInfo.setProfile_image(null);
         return userRepository.saveUser(userInfo);
@@ -153,7 +160,7 @@ public class SocialLoginService {
 
     // 애플 로그인
     @Transactional
-    public User appleLogin(String identityToken) throws Exception {
+    public User appleLogin(String identityToken, String fcm) throws Exception {
         User userInfo = new User();
         String reqUrl = "https://appleid.apple.com/auth/keys";
         StringBuffer publicKey = new StringBuffer();
@@ -185,8 +192,15 @@ public class SocialLoginService {
         Optional<User> optionalUser = userRepository
                 .findUserByEmailAndSocialType(userInfo.getEmail(), userInfo.getSocial_type());
 
-        if (optionalUser.isPresent())
-            return optionalUser.get();
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            // fcm 갱신
+            if (!user.getFcm().equals(fcm)) {
+                user.setFcm(fcm);
+                userRepository.updateFcmToken(user);
+            }
+            return user;
+        }
 
         userInfo.setProfile_image(null);
         return userRepository.saveUser(userInfo);

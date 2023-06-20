@@ -164,6 +164,19 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public User updateFcmToken(User user) {
+        queryFactory = new JPAQueryFactory(em);
+        QUser qUser = QUser.user;
+
+        queryFactory.update(qUser)
+                .set(qUser.fcm, user.getFcm())
+                .where(qUser.id.eq(user.getId()))
+                .execute();
+
+        return queryFactory.selectFrom(qUser).where(qUser.id.eq(user.getId())).fetchOne();
+    }
+
+    @Override
     public List<FriendDto> findFriendByUserId(Long user_id) {
         queryFactory = new JPAQueryFactory(em);
         QFriend qFriend = QFriend.friend;
@@ -204,4 +217,5 @@ public class UserRepositoryImpl implements UserRepository {
 
         return result;
     }
+
 }

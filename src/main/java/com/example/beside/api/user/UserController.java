@@ -95,6 +95,7 @@ public class UserController {
         User user = new User();
         user.setEmail(requset.email);
         user.setPassword(requset.password);
+        user.setFcm(requset.fcm);
 
         User userInfo = userService.loginUser(user);
         String userToken = jwtProvider.createToken(userInfo);
@@ -435,6 +436,9 @@ public class UserController {
         @NotNull
         @Schema(description = "password", example = "password", type = "String")
         private String password;
+
+        @Schema(description = "fcm", example = "esZVkMAAYUrzi9-40UVPDL:APA91bHQPgHFfbo-dZojoJk2-RT4_EVVfP0njfGhFHAZmYIXWbbjBE", type = "String")
+        private String fcm;
     }
 
     @Data

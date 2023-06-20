@@ -49,7 +49,7 @@ public class SocialLoginController {
     public LoginResponse kakaoLogin(@RequestBody @Valid SocialUserRequest request,
             HttpServletResponse response)
             throws UserNotExistException, SocialLoginException {
-        User user = socialLoginService.getKaKaoUserInfo(request.access_token);
+        User user = socialLoginService.getKaKaoUserInfo(request.access_token, request.fcm);
 
         // jwt 토큰발급
         String userToken = jwtProvider.createToken(user);
@@ -94,7 +94,7 @@ public class SocialLoginController {
     public LoginResponse appleLogin(@RequestBody @Valid SocialUserRequest request,
             HttpServletResponse response)
             throws Exception {
-        User user = socialLoginService.appleLogin(request.access_token);
+        User user = socialLoginService.appleLogin(request.access_token, request.fcm);
 
         // jwt 토큰발급
         String userToken = jwtProvider.createToken(user);
@@ -112,6 +112,9 @@ public class SocialLoginController {
         @NotNull
         @Schema(description = "access_token", example = "", type = "String")
         private String access_token;
+
+        @Schema(description = "fcm", example = "esZVkMAAYUrzi9-40UVPDL:APA91bHQPgHFfbo-dZojoJk2-RT4_EVVfP0njfGhFHAZmYIXWbbjBE", type = "String")
+        private String fcm;
     }
 
 }

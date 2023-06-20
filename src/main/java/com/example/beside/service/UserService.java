@@ -53,18 +53,20 @@ public class UserService {
 
     public User loginUser(User user) throws PasswordException, UserNotExistException, PasswordNotCorrectException {
         String password = user.getPassword();
-        // 패스워드 검증
         Common.PasswordValidate(password);
 
-        Optional<User> OptionalUser = userRepository
-                .findUserByEmail(user.getEmail());
-
+        Optional<User> OptionalUser = userRepository.findUserByEmail(user.getEmail());
         OptionalUser.orElseThrow(() -> new UserNotExistException("해당 계정이 존재하지 않습니다"));
+
         User userInfo = OptionalUser.get();
         String hashPassword = PasswordConverter.hashPassword(password);
 
         if (!userInfo.getPassword().equals(hashPassword))
             throw new PasswordNotCorrectException("비밀번호가 일치하지 않습니다");
+
+        // fcm 갱신
+        if (!user.getFcm().equals(userInfo.getFcm()))
+            userRepository.updateFcmToken(user);
 
         return OptionalUser.get();
     }
