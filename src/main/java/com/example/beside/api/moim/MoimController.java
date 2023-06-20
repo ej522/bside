@@ -238,7 +238,7 @@ public class MoimController {
 
     }
 
-    @Operation(tags = { "Moim" }, summary = "미래 약속 모임 목록")
+    @Operation(tags = { "Moim" }, summary = "예정된 약속 모임 목록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "예정 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MoimListResponse.class))),
             @ApiResponse(responseCode = "404", description = "예정 모임 목록이 없습니다.")
@@ -252,7 +252,7 @@ public class MoimController {
         return MoimListResponse.success(200, "예정 모임 목록이 조회 되었습니다.", moimList);
     }
 
-    @Operation(tags = { "Moim" }, summary = "초대된 모임 모록 조회")
+    @Operation(tags = { "Moim" }, summary = "초대된 모임 모록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "초대 모임이 조회되었습니다", content = @Content(schema = @Schema(implementation = InvitedMoimResponse.class))),
             @ApiResponse(responseCode = "404", description = "초대 모임 목록이 없습니다.")
