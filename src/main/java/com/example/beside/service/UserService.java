@@ -65,7 +65,7 @@ public class UserService {
             throw new PasswordNotCorrectException("비밀번호가 일치하지 않습니다");
 
         // fcm 갱신
-        if (!user.getFcm().equals(userInfo.getFcm()))
+        if (user.getFcm() != userInfo.getFcm())
             userRepository.updateFcmToken(user);
 
         return OptionalUser.get();
