@@ -241,7 +241,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                 QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
 
                 List<InvitedMoimListDto> result = queryFactory.select(Projections.constructor(InvitedMoimListDto.class,
-                                qMoim.encrypted_id.as("encryptedInfo"),
+                                qMoim.id.as("moim_id"),
                                 qMoim.moim_name.as("moim_name"),
                                 qUser.name.as("moim_leader"),
                                 qMoim.created_time.as("createdTime"),
