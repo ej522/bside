@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.beside.common.Exception.ExceptionDetail.AdjustScheduleException;
 import com.example.beside.common.Exception.ExceptionDetail.InviteMyMoimException;
 import com.example.beside.common.Exception.ExceptionDetail.MoimParticipateException;
-import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
@@ -219,33 +218,28 @@ public class MoimService {
     public List<MyMoimDto> getMoimHistoryList(Long user_id) throws NoResultListException {
         List<MyMoimDto> moimList = moimRepository.findMyMoimHistoryList(user_id);
 
-        if(moimList.isEmpty()) {
+        if (moimList.isEmpty())
             throw new NoResultListException("과거 모임 목록이 없습니다.");
-        }
 
         for (int i = 0; i < moimList.size(); i++) {
             MyMoimDto moim = moimList.get(i);
+            String fixedDate = moim.getFixed_date();
+            int fixedHour = Integer.parseInt(moim.getFixed_time());
 
-            String date = moim.getFixed_date();
-            String[] dateList = date.split("-");
-            String time = moim.getFixed_time();
+            int year = Integer.parseInt(fixedDate.split("-")[0]);
+            int month = Integer.parseInt(fixedDate.split("-")[1]);
+            int day = Integer.parseInt(fixedDate.split("-")[2]);
 
-            // 쿼리에서 날짜와 시간을 같이 비교할 수 없어서 서비스 단에서 비교후 오늘 이후의 날짜는 제거
-            LocalDateTime dateTime = LocalDateTime.of(Integer.parseInt(dateList[0]),
-                    Integer.parseInt(dateList[1]),
-                    Integer.parseInt(dateList[2]), Integer.parseInt(time), 0);
-
-            if (dateTime.isAfter(LocalDateTime.now())) {
+            LocalDateTime moimExpectedTime = LocalDateTime.of(year, month, day, fixedHour, 0);
+            if (moimExpectedTime.isAfter(LocalDateTime.now())) {
                 moimList.remove(i);
                 continue;
             }
 
-            int cnt = moimRepository.findMemberCount(moim.getMoim_id());
+            int moimMemberCnt = moimRepository.findMemberCount(moim.getMoim_id());
+            moimMemberCnt += 1;
 
-            // 주최자도 더해줌
-            cnt += 1;
-
-            moim.setMemeber_cnt(cnt);
+            moim.setMemeber_cnt(moimMemberCnt);
         }
 
         return moimList;
@@ -468,15 +462,15 @@ public class MoimService {
         return result;
     }
 
-    //미래 모임 목록
+    // 미래 모임 목록
     public List<MyMoimDto> getMoimFutureList(Long user_id) throws NoResultListException {
         List<MyMoimDto> moimList = moimRepository.findMyMoimFutureList(user_id);
 
-        if(moimList.isEmpty()) {
+        if (moimList.isEmpty()) {
             throw new NoResultListException("예정 모임 목록이 없습니다.");
         }
 
-        for(MyMoimDto moim : moimList) {
+        for (MyMoimDto moim : moimList) {
             int cnt = moimRepository.findMemberCount(moim.getMoim_id());
 
             // 주최자도 더해줌
@@ -484,7 +478,6 @@ public class MoimService {
 
             moim.setMemeber_cnt(cnt);
         }
-
 
         return moimList;
     }
