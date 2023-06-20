@@ -222,9 +222,9 @@ public class MoimService {
             throw new NoResultListException("과거 모임 목록이 없습니다.");
 
         for (int i = 0; i < moimList.size(); i++) {
-            MyMoimDto moim = moimList.get(i);
-            String fixedDate = moim.getFixed_date();
-            int fixedHour = Integer.parseInt(moim.getFixed_time());
+            MyMoimDto moimDto = moimList.get(i);
+            String fixedDate = moimDto.getFixed_date();
+            int fixedHour = Integer.parseInt(moimDto.getFixed_time());
 
             int year = Integer.parseInt(fixedDate.split("-")[0]);
             int month = Integer.parseInt(fixedDate.split("-")[1]);
@@ -236,10 +236,10 @@ public class MoimService {
                 continue;
             }
 
-            int moimMemberCnt = moimRepository.findMemberCount(moim.getMoim_id());
+            int moimMemberCnt = moimRepository.findMemberCount(moimDto.getMoim_id());
             moimMemberCnt += 1;
 
-            moim.setMemeber_cnt(moimMemberCnt);
+            moimDto.setMemeber_cnt(moimMemberCnt);
         }
 
         return moimList;
