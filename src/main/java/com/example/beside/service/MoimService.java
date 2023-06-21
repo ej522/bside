@@ -2,6 +2,8 @@ package com.example.beside.service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
 import com.example.beside.dto.*;
@@ -249,7 +251,13 @@ public class MoimService {
     // #region [투표중인 모임 조회]
     public List<VotingMoimDto> getVotingMoimList(Long user_id) {
         List<VotingMoimDto> findVotingMoimHistory = moimRepository.findVotingMoimHistory(user_id);
-        return findVotingMoimHistory;
+        LocalDateTime now = LocalDateTime.now();
+
+        List<VotingMoimDto> onGoingMoimDto = findVotingMoimHistory.stream()
+                .filter(moimDto -> moimDto.getDead_line_time().isAfter(now))
+                .collect(Collectors.toList());
+
+        return onGoingMoimDto;
     }
     // #endregion
 
