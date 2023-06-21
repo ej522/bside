@@ -6,6 +6,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Repository;
@@ -168,12 +169,14 @@ public class UserRepositoryImpl implements UserRepository {
         queryFactory = new JPAQueryFactory(em);
         QUser qUser = QUser.user;
 
+        User findUser = queryFactory.selectFrom(qUser).where(qUser.email.eq(user.getEmail())).fetchOne();
+
         queryFactory.update(qUser)
                 .set(qUser.fcm, user.getFcm())
-                .where(qUser.id.eq(user.getId()))
+                .where(qUser.id.eq(findUser.getId()))
                 .execute();
 
-        return queryFactory.selectFrom(qUser).where(qUser.id.eq(user.getId())).fetchOne();
+        return queryFactory.selectFrom(qUser).where(qUser.id.eq(findUser.getId())).fetchOne();
     }
 
     @Override

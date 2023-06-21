@@ -51,6 +51,7 @@ public class UserService {
         return userRepository.saveUser(user);
     }
 
+    @Transactional
     public User loginUser(User user) throws PasswordException, UserNotExistException, PasswordNotCorrectException {
         String password = user.getPassword();
         Common.PasswordValidate(password);
