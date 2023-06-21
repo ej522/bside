@@ -42,7 +42,7 @@ public class VotingMoimDto {
 
     @NotEmpty
     @Schema(description = "모임 확정 시간", example = "2023-12-20")
-    private String dead_line_time;
+    private LocalDateTime dead_line_time;
 
     public VotingMoimDto(VotingMoimDto newDto) {
         this.user_id = newDto.user_id;
@@ -55,9 +55,8 @@ public class VotingMoimDto {
     }
 
     @PostLoad
-    private String calculateDeadLineTime(LocalDateTime createdTime, int deadLineHour) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private LocalDateTime calculateDeadLineTime(LocalDateTime createdTime, int deadLineHour) {
         LocalDateTime plusedTime = createdTime.plusHours(deadLineHour);
-        return plusedTime.format(formatter);
+        return plusedTime;
     }
 }

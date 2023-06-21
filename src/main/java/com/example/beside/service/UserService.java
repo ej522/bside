@@ -51,6 +51,7 @@ public class UserService {
         return userRepository.saveUser(user);
     }
 
+    @Transactional
     public User loginUser(User user) throws PasswordException, UserNotExistException, PasswordNotCorrectException {
         String password = user.getPassword();
         Common.PasswordValidate(password);
@@ -65,7 +66,7 @@ public class UserService {
             throw new PasswordNotCorrectException("비밀번호가 일치하지 않습니다");
 
         // fcm 갱신
-        if (user.getFcm() != userInfo.getFcm())
+        if (user.getFcm() != userInfo.getFcm() && user.getFcm() != null)
             userRepository.updateFcmToken(user);
 
         return OptionalUser.get();

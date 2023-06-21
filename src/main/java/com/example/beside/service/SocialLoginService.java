@@ -90,7 +90,7 @@ public class SocialLoginService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             // fcm 갱신
-            if (user.getFcm() != fcm) {
+            if (user.getFcm() != fcm && user.getFcm() != null) {
                 user.setFcm(fcm);
                 userRepository.updateFcmToken(user);
             }
@@ -195,7 +195,7 @@ public class SocialLoginService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             // fcm 갱신
-            if (user.getFcm() != fcm) {
+            if (user.getFcm() != fcm && user.getFcm() != null) {
                 user.setFcm(fcm);
                 userRepository.updateFcmToken(user);
             }
