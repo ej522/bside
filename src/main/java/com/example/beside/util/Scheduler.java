@@ -66,7 +66,7 @@ public class Scheduler {
 
             //주최자
             User host = userService.chkPushAgree(moim.getUser().getId());
-            sendFixMoimMessage(host, moim.getMoim_name());
+            sendFixMoimMessage(host, moim.getMoim_name(), moim.getEncrypted_id());
 
             User guest = new User();
             //참여자
@@ -74,7 +74,7 @@ public class Scheduler {
             for(MoimMember moimMember : moimMemberList) {
                 guest = userService.chkPushAgree(moimMember.getUser_id());
             }
-            sendFixMoimMessage(guest, moim.getMoim_name());
+            sendFixMoimMessage(guest, moim.getMoim_name(), moim.getEncrypted_id());
         }
 
     }
@@ -172,10 +172,10 @@ public class Scheduler {
         return maxSelectedTime.get(0);
     }
 
-    private void sendFixMoimMessage(User user, String moim_name) throws FirebaseMessagingException {
+    private void sendFixMoimMessage(User user, String moim_name, String encrptedInfo) throws FirebaseMessagingException {
         if(user != null) {
             if(user.getFcm()!=null) {
-                fcmPushService.sendFcmPushNotification(user.getFcm(), "일정 확인", "띵동! " + moim_name + "MOIM의 정해진 날짜와 시간을 확인하세요!");
+                fcmPushService.sendFcmPushNotification(user.getFcm(), "일정 확인", "띵동! " + moim_name + "MOIM의 정해진 날짜와 시간을 확인하세요!", encrptedInfo, "confirm");
             }
         }
     }

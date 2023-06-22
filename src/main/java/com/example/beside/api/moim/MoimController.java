@@ -119,7 +119,7 @@ public class MoimController {
             if(msgUserInfo != null) {
                 if(msgUserInfo.getFcm()!=null) {
                     fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), "모임 초대", "띵동! " + msgUserInfo.getName() + "님,\n"
-                            + user_.getName() + "에게 MOIM 초대장이 왔어요");
+                            + user_.getName() + "에게 MOIM 초대장이 왔어요", encrptedMoimInfo, "invite");
                 }
             }
 
