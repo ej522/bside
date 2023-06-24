@@ -57,6 +57,7 @@ public class MoimRepositoryImpl implements MoimRepository {
 
         }
 
+        @Override
         @Transactional
         public void fixMoimDate(Moim moim, LocalDateTime date, int time) {
                 String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
