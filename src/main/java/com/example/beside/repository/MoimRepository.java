@@ -27,6 +27,8 @@ public interface MoimRepository {
 
     long saveSchedule(MoimMember moimMember, List<MoimMemberTime> moimTimeInfos);
 
+    void fixMoimDate(Moim moim, LocalDateTime date, int time);
+
     // READ
     Moim getMoimInfo(Long moimId);
 
