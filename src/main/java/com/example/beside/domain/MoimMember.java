@@ -36,4 +36,6 @@ public class MoimMember {
     @ColumnDefault("true")
     private Boolean history_view_yn;
 
+    private Boolean is_accept;
+
 }
