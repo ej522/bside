@@ -63,7 +63,7 @@ public class MoimService {
 
     // #region [딥링크 모임 참여]
     @Transactional
-    public MoimParticipateInfoDto participateMoim(User user, String encryptInfo) throws Exception {
+    public MoimParticipateInfoDto participateDeepLink(User user, String encryptInfo) throws Exception {
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
         Moim moim = getMoimInfoWithMoimId(moimId);
         participateMoimValidate(user, moimId, moim);
@@ -71,6 +71,24 @@ public class MoimService {
         // 주최자, 초대자
         moimRepository.makeFriend(user.getId(), moimId, moim.getUser());
         moimRepository.makeFriend(moim.getUser().getId(), moimId, user);
+
+        // 모임 멤버 추가
+        moimRepository.makeMoimMember(user, moim);
+
+        // 모임 종합 정보 조회
+        List<MoimOveralDateDto> moimOveralInfo = moimRepository.getMoimOveralInfo(moimId);
+
+        // 데이터 결과 가공
+        MoimParticipateInfoDto result = new MoimParticipateInfoDto(moimOveralInfo);
+
+        return result;
+    }
+
+    // #region [초대받은 모임 참여]
+    @Transactional
+    public MoimParticipateInfoDto participateInvitedMoim(User user, Long moimId) throws Exception {
+        Moim moim = getMoimInfoWithMoimId(moimId);
+        participateMoimValidate(user, moimId, moim);
 
         // 모임 멤버 추가
         moimRepository.makeMoimMember(user, moim);
@@ -278,9 +296,7 @@ public class MoimService {
         return moimRepository.getMoimInfo(moimId);
     }
 
-    public MoimParticipateInfoDto getHostSelectMoimDate(User user, String encryptInfo) throws Exception {
-        Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
-
+    public MoimParticipateInfoDto getHostSelectMoimDate(User user, Long moimId) throws Exception {
         List<MoimOveralDateDto> moimInfo = moimRepository.getMoimOveralInfo(moimId);
 
         MoimParticipateInfoDto result = new MoimParticipateInfoDto(moimInfo);
@@ -288,9 +304,7 @@ public class MoimService {
         return result;
     }
 
-    public List<VoteMoimDateDto> getVoteDateInfo(String encryptInfo) throws Exception {
-        Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
-
+    public List<VoteMoimDateDto> getVoteDateInfo(Long moimId) throws Exception {
         // 모임 날짜 정보
         List<MoimOveralDateDto> dateInfo = moimRepository.getMoimOveralInfo(moimId);
 
