@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.beside.common.response.MoimMemberDto;
 import com.example.beside.dto.*;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -615,6 +616,64 @@ public class MoimRepositoryImpl implements MoimRepository {
                                                 .and(qMoim.fixed_time.isNotNull()))
                                 .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc())
                                 .fetch();
+
+                return result;
+        }
+
+        @Override
+        public Moim findMoimByMoimId(Long moimId) {
+                queryFactory = new JPAQueryFactory(em);
+
+                QMoim qMoim = QMoim.moim;
+
+                Moim result = queryFactory.selectFrom(qMoim)
+                        .where(qMoim.id.eq(moimId))
+                        .fetchOne();
+
+
+                return result;
+        }
+
+        @Override
+        public List<MoimMemberDto> findMoimMemberByMoimId(Long moimId) {
+                queryFactory = new JPAQueryFactory(em);
+
+                QMoim qMoim = QMoim.moim;
+                QMoimMember qMoimMember = QMoimMember.moimMember;
+                QUser qUser = QUser.user;
+
+                List<MoimMemberDto> result = queryFactory.select(
+                        Projections.constructor(MoimMemberDto.class,
+                                qMoimMember.id,
+                                qMoim.id,
+                                qMoimMember.user_id,
+                                qUser.name
+                                )).from(qMoim)
+                        .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
+                        .leftJoin(qUser).on(qUser.id.eq(qMoimMember.user_id))
+                        .where(qMoim.id.eq(moimId))
+                        .fetch();
+
+                return result;
+        }
+
+        @Override
+        public List<MoimDateDto> findMoimDateByMoimId(Long moimId) {
+                queryFactory = new JPAQueryFactory(em);
+
+                QMoim qMoim = QMoim.moim;
+                QMoimDate qMoimDate = QMoimDate.moimDate;
+
+                List<MoimDateDto> result = queryFactory.select(
+                        Projections.constructor(MoimDateDto.class,
+                                qMoimDate.morning,
+                                qMoimDate.afternoon,
+                                qMoimDate.evening,
+                                qMoimDate.selected_date))
+                        .from(qMoim)
+                        .leftJoin(qMoimDate).on(qMoim.id.eq(qMoimDate.moim.id))
+                        .where(qMoim.id.eq(moimId))
+                        .fetch();
 
                 return result;
         }

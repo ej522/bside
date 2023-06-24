@@ -158,16 +158,16 @@ public class MoimController {
 
     @Operation(tags = { "Moim" }, summary = "과거 약속 모임 목록")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "과거 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MoimListResponse.class))),
+            @ApiResponse(responseCode = "200", description = "과거 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MyMoimListResponse.class))),
             @ApiResponse(responseCode = "404", description = "과거 모임 목록이 없습니다.")
     })
     @GetMapping(value = "/v1/moim-history")
-    public MoimListResponse getMoimHistoryList(HttpServletRequest token) throws NoResultListException {
+    public MyMoimListResponse getMoimHistoryList(HttpServletRequest token) throws NoResultListException {
         User user = (User) token.getAttribute("user");
 
         List<MyMoimDto> moimList = moimService.getMoimHistoryList(user.getId());
 
-        return MoimListResponse.success(200, "모임 목록이 조회 되었습니다.", moimList);
+        return MyMoimListResponse.success(200, "모임 목록이 조회 되었습니다.", moimList);
     }
 
     @Operation(tags = { "Moim" }, summary = "투표중인 모임 목록")
@@ -185,7 +185,7 @@ public class MoimController {
 
     @Operation(tags = { "Moim" }, summary = "모임 주최자가 등록한 모임 일정")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "주최자가 등록한 모임일정이 조회되었습니다.", content = @Content(schema = @Schema(implementation = MoimListResponse.class))),
+            @ApiResponse(responseCode = "200", description = "주최자가 등록한 모임일정이 조회되었습니다.", content = @Content(schema = @Schema(implementation = MyMoimListResponse.class))),
     })
     @PostMapping(value = "/v1/host-select-date")
     public MoimParticipateResponse getHostSelectMoimDate(HttpServletRequest token,
@@ -225,31 +225,31 @@ public class MoimController {
 
     @Operation(tags = { "Moim" }, summary = "특정 모임 삭제")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "과거 모임이 삭제되었습니다.", content = @Content(schema = @Schema(implementation = MoimListResponse.class))),
+            @ApiResponse(responseCode = "200", description = "과거 모임이 삭제되었습니다.", content = @Content(schema = @Schema(implementation = MyMoimListResponse.class))),
     })
     @DeleteMapping(value = "/v1/delete/moim-history")
-    public MoimListResponse deleteMoimHistory(HttpServletRequest token,
-            @RequestBody @Validated MoimHistoryRequest request) {
+    public MyMoimListResponse deleteMoimHistory(HttpServletRequest token,
+                                                @RequestBody @Validated MoimHistoryRequest request) {
         User user = (User) token.getAttribute("user");
 
         List<MyMoimDto> result = moimService.deleteMoimHistory(request.moim_id, request.host_id, user.getId());
 
-        return MoimListResponse.success(200, "과거 모임이 삭제되었습니다.", result);
+        return MyMoimListResponse.success(200, "과거 모임이 삭제되었습니다.", result);
 
     }
 
     @Operation(tags = { "Moim" }, summary = "예정된 약속 모임 목록")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "예정 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MoimListResponse.class))),
+            @ApiResponse(responseCode = "200", description = "예정 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MyMoimListResponse.class))),
             @ApiResponse(responseCode = "404", description = "예정 모임 목록이 없습니다.")
     })
     @GetMapping(value = "/v1/moim-future")
-    public MoimListResponse getMoimFutureList(HttpServletRequest token) throws NoResultListException {
+    public MyMoimListResponse getMoimFutureList(HttpServletRequest token) throws NoResultListException {
         User user = (User) token.getAttribute("user");
 
         List<MyMoimDto> moimList = moimService.getMoimFutureList(user.getId());
 
-        return MoimListResponse.success(200, "예정 모임 목록이 조회 되었습니다.", moimList);
+        return MyMoimListResponse.success(200, "예정 모임 목록이 조회 되었습니다.", moimList);
     }
 
     @Operation(tags = { "Moim" }, summary = "초대된 모임 모록")
@@ -264,6 +264,19 @@ public class MoimController {
         List<InvitedMoimListDto> invitedMoimList = moimService.getInvitedMoimList(user.getId());
 
         return InvitedMoimResponse.success(200, "초대 모임이 조회되었습니다.", invitedMoimList);
+
+    }
+
+    @Operation(tags = { "Moim" }, summary = "모임 상세 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임 정보가 조회되었습니다.", content = @Content(schema = @Schema(implementation = InvitedMoimResponse.class))),
+            @ApiResponse(responseCode = "404", description = "해당 모임이 존재하지 않습니다.")
+    })
+    @GetMapping(value = "/v1/detail")
+    public MoimDetailListResponse getMoimDetailInfo(MoimHistoryRequest request) throws NoResultListException {
+        MoimDetailDto moimDetailInfo = moimService.getMoimDetailInfo(request.moim_id);
+
+        return MoimDetailListResponse.success(200, "모임 정보가 조회되었습니다.", moimDetailInfo);
 
     }
 

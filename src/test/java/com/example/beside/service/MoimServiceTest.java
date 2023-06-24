@@ -6,9 +6,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.beside.common.Exception.ExceptionDetail.AdjustScheduleException;
-import com.example.beside.common.Exception.ExceptionDetail.MoimParticipateException;
+import com.example.beside.common.Exception.ExceptionDetail.*;
 
+import com.example.beside.common.response.MoimMemberDto;
+import com.example.beside.domain.*;
 import com.example.beside.dto.*;
 import com.example.beside.repository.MoimRepositoryImpl;
 import org.assertj.core.api.Assertions;
@@ -20,10 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import com.example.beside.domain.Moim;
-import com.example.beside.domain.MoimDate;
-import com.example.beside.domain.MoimMemberTime;
-import com.example.beside.domain.User;
 import com.example.beside.util.Encrypt;
 
 import jakarta.transaction.Transactional;
@@ -619,5 +616,35 @@ public class MoimServiceTest {
 
         // then
         assertTrue(moimList.get(0).getMemeber_cnt() > 1);
+    }
+
+    @Test
+    @DisplayName("모임id로 모임 상세 조회")
+    void test() throws Exception {
+        // given
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(saveUser1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+        newMoim.setFixed_date("2023-03-13");
+        newMoim.setFixed_time("2");
+
+        var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        moimService.participateMoim(saveUser2, encryptedId);
+        moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
+
+        Long moimId = Long.parseLong(mockEncrypt.decrypt(encryptedId));
+
+        //when
+        MoimDetailDto moimDetailDto = moimService.getMoimDetailInfo(moimId);
+
+        //then
+        assertTrue(moimDetailDto.getMoim_name().equals("테스트 모임"));
+        assertTrue(moimDetailDto.getMemeber_cnt()==2);
+        assertTrue(moimDetailDto.getMoimDateList().size()>0);
+        assertTrue(moimDetailDto.getMoimMemberList().size()>0);
     }
 }

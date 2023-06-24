@@ -3,17 +3,13 @@ package com.example.beside.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.beside.common.response.MoimMemberDto;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
-import com.example.beside.dto.InvitedMoimListDto;
-import com.example.beside.dto.MoimOveralDateDto;
-import com.example.beside.dto.MoimOveralScheduleDto;
-import com.example.beside.dto.MyMoimDto;
-import com.example.beside.dto.VoteMoimTimeCntDto;
-import com.example.beside.dto.VotingMoimDto;
+import com.example.beside.dto.*;
 
 public interface MoimRepository {
     // CREATE
@@ -57,6 +53,12 @@ public interface MoimRepository {
     VoteMoimTimeCntDto getTimeVoteCnt(Long moimId, LocalDateTime selectedDate);
 
     List<MyMoimDto> findMyMoimFutureList(Long userId);
+
+    Moim findMoimByMoimId(Long moimId);
+
+    List<MoimMemberDto> findMoimMemberByMoimId(Long moimId);
+
+    List<MoimDateDto> findMoimDateByMoimId(Long moimId);
 
     // UPDATE
     long deleteHostHistory(Long userId, Long moimId);
