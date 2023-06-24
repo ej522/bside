@@ -52,8 +52,9 @@ public class MoimRepositoryImpl implements MoimRepository {
 
                 QMoim qMoim = new QMoim("moim");
                 return queryFactory.selectFrom(qMoim)
-                                .where(qMoim.fixed_date.isNull().and(qMoim.nobody_schedule_selected.eq(false)))
+                                .where(qMoim.fixed_date.isNull())
                                 .fetch();
+                //.and(qMoim.nobody_schedule_selected.eq(false))
 
         }
 
@@ -359,6 +360,18 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .where(qMoimMember.user_id.eq(user_id)
                                                 .and(qMoimMember.moim.id.eq(moim_id)))
                                 .execute();
+
+                return 0;
+        }
+
+        @Override
+        @Transactional
+        public long deleteMoim(Long moimId) {
+                queryFactory = new JPAQueryFactory(em);
+
+                QMoim qMoim = QMoim.moim;
+
+                queryFactory.delete(qMoim).where(qMoim.id.eq(moimId)).execute();
 
                 return 0;
         }

@@ -63,4 +63,6 @@ public interface MoimRepository {
 
     long deleteGusetHistory(Long userId, Long moimId);
 
+    long deleteMoim(Long moimId);
+
 }
