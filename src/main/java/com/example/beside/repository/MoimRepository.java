@@ -21,7 +21,7 @@ public interface MoimRepository {
 
     long makeMoimMember(User user, Moim moim);
 
-    long makeMoimMember(String friend, Moim moim);
+    long makeMoimMemberToFriend(String friend, Moim moim);
 
     long makeFriend(Long friend_id, Long moim_id, User user);
 

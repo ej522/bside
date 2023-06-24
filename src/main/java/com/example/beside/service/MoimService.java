@@ -3,7 +3,6 @@ package com.example.beside.service;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
 import com.example.beside.dto.*;
@@ -69,9 +68,8 @@ public class MoimService {
         Moim moim = getMoimInfoWithMoimId(moimId);
         participateMoimValidate(user, moimId, moim);
 
-        // 주최자
+        // 주최자, 초대자
         moimRepository.makeFriend(user.getId(), moimId, moim.getUser());
-        // 초대자
         moimRepository.makeFriend(moim.getUser().getId(), moimId, user);
 
         // 모임 멤버 추가
@@ -113,7 +111,7 @@ public class MoimService {
         Set<String> friendSet = new HashSet<>(friendList);
         // 모임 멤버 추가
         for (var friend : friendSet)
-            moimRepository.makeMoimMember(friend, moim);
+            moimRepository.makeMoimMemberToFriend(friend, moim);
 
         // 모임 종합 정보 조회
         List<MoimOveralDateDto> moimOveralInfo = moimRepository.getMoimOveralInfo(moimId);
