@@ -11,7 +11,7 @@ import com.example.beside.common.Exception.ExceptionDetail.*;
 import com.example.beside.common.response.MoimMemberDto;
 import com.example.beside.domain.*;
 import com.example.beside.dto.*;
-import com.example.beside.repository.MoimRepositoryImpl;
+import com.example.beside.repository.MoimRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,9 +39,8 @@ public class MoimServiceTest {
     @Value("${spring.secret.key}")
     private String secret_key;
 
-    // @Mock
     @Autowired
-    private Encrypt mockEncrypt;
+    private MoimRepository moimRepository;
 
     @Autowired
     private UserService userService;
@@ -50,7 +49,7 @@ public class MoimServiceTest {
     private MoimService moimService;
 
     @Autowired
-    private MoimRepositoryImpl moimRepository;
+    private Encrypt encrypt;
 
     private List<MoimDate> normalMoimDates = new ArrayList<>();
     private List<MoimDate> wrongMoimDates = new ArrayList<>();
@@ -217,8 +216,8 @@ public class MoimServiceTest {
     }
 
     @Test
-    @DisplayName("모임 참여하기")
-    void testParticipateMoim() throws Exception {
+    @DisplayName("딥링크 모임 참여하기")
+    void testDeepLinkParticipate() throws Exception {
         // given
         User saveUser1 = userService.saveUser(user);
         User saveUser2 = userService.saveUser(user2);
@@ -230,7 +229,7 @@ public class MoimServiceTest {
         String encryptMoimID = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
 
         // when
-        MoimParticipateInfoDto participateMoim = moimService.participateMoim(saveUser2, encryptMoimID);
+        MoimParticipateInfoDto participateMoim = moimService.participateDeepLink(saveUser2, encryptMoimID);
 
         // then
         Assertions.assertThat(participateMoim.getMoim_name()).isEqualTo("테스트 모임");
@@ -238,32 +237,7 @@ public class MoimServiceTest {
     }
 
     @Test
-    @DisplayName("내 모임에 친구 초대하기")
-    void testInviteMyMoim() throws Exception {
-        // given
-        User saveUser1 = userService.saveUser(user);
-        User saveUser2 = userService.saveUser(user2);
-        User saveUser3 = userService.saveUser(user3);
-
-        Moim newMoim = new Moim();
-        newMoim.setUser(saveUser1);
-        newMoim.setMoim_name("테스트 모임");
-        newMoim.setDead_line_hour(5);
-        String encryptMoimID = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
-
-        List<String> friendList = new ArrayList();
-        friendList.add(String.valueOf(user2.getId()));
-        friendList.add(String.valueOf(user3.getId()));
-
-        // when
-        MoimParticipateInfoDto participateMoim = moimService.inviteMyMoim(saveUser1, encryptMoimID, friendList);
-
-        // then
-        Assertions.assertThat(participateMoim.getMoim_name()).isEqualTo("테스트 모임");
-    }
-
-    @Test
-    @DisplayName("모임 주최자가 만든 모임 참여하기")
+    @DisplayName("자신이 만든 모임 딥링크로 모임 참여하기")
     void testParticipateMoimByMoimCreator() throws Exception {
         // given
         User saveUser1 = userService.saveUser(user);
@@ -271,14 +245,15 @@ public class MoimServiceTest {
         newMoim.setUser(saveUser1);
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
-        String encryptMoimID = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        String encryptMoimID = moimService.makeMoim(saveUser1, newMoim,
+                normalMoimDates);
 
         // when, then
-        assertThrows(MoimParticipateException.class, () -> moimService.participateMoim(saveUser1, encryptMoimID));
+        assertThrows(MoimParticipateException.class, () -> moimService.participateDeepLink(saveUser1, encryptMoimID));
     }
 
     @Test
-    @DisplayName("기존 참여한 모임 다시 참여하기")
+    @DisplayName("기존 참여한 모임 딥링크로 다시 참여하기")
     void testParticipateMoimByAlreadyJoinedPeople() throws Exception {
         // given
         User saveUser1 = userService.saveUser(user);
@@ -288,13 +263,14 @@ public class MoimServiceTest {
         newMoim.setUser(saveUser1);
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
-        String encryptMoimID = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        String encryptMoimID = moimService.makeMoim(saveUser1, newMoim,
+                normalMoimDates);
 
         // when
-        moimService.participateMoim(saveUser2, encryptMoimID);
+        moimService.participateDeepLink(saveUser2, encryptMoimID);
 
         // then
-        assertThrows(MoimParticipateException.class, () -> moimService.participateMoim(saveUser2, encryptMoimID));
+        assertThrows(MoimParticipateException.class, () -> moimService.participateDeepLink(saveUser2, encryptMoimID));
     }
 
     @Test
@@ -319,27 +295,55 @@ public class MoimServiceTest {
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
 
-        // 모임 생성
-        String encryptMoimID = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        // [모임 생성]
+        String encryptMoimID = moimService.makeMoim(saveUser1, newMoim,
+                normalMoimDates);
 
         // when
-        moimService.participateMoim(saveUser2, encryptMoimID);
-        moimService.participateMoim(saveUser3, encryptMoimID);
-        moimService.participateMoim(saveUser4, encryptMoimID);
-        moimService.participateMoim(saveUser5, encryptMoimID);
-        moimService.participateMoim(saveUser6, encryptMoimID);
-        moimService.participateMoim(saveUser7, encryptMoimID);
-        moimService.participateMoim(saveUser8, encryptMoimID);
-        moimService.participateMoim(saveUser9, encryptMoimID);
-        moimService.participateMoim(saveUser10, encryptMoimID);
-        moimService.participateMoim(saveUser11, encryptMoimID);
+        moimService.participateDeepLink(saveUser2, encryptMoimID);
+        moimService.participateDeepLink(saveUser3, encryptMoimID);
+        moimService.participateDeepLink(saveUser4, encryptMoimID);
+        moimService.participateDeepLink(saveUser5, encryptMoimID);
+        moimService.participateDeepLink(saveUser6, encryptMoimID);
+        moimService.participateDeepLink(saveUser7, encryptMoimID);
+        moimService.participateDeepLink(saveUser8, encryptMoimID);
+        moimService.participateDeepLink(saveUser9, encryptMoimID);
+        moimService.participateDeepLink(saveUser10, encryptMoimID);
+        moimService.participateDeepLink(saveUser11, encryptMoimID);
 
         // then
-        assertThrows(MoimParticipateException.class, () -> moimService.participateMoim(saveUser12, encryptMoimID));
+        assertThrows(MoimParticipateException.class, () -> moimService.participateDeepLink(saveUser12, encryptMoimID));
     }
 
     @Test
-    @DisplayName("참여자 일정 정하기")
+    @DisplayName("내가 만든 모임에 친구 초대하기")
+    void testInviteMyMoim() throws Exception {
+        // given
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
+        User saveUser3 = userService.saveUser(user3);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(saveUser1);
+        newMoim.setMoim_name("테스트 모임");
+        newMoim.setDead_line_hour(5);
+        String encryptMoimID = moimService.makeMoim(saveUser1, newMoim,
+                normalMoimDates);
+
+        List<String> friendList = new ArrayList();
+        friendList.add(String.valueOf(user2.getId()));
+        friendList.add(String.valueOf(user3.getId()));
+
+        // when
+        MoimParticipateInfoDto participateMoim = moimService.inviteMyMoim(saveUser1,
+                encryptMoimID, friendList);
+
+        // then
+        Assertions.assertThat(participateMoim.getMoim_name()).isEqualTo("테스트 모임");
+    }
+
+    @Test
+    @DisplayName("참여한 모임 일정 투표하기")
     void testAdjustSchedule() throws Exception {
         // given
         User saveUser1 = userService.saveUser(user);
@@ -350,13 +354,14 @@ public class MoimServiceTest {
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
 
-        // 모임 생성
+        // [모임 생성]
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
-        // 모임 참여
-        moimService.participateMoim(saveUser2, encryptedId);
+        // [모임 참여]
+        moimService.participateDeepLink(saveUser2, encryptedId);
 
         // when
-        MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
+        MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(saveUser2,
+                encryptedId, normalMoimMemberTime);
 
         // then
         Moim moim = moimService.getMoimInfoWithEncrypedMoimId(encryptedId);
@@ -383,7 +388,8 @@ public class MoimServiceTest {
 
         // when, then
         assertThrows(AdjustScheduleException.class,
-                () -> moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime));
+                () -> moimService.adjustSchedule(saveUser2, encryptedId,
+                        normalMoimMemberTime));
     }
 
     @Test
@@ -398,14 +404,55 @@ public class MoimServiceTest {
         newMoim.setMoim_name("테스트 모임");
         newMoim.setDead_line_hour(5);
 
-        // 모임 생성
+        // [모임 생성]
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
-        // 모임 참여
-        moimService.participateMoim(saveUser2, encryptedId);
+        // [모임 참여]
+        moimService.participateDeepLink(saveUser2, encryptedId);
 
         // when, then
         assertThrows(AdjustScheduleException.class,
-                () -> moimService.adjustSchedule(saveUser2, encryptedId, wrongMoimMemberTime));
+                () -> moimService.adjustSchedule(saveUser2, encryptedId,
+                        wrongMoimMemberTime));
+    }
+
+    @Test
+    @DisplayName("초대받은 모임 참여하기")
+    void testInvitedMoimParticipate() throws Exception {
+        // given
+        User saveUser1 = userService.saveUser(user);
+        User saveUser2 = userService.saveUser(user2);
+
+        Moim newMoim = new Moim();
+        newMoim.setUser(saveUser1);
+        newMoim.setMoim_name("테스트 모임1");
+        newMoim.setDead_line_hour(5);
+
+        Moim newMoim2 = new Moim();
+        newMoim2.setUser(saveUser1);
+        newMoim2.setMoim_name("테스트 모임2");
+        newMoim2.setDead_line_hour(5);
+
+        // [user1 과거 모임 생성]
+        var encryptMoimID = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+
+        // [user2 과거 모임 참여 (친구 등록)]
+        moimService.participateDeepLink(saveUser2, encryptMoimID);
+
+        // [user1 신규 모임 생성]
+        var encryptMoimId2 = moimService.makeMoim(saveUser1, newMoim2, normalMoimDates);
+        var newMoimId = Long.parseLong(encrypt.decrypt(encryptMoimId2));
+
+        // [user1 신규 모임 초대]
+        List<String> friendList = new ArrayList<>();
+        friendList.add(saveUser2.getId().toString());
+        moimService.inviteMyMoim(saveUser1, encryptMoimId2, friendList);
+
+        // when
+        MoimParticipateInfoDto participateMoim = moimService.participateInvitedMoim(saveUser2, newMoimId);
+
+        // then
+        Assertions.assertThat(participateMoim.getMoim_name()).isEqualTo("테스트 모임2");
+        Assertions.assertThat(participateMoim.getDead_line_hour()).isEqualTo(5);
     }
 
     @Test
@@ -424,8 +471,8 @@ public class MoimServiceTest {
         newMoim.setFixed_time("2");
 
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
-        moimService.participateMoim(saveUser2, encryptedId);
-        moimService.participateMoim(saveUser3, encryptedId);
+        moimService.participateDeepLink(saveUser2, encryptedId);
+        moimService.participateDeepLink(saveUser3, encryptedId);
 
         moimRepository.fixMoimDate(newMoim, LocalDateTime.now().minusDays(1), 12);
 
@@ -453,14 +500,16 @@ public class MoimServiceTest {
         newMoim.setMoim_name("테스트 모임2");
         newMoim.setDead_line_hour(5);
 
-        // 친구 생성
+        // [모임 생성]
         String encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
-        moimService.participateMoim(saveUser2, encryptedId);
+        // [모임 참여 -> 친구 생성]
+        moimService.participateDeepLink(saveUser2, encryptedId);
 
-        // 모임 초대
+        // [모임 생성]
         String encryptedId2 = moimService.makeMoim(saveUser1, newMoim2, normalMoimDates);
         List<String> friendIdList = new ArrayList<>();
         friendIdList.add(String.valueOf(saveUser2.getId()));
+        // [모임 초대]
         moimService.inviteMyMoim(saveUser1, encryptedId2, friendIdList);
 
         // when
@@ -484,11 +533,15 @@ public class MoimServiceTest {
         newMoim.setFixed_date("2023-03-13");
         newMoim.setFixed_time("2");
 
+        // [모임 생성]
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
-        moimService.participateMoim(saveUser2, encryptedId);
+        Long moimId = Long.parseLong(encrypt.decrypt(encryptedId).toString());
+
+        // [모임 참여]
+        moimService.participateDeepLink(saveUser2, encryptedId);
 
         // when
-        MoimParticipateInfoDto moimInfo = moimService.getHostSelectMoimDate(saveUser2, encryptedId);
+        MoimParticipateInfoDto moimInfo = moimService.getHostSelectMoimDate(saveUser2, moimId);
 
         // then
         assertTrue(moimInfo.getMoim_leader_id().equals(saveUser1.getId()));
@@ -499,6 +552,7 @@ public class MoimServiceTest {
     @DisplayName("주최자가 선택한 날짜에 투표한 모임원 정보")
     void getVoteDateInfo() throws Exception {
         // given
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         User saveUser1 = userService.saveUser(user);
         User saveUser2 = userService.saveUser(user2);
 
@@ -509,17 +563,22 @@ public class MoimServiceTest {
         newMoim.setFixed_date("2023-03-13");
         newMoim.setFixed_time("2");
 
+        // [모임 생성]
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
-        moimService.participateMoim(saveUser2, encryptedId);
+        Long moimId = Long.parseLong(encrypt.decrypt(encryptedId));
+
+        // [모임 참여]
+        moimService.participateDeepLink(saveUser2, encryptedId);
+
+        // [모임 투표]
         moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
         // when
-        List<VoteMoimDateDto> test = moimService.getVoteDateInfo(encryptedId);
+        List<VoteMoimDateDto> test = moimService.getVoteDateInfo(moimId);
 
         // given
-        assertTrue(test.get(0).getSelected_date().equals(LocalDate.parse("2023-03-10", formatter).atStartOfDay()));
+        assertTrue(test.get(0).getSelected_date().equals(LocalDate.parse("2023-03-10",
+                formatter).atStartOfDay()));
         assertTrue(test.get(0).getVote_cnt().equals(0));
         assertTrue(test.get(1).getUser_info().get(0).getName().equals("다람쥐"));
 
@@ -529,6 +588,7 @@ public class MoimServiceTest {
     @DisplayName("주최자가 선택한 시간에 투표한 모임원 정보")
     void testGetVoteTimeInfo() throws Exception {
         // given
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         User saveUser1 = userService.saveUser(user);
         User saveUser2 = userService.saveUser(user2);
 
@@ -539,13 +599,15 @@ public class MoimServiceTest {
         newMoim.setFixed_date("2023-03-13");
         newMoim.setFixed_time("2");
 
+        // [모임 생성]
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
-        moimService.participateMoim(saveUser2, encryptedId);
+        Long moimId = Long.parseLong(encrypt.decrypt(encryptedId));
+
+        // [모임 참여]
+        moimService.participateDeepLink(saveUser2, encryptedId);
+
+        // [모임 투표]
         moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        Long moimId = Long.parseLong(mockEncrypt.decrypt(encryptedId));
 
         // when
         VoteMoimTimeDto test = moimService.getVoteTimeInfo(moimId,
@@ -571,27 +633,31 @@ public class MoimServiceTest {
         newMoim.setFixed_date("2023-03-13");
         newMoim.setFixed_time("2");
 
+        // [모임 생성]
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
-        moimService.participateMoim(saveUser2, encryptedId);
+        Long moimId = Long.parseLong(encrypt.decrypt(encryptedId));
+
+        // [모임 참여]
+        moimService.participateDeepLink(saveUser2, encryptedId);
+
+        // [모임 투표]
         moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
 
+        // [모임 확정]
         moimRepository.fixMoimDate(newMoim, LocalDateTime.now().minusDays(1), 12);
 
-        Long moimId = Long.parseLong(mockEncrypt.decrypt(encryptedId));
-
         // when
-        List<MyMoimDto> hostResult = moimService.deleteMoimHistory(moimId, newMoim.getUser().getId(),
-                saveUser1.getId());
+        List<MyMoimDto> hostResult = moimService.deleteMoimHistory(moimId,
+                newMoim.getUser().getId(), saveUser1.getId());
 
         // then
-        assertTrue(hostResult.size() == 0);
-
         List<MyMoimDto> guestResult = moimService.getMoimHistoryList(saveUser2.getId());
+        assertTrue(hostResult.size() == 0);
         assertTrue(guestResult.size() != 0);
     }
 
     @Test
-    @DisplayName("미래 모임 목록 조회")
+    @DisplayName("예정된 모임 목록 조회")
     public void testGetMoimFutureList() throws Exception {
         // given
         User saveUser1 = userService.saveUser(user);
@@ -605,10 +671,13 @@ public class MoimServiceTest {
         newMoim.setFixed_date("2024-03-13");
         newMoim.setFixed_time("2");
 
+        // [모임 생성]
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
-        moimService.participateMoim(saveUser2, encryptedId);
-        moimService.participateMoim(saveUser3, encryptedId);
+        // [모임 참여]
+        moimService.participateDeepLink(saveUser2, encryptedId);
+        moimService.participateDeepLink(saveUser3, encryptedId);
 
+        // [모임 확정]
         moimRepository.fixMoimDate(newMoim, LocalDateTime.now().plusDays(2), 12);
 
         // when

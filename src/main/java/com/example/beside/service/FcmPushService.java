@@ -10,10 +10,12 @@ import com.google.firebase.messaging.Notification;
 @Service
 public class FcmPushService {
 
-    public void sendFcmPushNotification(String fcmToken, String title, String body) throws FirebaseMessagingException {
+    public void sendFcmPushNotification(String fcmToken, String title, String body, String encrptedInfo, String type) throws FirebaseMessagingException {
         Message message = Message.builder()
                 .setNotification(Notification.builder().setTitle(title).setBody(body).build())
                 .setToken(fcmToken)
+                .putData("encrptedInfo", encrptedInfo)
+                .putData("linkTo", type)
                 .build();
 
         String response = FirebaseMessaging.getInstance().send(message);

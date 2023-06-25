@@ -17,11 +17,13 @@ public interface MoimRepository {
 
     long makeMoimMember(User user, Moim moim);
 
-    long makeMoimMember(String friend, Moim moim);
+    long makeMoimMemberToFriend(String friend, Moim moim);
 
     long makeFriend(Long friend_id, Long moim_id, User user);
 
     long saveSchedule(MoimMember moimMember, List<MoimMemberTime> moimTimeInfos);
+
+    void fixMoimDate(Moim moim, LocalDateTime date, int time);
 
     // READ
     Moim getMoimInfo(Long moimId);
@@ -53,6 +55,7 @@ public interface MoimRepository {
     VoteMoimTimeCntDto getTimeVoteCnt(Long moimId, LocalDateTime selectedDate);
 
     List<MyMoimDto> findMyMoimFutureList(Long userId);
+    MoimDateDto findMoimDateByMoimIdAndDate(Long moimId, LocalDateTime selectedDate);
 
     Moim findMoimByMoimId(Long moimId);
 
