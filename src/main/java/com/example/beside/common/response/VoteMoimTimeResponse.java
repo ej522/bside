@@ -6,8 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-
 @Schema(name = "voteMoimTimeList", description = "모임 투표 시간 결과")
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)

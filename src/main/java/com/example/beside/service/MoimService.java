@@ -2,7 +2,9 @@ package com.example.beside.service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
 import com.example.beside.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +18,8 @@ import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
-import com.example.beside.repository.MoimRepositoryImpl;
-import com.example.beside.repository.UserRepositoryImpl;
+import com.example.beside.repository.MoimRepository;
+import com.example.beside.repository.UserRepository;
 import com.example.beside.util.Encrypt;
 
 import lombok.RequiredArgsConstructor;
@@ -26,8 +28,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MoimService {
-    private final MoimRepositoryImpl moimRepository;
-    private final UserRepositoryImpl userRepository;
+    private final MoimRepository moimRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     private Encrypt encrypt;
@@ -61,15 +63,32 @@ public class MoimService {
 
     // #region [딥링크 모임 참여]
     @Transactional
-    public MoimParticipateInfoDto participateMoim(User user, String encryptInfo) throws Exception {
+    public MoimParticipateInfoDto participateDeepLink(User user, String encryptInfo) throws Exception {
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
         Moim moim = getMoimInfoWithMoimId(moimId);
         participateMoimValidate(user, moimId, moim);
 
-        // 주최자
+        // 주최자, 초대자
         moimRepository.makeFriend(user.getId(), moimId, moim.getUser());
-        // 초대자
         moimRepository.makeFriend(moim.getUser().getId(), moimId, user);
+
+        // 모임 멤버 추가
+        moimRepository.makeMoimMember(user, moim);
+
+        // 모임 종합 정보 조회
+        List<MoimOveralDateDto> moimOveralInfo = moimRepository.getMoimOveralInfo(moimId);
+
+        // 데이터 결과 가공
+        MoimParticipateInfoDto result = new MoimParticipateInfoDto(moimOveralInfo);
+
+        return result;
+    }
+
+    // #region [초대받은 모임 참여]
+    @Transactional
+    public MoimParticipateInfoDto participateInvitedMoim(User user, Long moimId) throws Exception {
+        Moim moim = getMoimInfoWithMoimId(moimId);
+        participateMoimValidate(user, moimId, moim);
 
         // 모임 멤버 추가
         moimRepository.makeMoimMember(user, moim);
@@ -110,7 +129,7 @@ public class MoimService {
         Set<String> friendSet = new HashSet<>(friendList);
         // 모임 멤버 추가
         for (var friend : friendSet)
-            moimRepository.makeMoimMember(friend, moim);
+            moimRepository.makeMoimMemberToFriend(friend, moim);
 
         // 모임 종합 정보 조회
         List<MoimOveralDateDto> moimOveralInfo = moimRepository.getMoimOveralInfo(moimId);
@@ -214,31 +233,31 @@ public class MoimService {
     // #endregion
 
     // #region [과거 모임 이력 조회]
-    public List<MyMoimDto> getMoimHistoryList(Long user_id) {
+    public List<MyMoimDto> getMoimHistoryList(Long user_id) throws NoResultListException {
         List<MyMoimDto> moimList = moimRepository.findMyMoimHistoryList(user_id);
 
+        if (moimList.isEmpty())
+            throw new NoResultListException("과거 모임 목록이 없습니다.");
+
         for (int i = 0; i < moimList.size(); i++) {
-            MyMoimDto moim = moimList.get(i);
+            MyMoimDto moimDto = moimList.get(i);
+            String fixedDate = moimDto.getFixed_date();
+            int fixedHour = Integer.parseInt(moimDto.getFixed_time());
 
-            String date = moim.getFixed_date();
-            String[] dateList = date.split("-");
-            String time = moim.getFixed_time();
+            int year = Integer.parseInt(fixedDate.split("-")[0]);
+            int month = Integer.parseInt(fixedDate.split("-")[1]);
+            int day = Integer.parseInt(fixedDate.split("-")[2]);
 
-            // 쿼리에서 날짜와 시간을 같이 비교할 수 없어서 서비스 단에서 비교후 오늘 이후의 날짜는 제거
-            LocalDateTime dateTime = LocalDateTime.of(Integer.parseInt(dateList[0]), Integer.parseInt(dateList[1]),
-                    Integer.parseInt(dateList[2]), Integer.parseInt(time), 0);
-
-            if (dateTime.isAfter(LocalDateTime.now())) {
+            LocalDateTime moimExpectedTime = LocalDateTime.of(year, month, day, fixedHour, 0);
+            if (moimExpectedTime.isAfter(LocalDateTime.now())) {
                 moimList.remove(i);
                 continue;
             }
 
-            int cnt = moimRepository.findMemberCount(moim.getMoim_id());
+            int moimMemberCnt = moimRepository.findMemberCount(moimDto.getMoim_id());
+            moimMemberCnt += 1;
 
-            // 주최자도 더해줌
-            cnt += 1;
-
-            moim.setMemeber_cnt(cnt);
+            moimDto.setMemeber_cnt(moimMemberCnt);
         }
 
         return moimList;
@@ -248,7 +267,23 @@ public class MoimService {
     // #region [투표중인 모임 조회]
     public List<VotingMoimDto> getVotingMoimList(Long user_id) {
         List<VotingMoimDto> findVotingMoimHistory = moimRepository.findVotingMoimHistory(user_id);
-        return findVotingMoimHistory;
+        LocalDateTime now = LocalDateTime.now();
+
+        List<VotingMoimDto> onGoingMoimDto = findVotingMoimHistory.stream()
+                .filter(moimDto -> moimDto.getDead_line_time().isAfter(now))
+                .collect(Collectors.toList());
+
+        return onGoingMoimDto;
+    }
+    // #endregion
+
+    // #region [초대받은 모임 목록 조회]
+    public List<InvitedMoimListDto> getInvitedMoimList(Long user_id) throws NoResultListException {
+        List<InvitedMoimListDto> invitedMoimList = moimRepository.getInvitedMoimList(user_id);
+        if (invitedMoimList.size() == 0)
+            throw new NoResultListException("초대 받은 모임이 없습니다");
+
+        return invitedMoimList;
     }
     // #endregion
 
@@ -261,9 +296,7 @@ public class MoimService {
         return moimRepository.getMoimInfo(moimId);
     }
 
-    public MoimParticipateInfoDto getHostSelectMoimDate(User user, String encryptInfo) throws Exception {
-        Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
-
+    public MoimParticipateInfoDto getHostSelectMoimDate(User user, Long moimId) throws Exception {
         List<MoimOveralDateDto> moimInfo = moimRepository.getMoimOveralInfo(moimId);
 
         MoimParticipateInfoDto result = new MoimParticipateInfoDto(moimInfo);
@@ -271,9 +304,7 @@ public class MoimService {
         return result;
     }
 
-    public List<VoteMoimDateDto> getVoteDateInfo(String encryptInfo) throws Exception {
-        Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
-
+    public List<VoteMoimDateDto> getVoteDateInfo(Long moimId) throws Exception {
         // 모임 날짜 정보
         List<MoimOveralDateDto> dateInfo = moimRepository.getMoimOveralInfo(moimId);
 
@@ -449,6 +480,26 @@ public class MoimService {
         List<MyMoimDto> result = moimRepository.findMyMoimHistoryList(user_id);
 
         return result;
+    }
+
+    // 미래 모임 목록
+    public List<MyMoimDto> getMoimFutureList(Long user_id) throws NoResultListException {
+        List<MyMoimDto> moimList = moimRepository.findMyMoimFutureList(user_id);
+
+        if (moimList.isEmpty()) {
+            throw new NoResultListException("예정 모임 목록이 없습니다.");
+        }
+
+        for (MyMoimDto moim : moimList) {
+            int cnt = moimRepository.findMemberCount(moim.getMoim_id());
+
+            // 주최자도 더해줌
+            cnt += 1;
+
+            moim.setMemeber_cnt(cnt);
+        }
+
+        return moimList;
     }
 
     private List<UserDto> setTimeUserInfo(MoimOveralScheduleDto voteUserInfo, List<UserDto> voteUserInfoList) {

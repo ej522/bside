@@ -6,6 +6,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Repository;
@@ -164,6 +165,21 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public User updateFcmToken(User user) {
+        queryFactory = new JPAQueryFactory(em);
+        QUser qUser = QUser.user;
+
+        User findUser = queryFactory.selectFrom(qUser).where(qUser.email.eq(user.getEmail())).fetchOne();
+
+        queryFactory.update(qUser)
+                .set(qUser.fcm, user.getFcm())
+                .where(qUser.id.eq(findUser.getId()))
+                .execute();
+
+        return queryFactory.selectFrom(qUser).where(qUser.id.eq(findUser.getId())).fetchOne();
+    }
+
+    @Override
     public List<FriendDto.FriendInfo> findFriendByUserId(Long user_id) {
         queryFactory = new JPAQueryFactory(em);
         QFriend qFriend = QFriend.friend;
@@ -183,4 +199,5 @@ public class UserRepositoryImpl implements UserRepository {
 
         return result;
     }
+
 }

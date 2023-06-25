@@ -3,16 +3,12 @@ package com.example.beside.repository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import com.example.beside.dto.*;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
-import com.example.beside.dto.MyMoimDto;
-import com.example.beside.dto.VotingMoimDto;
 
-import com.querydsl.jpa.JPQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -61,6 +57,7 @@ public class MoimRepositoryImpl implements MoimRepository {
 
         }
 
+        @Override
         @Transactional
         public void fixMoimDate(Moim moim, LocalDateTime date, int time) {
                 String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -143,7 +140,8 @@ public class MoimRepositoryImpl implements MoimRepository {
                 MoimMember fetchOne = queryFactory.selectFrom(qMoimMember)
                                 .from(qMoimMember)
                                 .where(qMoimMember.moim.id.eq(moimId)
-                                                .and(qMoimMember.user_id.eq(userId)))
+                                                .and(qMoimMember.user_id.eq(userId))
+                                                .and(qMoimMember.is_accept.eq(true)))
                                 .fetchOne();
 
                 if (fetchOne == null)
@@ -162,28 +160,8 @@ public class MoimRepositoryImpl implements MoimRepository {
                 LocalDateTime today = LocalDateTime.now();
 
                 String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                String formattedTime = String.valueOf(today.toLocalTime().getHour());
 
-                // 주최한 모임
-                JPQLQuery<MyMoimDto> hostQuery = queryFactory.select(
-                                Projections.fields(MyMoimDto.class,
-                                                qMoim.id.as("moim_id"),
-                                                qMoim.moim_name.as("moim_name"),
-                                                qUser.profile_image.as("host_profile_img"),
-                                                qMoim.fixed_date.as("fixed_date"),
-                                                qMoim.fixed_time.as("fixed_time"),
-                                                qMoim.user.id.as("host_id")))
-                                .from(qMoim)
-                                .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
-                                .where(qMoim.user.id.eq(user_id)
-                                                .and(qMoim.fixed_date.loe(formattedDate))
-                                                .and(qMoim.fixed_date.isNotNull())
-                                                .and(qMoim.fixed_time.isNotNull())
-                                                .and(qMoim.history_view_yn.eq(true)))
-                                .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc());
-
-                // 초대된 모임
-                JPQLQuery<MyMoimDto> guestQuery = queryFactory.select(
+                List<MyMoimDto> result = queryFactory.select(
                                 Projections.fields(MyMoimDto.class,
                                                 qMoim.id.as("moim_id"),
                                                 qMoim.moim_name.as("moim_name"),
@@ -193,21 +171,16 @@ public class MoimRepositoryImpl implements MoimRepository {
                                                 qMoim.user.id.as("host_id")))
                                 .from(qMoim)
                                 .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
-                                .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
-                                .where(qMoim.user.id.ne(user_id)
+                                .leftJoin(qUser).on(qUser.id.eq(qMoim.user.id))
+                                .where(((qMoim.user.id.eq(user_id).and(qMoim.history_view_yn.eq(true)))
+                                                .or((qMoimMember.user_id.eq(user_id)
+                                                                .and(qMoimMember.history_view_yn.eq(true)))))
                                                 .and(qMoim.fixed_date.loe(formattedDate))
-                                                .and(qMoimMember.user_id.eq(user_id))
                                                 .and(qMoim.fixed_date.isNotNull())
                                                 .and(qMoim.fixed_time.isNotNull())
-                                                .and(qMoimMember.history_view_yn.eq(true)))
-                                .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc());
-
-                // UINON ALL
-                List<MyMoimDto> result = hostQuery.fetch();
-                result.addAll(guestQuery.fetch());
-
-                result.sort(Comparator.comparing(MyMoimDto::getFixed_date).thenComparing(MyMoimDto::getFixed_time)
-                                .reversed());
+                                                .and(qMoimMember.is_accept.eq(true)))
+                                .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc())
+                                .fetch();
 
                 return result;
         }
@@ -233,10 +206,11 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .where(qMoim.id.in(
                                                 JPAExpressions.select(qMoimMember.moim.id)
                                                                 .from(qMoimMember)
-                                                                .where(qMoimMember.user_id.eq(user_id)))
+                                                                .where(qMoimMember.user_id.eq(user_id)
+                                                                                .and(qMoimMember.is_accept.eq(true))))
                                                 .and(qMoim.fixed_date.isNull()));
 
-                // 내가 모임장인 모임
+                // // 내가 모임장인 모임
                 JPAQuery<VotingMoimDto> query2 = queryFactory
                                 .select(Projections.fields(VotingMoimDto.class, qUser.id.as("user_id"),
                                                 qUser.name.as("user_name"),
@@ -261,6 +235,34 @@ public class MoimRepositoryImpl implements MoimRepository {
                 return newResult;
         }
 
+        @Override
+        public List<InvitedMoimListDto> getInvitedMoimList(Long user_id) {
+                queryFactory = new JPAQueryFactory(em);
+
+                QUser qUser = QUser.user;
+                QMoim qMoim = QMoim.moim;
+                QMoimMember qMoimMember = QMoimMember.moimMember;
+                QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
+
+                List<InvitedMoimListDto> result = queryFactory.select(Projections.constructor(InvitedMoimListDto.class,
+                                qMoim.id.as("moim_id"),
+                                qMoim.moim_name.as("moim_name"),
+                                qUser.name.as("moim_leader"),
+                                qMoim.created_time.as("createdTime"),
+                                qMoim.dead_line_hour.as("dead_line_hour"),
+                                qMoimMember.is_accept.as("is_accept_this_moim")))
+                                .from(qUser).innerJoin(qMoim)
+                                .on(qUser.id.eq(qMoim.user.id)).leftJoin(qMoimMember)
+                                .on(qMoim.id.eq(qMoimMember.moim.id)).leftJoin(qMoimMemberTime)
+                                .on(qMoimMember.id.eq(qMoimMemberTime.moim_member.id))
+                                .where(qMoimMember.user_id.eq(user_id)
+                                                .and(qMoim.fixed_date.isNull()
+                                                                .and(qMoimMemberTime.selected_date.isNull())))
+                                .fetch();
+
+                return result;
+        }
+
         /**
          * moim member
          */
@@ -273,13 +275,15 @@ public class MoimRepositoryImpl implements MoimRepository {
                 moimMember.setMoim(moim);
                 moimMember.setJoin_time(LocalDateTime.now());
                 moimMember.setHistory_view_yn(true);
+                moimMember.setIs_accept(true);
 
                 em.persist(moimMember);
                 em.flush();
                 return moimMember.getId();
         }
 
-        public long makeMoimMember(String user_id, Moim moim) {
+        @Override
+        public long makeMoimMemberToFriend(String user_id, Moim moim) {
                 User user = em.find(User.class, user_id);
 
                 MoimMember moimMember = new MoimMember();
@@ -288,6 +292,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                 moimMember.setMoim(moim);
                 moimMember.setJoin_time(LocalDateTime.now());
                 moimMember.setHistory_view_yn(true);
+                moimMember.setIs_accept(false);
 
                 em.persist(moimMember);
                 em.flush();
@@ -503,8 +508,8 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .from(qMoim)
                                 .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
                                 .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
-                                .where(qMoim.user.id.eq(user_id)
-                                                .or(qMoimMember.user_id.eq(user_id))
+                                .where((qMoim.user.id.eq(user_id)
+                                                .or(qMoimMember.user_id.eq(user_id)))
                                                 .and(qMoim.fixed_date.isNotNull())
                                                 .and(qMoim.fixed_time.isNotNull()))
                                 .groupBy(qMoim.id, qMoim.moim_name, qUser.profile_image, qMoim.fixed_date,
@@ -582,6 +587,42 @@ public class MoimRepositoryImpl implements MoimRepository {
                         result.setPm_eight_cnt(0);
                         result.setPm_nine_cnt(0);
                 }
+
+                return result;
+        }
+
+        @Override
+        public List<MyMoimDto> findMyMoimFutureList(Long userId) {
+                queryFactory = new JPAQueryFactory(em);
+
+                QMoim qMoim = QMoim.moim;
+                QMoimMember qMoimMember = QMoimMember.moimMember;
+                QUser qUser = QUser.user;
+
+                LocalDateTime today = LocalDateTime.now();
+
+                String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+                List<MyMoimDto> result = queryFactory.select(
+                                Projections.fields(MyMoimDto.class,
+                                                qMoim.id.as("moim_id"),
+                                                qMoim.moim_name.as("moim_name"),
+                                                qUser.profile_image.as("host_profile_img"),
+                                                qMoim.fixed_date.as("fixed_date"),
+                                                qMoim.fixed_time.as("fixed_time"),
+                                                qMoim.user.id.as("host_id")))
+                                .from(qMoim)
+                                .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
+                                .leftJoin(qUser).on(qUser.id.eq(qMoim.user.id))
+                                .where(((qMoim.user.id.eq(userId).and(qMoim.history_view_yn.eq(true)))
+                                                .or((qMoimMember.user_id.eq(userId)
+                                                                .and(qMoimMember.history_view_yn.eq(true)))))
+                                                .and(qMoim.fixed_date.goe(formattedDate))
+                                                .and(qMoim.fixed_date.isNotNull())
+                                                .and(qMoim.fixed_time.isNotNull())
+                                                .and(qMoimMember.is_accept.eq(true)))
+                                .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc())
+                                .fetch();
 
                 return result;
         }

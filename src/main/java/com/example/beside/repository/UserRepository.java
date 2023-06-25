@@ -24,6 +24,8 @@ public interface UserRepository {
     List<User> findUserAll();
 
     // UPDATE
+    User updateFcmToken(User user);
+
     User updateNickname(User user);
 
     User updatePassword(User user);

@@ -8,6 +8,7 @@ import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
+import com.example.beside.dto.InvitedMoimListDto;
 import com.example.beside.dto.MoimOveralDateDto;
 import com.example.beside.dto.MoimOveralScheduleDto;
 import com.example.beside.dto.MyMoimDto;
@@ -20,9 +21,13 @@ public interface MoimRepository {
 
     long makeMoimMember(User user, Moim moim);
 
+    long makeMoimMemberToFriend(String friend, Moim moim);
+
     long makeFriend(Long friend_id, Long moim_id, User user);
 
     long saveSchedule(MoimMember moimMember, List<MoimMemberTime> moimTimeInfos);
+
+    void fixMoimDate(Moim moim, LocalDateTime date, int time);
 
     // READ
     Moim getMoimInfo(Long moimId);
@@ -37,6 +42,8 @@ public interface MoimRepository {
 
     List<MoimMember> getMoimMembers(Long moimId);
 
+    List<InvitedMoimListDto> getInvitedMoimList(Long user_id);
+
     MoimMember getMoimMemberByMemberId(Long moimId, Long memberId);
 
     int findMemberCount(Long moim_id);
@@ -50,6 +57,8 @@ public interface MoimRepository {
     int getDateVoteCnt(Long moimId, LocalDateTime selectedDate);
 
     VoteMoimTimeCntDto getTimeVoteCnt(Long moimId, LocalDateTime selectedDate);
+
+    List<MyMoimDto> findMyMoimFutureList(Long userId);
 
     // UPDATE
     long deleteHostHistory(Long userId, Long moimId);
