@@ -273,8 +273,8 @@ public class MoimController {
             @ApiResponse(responseCode = "404", description = "해당 모임이 존재하지 않습니다.")
     })
     @GetMapping(value = "/v1/detail")
-    public MoimDetailListResponse getMoimDetailInfo(MoimHistoryRequest request) throws NoResultListException {
-        MoimDetailDto moimDetailInfo = moimService.getMoimDetailInfo(request.moim_id);
+    public MoimDetailListResponse getMoimDetailInfo(@RequestParam(name = "moim_id") @NotNull Long moim_id) throws NoResultListException {
+        MoimDetailDto moimDetailInfo = moimService.getMoimDetailInfo(moim_id);
 
         return MoimDetailListResponse.success(200, "모임 정보가 조회되었습니다.", moimDetailInfo);
 
