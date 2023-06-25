@@ -309,7 +309,7 @@ public class MoimRepositoryTest {
         userRepository.deleteUser(savedUser);
 
         // when
-        List<FriendDto> friendDtoList = userRepository.findFriendByUserId(savedUser.getId());
+        List<FriendDto.FriendInfo> friendDtoList = userRepository.findFriendByUserId(savedUser.getId());
 
         // then
         Assertions.assertThat(friendDtoList.size()).isEqualTo(0);

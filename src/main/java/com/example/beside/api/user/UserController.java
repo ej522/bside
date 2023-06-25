@@ -258,23 +258,15 @@ public class UserController {
         List<String> profileList = new ArrayList<String>();
 
         String img = "";
-        img = "https://moim.life/profile/green.jpg";
+        img = "https://moim.life/profile/char1.png";
         profileList.add(img);
-        img = "https://moim.life/profile/heart.jpg";
+        img = "https://moim.life/profile/char2.png";
         profileList.add(img);
-        img = "https://moim.life/profile/lightgreen.jpg";
+        img = "https://moim.life/profile/char3.png";
         profileList.add(img);
-        img = "https://moim.life/profile/lightpurple.jpg";
+        img = "https://moim.life/profile/char4.png";
         profileList.add(img);
-        img = "https://moim.life/profile/purple_bubble.jpg";
-        profileList.add(img);
-        img = "https://moim.life/profile/purple_diamond.jpg";
-        profileList.add(img);
-        img = "https://moim.life/profile/purple_flower.jpg";
-        profileList.add(img);
-        img = "https://moim.life/profile/skyblue.jpg";
-        profileList.add(img);
-        img = "https://moim.life/profile/yellow.jpg";
+        img = "https://moim.life/profile/char5.png";
         profileList.add(img);
 
         return Response.success(200, "프로필 이미지가 조회 되었습니다.", profileList);

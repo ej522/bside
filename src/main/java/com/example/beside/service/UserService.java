@@ -180,7 +180,7 @@ public class UserService {
     public FriendDto findFriendByUserId(User user) throws NoResultListException {
         FriendDto friendDto = new FriendDto();
 
-        List<FriendDto.FriendInfo> friendInfo = userRepository.test(user.getId());
+        List<FriendDto.FriendInfo> friendInfo = userRepository.findFriendByUserId(user.getId());
 
         int friend_cnt = friendInfo.size();
 
@@ -194,4 +194,17 @@ public class UserService {
         return friendDto;
     }
 
+    public User chkPushAgree(Long user_id) {
+        User userInfo = userRepository.findUserById(user_id);
+
+        if(!userInfo.getPush_alarm()) {
+            return null;
+        }
+
+//        if(userInfo.getFcm() == null){
+//            throw new RuntimeException("fcm토큰이 없습니다.");
+//        }
+
+        return userInfo;
+    }
 }
