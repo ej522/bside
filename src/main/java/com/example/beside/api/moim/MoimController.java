@@ -173,13 +173,15 @@ public class MoimController {
 
         MoimParticipateInfoDto participateMoim = moimService.inviteMyMoim(user_, encrptedMoimInfo, friend_id_list);
 
-        for(String friend_id : friend_id_list) {
+        for (String friend_id : friend_id_list) {
             User msgUserInfo = userService.chkPushAgree(Long.valueOf(friend_id));
 
-            if(msgUserInfo != null) {
-                if(msgUserInfo.getFcm()!=null) {
-                    fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), "모임 초대", "띵동! " + msgUserInfo.getName() + "님,\n"
-                            + user_.getName() + "에게 MOIM 초대장이 왔어요", encrptedMoimInfo, "invite");
+            if (msgUserInfo != null) {
+                if (msgUserInfo.getFcm() != null) {
+                    fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), "모임 초대",
+                            "띵동! " + msgUserInfo.getName() + "님,\n"
+                                    + user_.getName() + "에게 MOIM 초대장이 왔어요",
+                            encrptedMoimInfo, "invite");
                 }
             }
 
@@ -198,36 +200,22 @@ public class MoimController {
     public MoimAdjustScheduleResponse adjustSchedule(HttpServletRequest token,
             @RequestBody @Validated AdjustScheduleRequest request) throws Exception {
         User user_ = (User) token.getAttribute("user");
-        String encrptedInfo = request.getEncrptedInfo();
 
-        // 선택 시간 정보
-        List<MoimTimeInfo> moimTimeList = request.getMoim_time_list();
-        var moimMemberTimeList = new ArrayList<MoimMemberTime>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        var moimTimeInfos = new ArrayList<MoimMemberTime>();
+        var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        for (MoimTimeInfo moimTime : moimTimeList) {
-            var temp = new MoimMemberTime();
-            LocalDateTime selectedDate = LocalDate.parse(moimTime.selectedDate, formatter).atStartOfDay();
-            temp.setSelected_date(selectedDate);
+        Long moimId = request.getMoim_id();
+        List<MoimTImeInfoDto> moimTimeList = request.getMoim_time_list();
 
-            temp.setAm_nine(moimTime.amNine);
-            temp.setAm_ten(moimTime.amTen);
-            temp.setAm_eleven(moimTime.amEleven);
-            temp.setNoon(moimTime.noon);
-            temp.setPm_one(moimTime.pmOne);
-            temp.setPm_two(moimTime.pmTwo);
-            temp.setPm_three(moimTime.pmThree);
-            temp.setPm_four(moimTime.pmFour);
-            temp.setPm_five(moimTime.pmFive);
-            temp.setPm_six(moimTime.pmSix);
-            temp.setPm_seven(moimTime.pmSeven);
-            temp.setPm_eigth(moimTime.pmEight);
-            temp.setPm_nine(moimTime.pmNine);
+        for (MoimTImeInfoDto moimTime : moimTimeList) {
+            var scheduleInfo = new MoimMemberTime();
+            var selectedDate = LocalDate.parse(moimTime.getSelectedDate(), formatter).atStartOfDay();
 
-            moimMemberTimeList.add(temp);
+            scheduleInfo.setSchedule(selectedDate, moimTime);
+            moimTimeInfos.add(scheduleInfo);
         }
 
-        MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(user_, encrptedInfo, moimMemberTimeList);
+        MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(user_, moimId, moimTimeInfos);
 
         return MoimAdjustScheduleResponse.success(200, "모임 스케줄을 등록 했습니다.", adjustSchedule);
     }
@@ -309,12 +297,13 @@ public class MoimController {
             @ApiResponse(responseCode = "404", description = "해당 모임이 존재하지 않습니다.")
     })
     @GetMapping(value = "/v1/detail")
-    public MoimDetailListResponse getMoimDetailInfo(@RequestParam(name = "moim_id") @NotNull Long moim_id) throws NoResultListException {
+    public MoimDetailListResponse getMoimDetailInfo(HttpServletRequest token, @RequestParam(name = "moim_id") @NotNull Long moim_id) throws NoResultListException {
         MoimDetailDto moimDetailInfo = moimService.getMoimDetailInfo(moim_id);
 
         return MoimDetailListResponse.success(200, "모임 정보가 조회되었습니다.", moimDetailInfo);
 
     }
+
     @Operation(tags = { "Moim" }, summary = "딥링크를 통한 모임 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "모임 정보가 조회되었습니다.", content = @Content(schema = @Schema(implementation = DeepLinkMoimResponse.class))),
@@ -327,7 +316,6 @@ public class MoimController {
         return DeepLinkMoimResponse.success(200, "모임 정보가 조회되었습니다.", moimInfo);
 
     }
-
 
     @Data
     static class deepLinkParticipate {
@@ -389,59 +377,13 @@ public class MoimController {
     @Data
     static class AdjustScheduleRequest {
         @NotNull
-        @Schema(description = "모임방 정보", example = "CbXrx470K6OcAZWiy94SPw==", type = "String")
-        private String encrptedInfo;
+        @Schema(description = "모임 아이디", example = "1")
+        private Long moim_id;
 
         @NotNull
         @Schema(description = "모임시간 정보", type = "MoimTimeInfo")
-        private List<MoimTimeInfo> moim_time_list;
+        private List<MoimTImeInfoDto> moim_time_list;
 
-    }
-
-    @Data
-    static class MoimTimeInfo {
-        @NonNull
-        @Schema(description = "선택일", example = "2023-03-10", type = "String")
-        private String selectedDate;
-
-        @Schema(description = "오전 9시", example = "true", type = "Boolean")
-        private boolean amNine;
-
-        @Schema(description = "오전 10시", example = "true", type = "Boolean")
-        private boolean amTen;
-
-        @Schema(description = "오전 11시", example = "true", type = "Boolean")
-        private boolean amEleven;
-
-        @Schema(description = "정오", example = "true", type = "Boolean")
-        private boolean noon;
-
-        @Schema(description = "오후 1시", example = "true", type = "Boolean")
-        private boolean pmOne;
-
-        @Schema(description = "오후 2시", example = "true", type = "Boolean")
-        private boolean pmTwo;
-
-        @Schema(description = "오후 3시", example = "true", type = "Boolean")
-        private boolean pmThree;
-
-        @Schema(description = "오후 4시", example = "true", type = "Boolean")
-        private boolean pmFour;
-
-        @Schema(description = "오후 5시", example = "true", type = "Boolean")
-        private boolean pmFive;
-
-        @Schema(description = "오후 6시", example = "true", type = "Boolean")
-        private boolean pmSix;
-
-        @Schema(description = "오후 7시", example = "true", type = "Boolean")
-        private boolean pmSeven;
-
-        @Schema(description = "오후 8시", example = "true", type = "Boolean")
-        private boolean pmEight;
-
-        @Schema(description = "오후 9시", example = "true", type = "Boolean")
-        private boolean pmNine;
     }
 
     @Data

@@ -161,9 +161,8 @@ public class MoimService {
 
     // #region [모임 일정 투표]
     @Transactional
-    public MoimAdjustScheduleDto adjustSchedule(User user, String encryptInfo, List<MoimMemberTime> moimTimeInfos)
+    public MoimAdjustScheduleDto adjustSchedule(User user, Long moimId, List<MoimMemberTime> moimTimeInfos)
             throws Exception {
-        Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
         adjustScheduleValidate(user, moimId, moimTimeInfos);
         MoimMember moimMember = moimRepository.getMoimMemberByMemberId(moimId, user.getId());
 
@@ -306,7 +305,7 @@ public class MoimService {
         return result;
     }
 
-    //날짜투표결과
+    // 날짜투표결과
     public List<VoteMoimDateDto> getVoteDateInfo(Long moimId) throws Exception {
         // 모임 날짜 정보
         List<MoimOveralDateDto> dateInfo = moimRepository.getMoimOveralInfo(moimId);
@@ -352,7 +351,7 @@ public class MoimService {
 
     }
 
-    //시간투표결과
+    // 시간투표결과
     public VoteMoimTimeDto getVoteTimeInfo(Long moimId, LocalDateTime selected_date) throws Exception {
         // 투표 인원 정보
         List<MoimOveralScheduleDto> voteUserInfoList = moimRepository.getMoimScheduleInfo(moimId);
@@ -453,15 +452,15 @@ public class MoimService {
             }
         }
 
-        //주최자가 설정한 모임 날짜별 시간
+        // 주최자가 설정한 모임 날짜별 시간
         MoimDateDto moimDateInfo = moimRepository.findMoimDateByMoimIdAndDate(moimId, selected_date);
-        if(moimDateInfo.isMorning()) {
+        if (moimDateInfo.isMorning()) {
             timeInfoList = setVoteTimeInfoList(timeInfoList, am9Info, am9userInfoList);
             timeInfoList = setVoteTimeInfoList(timeInfoList, am10Info, am10userInfoList);
             timeInfoList = setVoteTimeInfoList(timeInfoList, am11Info, am11userInfoList);
         }
 
-        if(moimDateInfo.isAfternoon()) {
+        if (moimDateInfo.isAfternoon()) {
             timeInfoList = setVoteTimeInfoList(timeInfoList, pm12Info, pm12userInfoList);
             timeInfoList = setVoteTimeInfoList(timeInfoList, pm1Info, pm1userInfoList);
             timeInfoList = setVoteTimeInfoList(timeInfoList, pm2Info, pm2userInfoList);
@@ -470,7 +469,7 @@ public class MoimService {
             timeInfoList = setVoteTimeInfoList(timeInfoList, pm5Info, pm5userInfoList);
         }
 
-        if(moimDateInfo.isEvening()) {
+        if (moimDateInfo.isEvening()) {
             timeInfoList = setVoteTimeInfoList(timeInfoList, pm6Info, pm6userInfoList);
             timeInfoList = setVoteTimeInfoList(timeInfoList, pm7Info, pm7userInfoList);
             timeInfoList = setVoteTimeInfoList(timeInfoList, pm8Info, pm8userInfoList);
@@ -482,7 +481,7 @@ public class MoimService {
         return moimTimeInfo;
     }
 
-    //과거모임목록삭제
+    // 과거모임목록삭제
     @Transactional
     public List<MoimDto> deleteMoimHistory(Long moim_id, Long host_id, Long user_id) {
 
@@ -517,20 +516,20 @@ public class MoimService {
         return moimList;
     }
 
-    //모임 상세정보
+    // 모임 상세정보
     public MoimDetailDto getMoimDetailInfo(Long moim_id) throws NoResultListException {
-        //모임
+        // 모임
         MoimDto moimInfo = moimRepository.findMoimByMoimId(moim_id);
-        if(moimInfo.getMoim_id()==null)
+        if (moimInfo.getMoim_id() == null)
             throw new NoResultListException("해당 모임이 존재하지 않습니다.");
 
-        //선택된 모임
+        // 선택된 모임
         List<MoimDateDto> moimDateList = moimRepository.findMoimDateByMoimId(moim_id);
 
         List<MoimMemberDto> moimMembers = moimRepository.findMoimMemberByMoimId(moim_id);
 
         int moim_cnt = moimRepository.findMemberCount(moim_id);
-        //주최자 더해줌
+        // 주최자 더해줌
         moim_cnt += 1;
 
         MoimDetailDto moimDetailDto = new MoimDetailDto(moimInfo, moim_cnt, moimDateList, moimMembers);
@@ -540,11 +539,12 @@ public class MoimService {
 
     //모임정보
     public MoimDto getMoimNameAndDeadLine(String encryptInfo) throws Exception {
+
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
 
         MoimDto moimInfo = moimRepository.findMoimByMoimId(moimId);
 
-        if(moimInfo==null) {
+        if (moimInfo == null) {
             throw new NoResultListException("해당 모임이 존재하지 않습니다.");
         }
 
