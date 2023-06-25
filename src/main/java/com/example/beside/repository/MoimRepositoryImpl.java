@@ -627,6 +627,25 @@ public class MoimRepositoryImpl implements MoimRepository {
                 return result;
         }
 
+        @Override
+        public MoimDateDto findMoimDateByMoimIdAndDate(Long moimId, LocalDateTime selectedDate) {
+                queryFactory = new JPAQueryFactory(em);
+
+                QMoimDate qMoimDate = QMoimDate.moimDate;
+
+                MoimDateDto result = queryFactory.select(
+                        Projections.constructor(MoimDateDto.class,
+                                qMoimDate.morning,
+                                qMoimDate.afternoon,
+                                qMoimDate.evening,
+                                qMoimDate.selected_date))
+                        .from(qMoimDate)
+                        .where(qMoimDate.moim.id.eq(moimId).and(qMoimDate.selected_date.eq(selectedDate)))
+                        .fetchOne();
+
+                return result;
+        }
+
         private NumberExpression<Integer> getTimeCnt(Object object) {
                 return Expressions
                                 .numberTemplate(Integer.class, "count(case when {0} then 1 end)", object);

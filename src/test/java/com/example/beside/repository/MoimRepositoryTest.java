@@ -407,4 +407,26 @@ public class MoimRepositoryTest {
         Assertions.assertThat(result.get(0).getFixed_time()).isLessThanOrEqualTo("12");
     }
 
+    @Test
+    @DisplayName("주최자가 설정한 날짜 목록을 모임아이디와 선택된 날짜로 조회할 수 있는가?")
+    void testFindMoimDateByMoimIdAndDate() throws Exception {
+        // given
+        User findUser = userRepository.saveUser(user);
+
+        newMoim.setUser(findUser);
+        // 모임 생성
+        long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
+        newMoim.setId(moimId);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        //when
+        MoimDateDto result = moimRepository.findMoimDateByMoimIdAndDate(moimId, LocalDate.parse("2023-03-10", formatter).atStartOfDay());
+
+        //then
+        Assertions.assertThat(result.isMorning()).isFalse();
+        Assertions.assertThat(result.isAfternoon()).isFalse();
+        Assertions.assertThat(result.isEvening()).isTrue();
+    }
+
 }

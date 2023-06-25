@@ -8,12 +8,7 @@ import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
-import com.example.beside.dto.InvitedMoimListDto;
-import com.example.beside.dto.MoimOveralDateDto;
-import com.example.beside.dto.MoimOveralScheduleDto;
-import com.example.beside.dto.MyMoimDto;
-import com.example.beside.dto.VoteMoimTimeCntDto;
-import com.example.beside.dto.VotingMoimDto;
+import com.example.beside.dto.*;
 
 public interface MoimRepository {
     // CREATE
@@ -59,6 +54,7 @@ public interface MoimRepository {
     VoteMoimTimeCntDto getTimeVoteCnt(Long moimId, LocalDateTime selectedDate);
 
     List<MyMoimDto> findMyMoimFutureList(Long userId);
+    MoimDateDto findMoimDateByMoimIdAndDate(Long moimId, LocalDateTime selectedDate);
 
     // UPDATE
     long deleteHostHistory(Long userId, Long moimId);
