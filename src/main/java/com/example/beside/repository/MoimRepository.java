@@ -3,6 +3,7 @@ package com.example.beside.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.beside.common.response.MoimMemberDto;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
@@ -55,6 +56,12 @@ public interface MoimRepository {
 
     List<MyMoimDto> findMyMoimFutureList(Long userId);
     MoimDateDto findMoimDateByMoimIdAndDate(Long moimId, LocalDateTime selectedDate);
+
+    Moim findMoimByMoimId(Long moimId);
+
+    List<MoimMemberDto> findMoimMemberByMoimId(Long moimId);
+
+    List<MoimDateDto> findMoimDateByMoimId(Long moimId);
 
     // UPDATE
     long deleteHostHistory(Long userId, Long moimId);

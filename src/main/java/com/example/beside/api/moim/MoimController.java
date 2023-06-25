@@ -303,6 +303,19 @@ public class MoimController {
 
     }
 
+    @Operation(tags = { "Moim" }, summary = "모임 상세 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임 정보가 조회되었습니다.", content = @Content(schema = @Schema(implementation = InvitedMoimResponse.class))),
+            @ApiResponse(responseCode = "404", description = "해당 모임이 존재하지 않습니다.")
+    })
+    @GetMapping(value = "/v1/detail")
+    public MoimDetailListResponse getMoimDetailInfo(@RequestParam(name = "moim_id") @NotNull Long moim_id) throws NoResultListException {
+        MoimDetailDto moimDetailInfo = moimService.getMoimDetailInfo(moim_id);
+
+        return MoimDetailListResponse.success(200, "모임 정보가 조회되었습니다.", moimDetailInfo);
+
+    }
+
     @Data
     static class deepLinkParticipate {
         @NotNull

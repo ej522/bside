@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
+import com.example.beside.common.response.MoimMemberDto;
 import com.example.beside.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -510,6 +511,26 @@ public class MoimService {
         }
 
         return moimList;
+    }
+
+    public MoimDetailDto getMoimDetailInfo(Long moim_id) throws NoResultListException {
+        //모임
+        Moim moimInfo = moimRepository.findMoimByMoimId(moim_id);
+        if(moimInfo.getId()==null)
+            throw new NoResultListException("해당 모임이 존재하지 않습니다.");
+
+        //선택된 모임
+        List<MoimDateDto> moimDateList = moimRepository.findMoimDateByMoimId(moim_id);
+
+        List<MoimMemberDto> moimMembers = moimRepository.findMoimMemberByMoimId(moim_id);
+
+        int moim_cnt = moimRepository.findMemberCount(moim_id);
+        //주최자 더해줌
+        moim_cnt += 1;
+
+        MoimDetailDto moimDetailDto = new MoimDetailDto(moimInfo, moim_cnt, moimDateList, moimMembers);
+
+        return moimDetailDto;
     }
 
     private List<UserDto> setTimeUserInfo(MoimOveralScheduleDto voteUserInfo, List<UserDto> voteUserInfoList) {
