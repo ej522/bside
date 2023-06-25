@@ -73,8 +73,8 @@ public class Scheduler {
             List<MoimMember> moimMemberList = moim.getMoim_member();
             for(MoimMember moimMember : moimMemberList) {
                 guest = userService.chkPushAgree(moimMember.getUser_id());
+                sendFixMoimMessage(guest, moim.getMoim_name(), moim.getEncrypted_id());
             }
-            sendFixMoimMessage(guest, moim.getMoim_name(), moim.getEncrypted_id());
         }
 
     }
