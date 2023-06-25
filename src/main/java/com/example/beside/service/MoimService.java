@@ -449,19 +449,29 @@ public class MoimService {
             }
         }
 
-        timeInfoList = setVoteTimeInfoList(timeInfoList, am9Info, am9userInfoList);
-        timeInfoList = setVoteTimeInfoList(timeInfoList, am10Info, am10userInfoList);
-        timeInfoList = setVoteTimeInfoList(timeInfoList, am11Info, am11userInfoList);
-        timeInfoList = setVoteTimeInfoList(timeInfoList, pm12Info, pm12userInfoList);
-        timeInfoList = setVoteTimeInfoList(timeInfoList, pm1Info, pm1userInfoList);
-        timeInfoList = setVoteTimeInfoList(timeInfoList, pm2Info, pm2userInfoList);
-        timeInfoList = setVoteTimeInfoList(timeInfoList, pm3Info, pm3userInfoList);
-        timeInfoList = setVoteTimeInfoList(timeInfoList, pm4Info, pm4userInfoList);
-        timeInfoList = setVoteTimeInfoList(timeInfoList, pm5Info, pm5userInfoList);
-        timeInfoList = setVoteTimeInfoList(timeInfoList, pm6Info, pm6userInfoList);
-        timeInfoList = setVoteTimeInfoList(timeInfoList, pm7Info, pm7userInfoList);
-        timeInfoList = setVoteTimeInfoList(timeInfoList, pm8Info, pm8userInfoList);
-        timeInfoList = setVoteTimeInfoList(timeInfoList, pm9Info, pm9userInfoList);
+        //주최자가 설정한 모임 날짜별 시간
+        MoimDateDto moimDateInfo = moimRepository.findMoimDateByMoimIdAndDate(moimId, selected_date);
+        if(moimDateInfo.isMorning()) {
+            timeInfoList = setVoteTimeInfoList(timeInfoList, am9Info, am9userInfoList);
+            timeInfoList = setVoteTimeInfoList(timeInfoList, am10Info, am10userInfoList);
+            timeInfoList = setVoteTimeInfoList(timeInfoList, am11Info, am11userInfoList);
+        }
+
+        if(moimDateInfo.isAfternoon()) {
+            timeInfoList = setVoteTimeInfoList(timeInfoList, pm12Info, pm12userInfoList);
+            timeInfoList = setVoteTimeInfoList(timeInfoList, pm1Info, pm1userInfoList);
+            timeInfoList = setVoteTimeInfoList(timeInfoList, pm2Info, pm2userInfoList);
+            timeInfoList = setVoteTimeInfoList(timeInfoList, pm3Info, pm3userInfoList);
+            timeInfoList = setVoteTimeInfoList(timeInfoList, pm4Info, pm4userInfoList);
+            timeInfoList = setVoteTimeInfoList(timeInfoList, pm5Info, pm5userInfoList);
+        }
+
+        if(moimDateInfo.isEvening()) {
+            timeInfoList = setVoteTimeInfoList(timeInfoList, pm6Info, pm6userInfoList);
+            timeInfoList = setVoteTimeInfoList(timeInfoList, pm7Info, pm7userInfoList);
+            timeInfoList = setVoteTimeInfoList(timeInfoList, pm8Info, pm8userInfoList);
+            timeInfoList = setVoteTimeInfoList(timeInfoList, pm9Info, pm9userInfoList);
+        }
 
         moimTimeInfo.setTime_info(timeInfoList);
 
