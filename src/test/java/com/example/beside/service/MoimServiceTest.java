@@ -702,10 +702,10 @@ public class MoimServiceTest {
         newMoim.setFixed_time("2");
 
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
-        moimService.participateMoim(saveUser2, encryptedId);
+        moimService.participateDeepLink(saveUser2, encryptedId);
         moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
 
-        Long moimId = Long.parseLong(mockEncrypt.decrypt(encryptedId));
+        Long moimId = Long.parseLong(encrypt.decrypt(encryptedId));
 
         //when
         MoimDetailDto moimDetailDto = moimService.getMoimDetailInfo(moimId);
