@@ -551,7 +551,7 @@ public class MoimService {
         LocalDateTime deadline = Common.calculateDeadLineTime(moimInfo.getCreated_time(), moimInfo.getDead_line_hour());
 
         MoimDto summInfo = new MoimDto();
-        summInfo.setMoim_name(moimInfo.getMoim_name());
+        summInfo.setHost_name(moimInfo.getHost_name());
         summInfo.setDead_line_time(deadline);
 
         return summInfo;
