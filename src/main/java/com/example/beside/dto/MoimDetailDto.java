@@ -44,12 +44,12 @@ public class MoimDetailDto {
     @Schema(description = "참여 유저 리스트")
     private List<MoimMemberDto> moimMemberList;
 
-    public MoimDetailDto(Moim moim, int member_cnt, List<MoimDateDto> moimDateList, List<MoimMemberDto> moimMemberList) {
-        this.moim_id = moim.getId();
+    public MoimDetailDto(MoimDto moim, int member_cnt, List<MoimDateDto> moimDateList, List<MoimMemberDto> moimMemberList) {
+        this.moim_id = moim.getMoim_id();
         this.moim_name = moim.getMoim_name();
         this.fixed_date = moim.getFixed_date();
         this.fixed_time = moim.getFixed_time();
-        this.host_id = moim.getUser().getId();
+        this.host_id = moim.getHost_id();
         this.memeber_cnt = member_cnt;
         this.moimDateList = moimDateList;
         this.moimMemberList = moimMemberList;

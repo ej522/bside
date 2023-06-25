@@ -45,6 +45,7 @@ public class InterCeptorConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/moim/v1/result-time-vote")
                 .addPathPatterns("/api/moim/v1/host-moim-info")
                 .addPathPatterns("/api/moim/v1/delete/moim-history")
+                .addPathPatterns("/api/moim/v1/invite-my-moim")
                 // 소셜
                 .addPathPatterns("/api/social/v1/unlink/Kakao")
                 .addPathPatterns("/api/social/v1/logout/kakao");

@@ -1,6 +1,7 @@
 package com.example.beside.util;
 
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -80,5 +81,10 @@ public class Common {
         }
 
         return randomList;
+    }
+
+    public static LocalDateTime calculateDeadLineTime(LocalDateTime createdTime, int deadLineHour) {
+        LocalDateTime plusedTime = createdTime.plusHours(deadLineHour);
+        return plusedTime;
     }
 }

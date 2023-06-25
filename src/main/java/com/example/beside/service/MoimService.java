@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
 import com.example.beside.common.response.MoimMemberDto;
 import com.example.beside.dto.*;
+import com.example.beside.util.Common;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -234,14 +235,14 @@ public class MoimService {
     // #endregion
 
     // #region [과거 모임 이력 조회]
-    public List<MyMoimDto> getMoimHistoryList(Long user_id) throws NoResultListException {
-        List<MyMoimDto> moimList = moimRepository.findMyMoimHistoryList(user_id);
+    public List<MoimDto> getMoimHistoryList(Long user_id) throws NoResultListException {
+        List<MoimDto> moimList = moimRepository.findMyMoimHistoryList(user_id);
 
         if (moimList.isEmpty())
             throw new NoResultListException("과거 모임 목록이 없습니다.");
 
         for (int i = 0; i < moimList.size(); i++) {
-            MyMoimDto moimDto = moimList.get(i);
+            MoimDto moimDto = moimList.get(i);
             String fixedDate = moimDto.getFixed_date();
             int fixedHour = Integer.parseInt(moimDto.getFixed_time());
 
@@ -305,6 +306,7 @@ public class MoimService {
         return result;
     }
 
+    //날짜투표결과
     public List<VoteMoimDateDto> getVoteDateInfo(Long moimId) throws Exception {
         // 모임 날짜 정보
         List<MoimOveralDateDto> dateInfo = moimRepository.getMoimOveralInfo(moimId);
@@ -350,6 +352,7 @@ public class MoimService {
 
     }
 
+    //시간투표결과
     public VoteMoimTimeDto getVoteTimeInfo(Long moimId, LocalDateTime selected_date) throws Exception {
         // 투표 인원 정보
         List<MoimOveralScheduleDto> voteUserInfoList = moimRepository.getMoimScheduleInfo(moimId);
@@ -479,8 +482,9 @@ public class MoimService {
         return moimTimeInfo;
     }
 
+    //과거모임목록삭제
     @Transactional
-    public List<MyMoimDto> deleteMoimHistory(Long moim_id, Long host_id, Long user_id) {
+    public List<MoimDto> deleteMoimHistory(Long moim_id, Long host_id, Long user_id) {
 
         if (user_id.equals(host_id)) {
             moimRepository.deleteHostHistory(user_id, moim_id);
@@ -488,20 +492,20 @@ public class MoimService {
             moimRepository.deleteGusetHistory(user_id, moim_id);
         }
 
-        List<MyMoimDto> result = moimRepository.findMyMoimHistoryList(user_id);
+        List<MoimDto> result = moimRepository.findMyMoimHistoryList(user_id);
 
         return result;
     }
 
     // 미래 모임 목록
-    public List<MyMoimDto> getMoimFutureList(Long user_id) throws NoResultListException {
-        List<MyMoimDto> moimList = moimRepository.findMyMoimFutureList(user_id);
+    public List<MoimDto> getMoimFutureList(Long user_id) throws NoResultListException {
+        List<MoimDto> moimList = moimRepository.findMyMoimFutureList(user_id);
 
         if (moimList.isEmpty()) {
             throw new NoResultListException("예정 모임 목록이 없습니다.");
         }
 
-        for (MyMoimDto moim : moimList) {
+        for (MoimDto moim : moimList) {
             int cnt = moimRepository.findMemberCount(moim.getMoim_id());
 
             // 주최자도 더해줌
@@ -513,10 +517,11 @@ public class MoimService {
         return moimList;
     }
 
+    //모임 상세정보
     public MoimDetailDto getMoimDetailInfo(Long moim_id) throws NoResultListException {
         //모임
-        Moim moimInfo = moimRepository.findMoimByMoimId(moim_id);
-        if(moimInfo.getId()==null)
+        MoimDto moimInfo = moimRepository.findMoimByMoimId(moim_id);
+        if(moimInfo.getMoim_id()==null)
             throw new NoResultListException("해당 모임이 존재하지 않습니다.");
 
         //선택된 모임
@@ -531,6 +536,21 @@ public class MoimService {
         MoimDetailDto moimDetailDto = new MoimDetailDto(moimInfo, moim_cnt, moimDateList, moimMembers);
 
         return moimDetailDto;
+    }
+
+    //모임정보
+    public MoimDto getMoimInfoByMoimId(String encryptInfo) throws Exception {
+        Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
+
+        MoimDto moimInfo = moimRepository.findMoimByMoimId(moimId);
+
+        if(moimInfo==null) {
+            throw new NoResultListException("해당 모임이 존재하지 않습니다.");
+        }
+
+        moimInfo.setDead_line_time(Common.calculateDeadLineTime(moimInfo.getCreated_time(), moimInfo.getDead_line_hour()));
+
+        return moimInfo;
     }
 
     private List<UserDto> setTimeUserInfo(MoimOveralScheduleDto voteUserInfo, List<UserDto> voteUserInfoList) {
