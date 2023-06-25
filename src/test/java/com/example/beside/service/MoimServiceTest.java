@@ -407,7 +407,7 @@ public class MoimServiceTest {
 
         // [모임 생성]
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
-        var moimId = Long.parseLong(encrypt.decrypt(algorithm));
+        var moimId = Long.parseLong(encrypt.decrypt(encryptedId));
         // [모임 참여]
         moimService.participateDeepLink(saveUser2, encryptedId);
 
