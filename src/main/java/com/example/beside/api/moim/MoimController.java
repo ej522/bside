@@ -317,14 +317,14 @@ public class MoimController {
     }
     @Operation(tags = { "Moim" }, summary = "딥링크를 통한 모임 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "모임 정보가 조회되었습니다.", content = @Content(schema = @Schema(implementation = Response.class))),
+            @ApiResponse(responseCode = "200", description = "모임 정보가 조회되었습니다.", content = @Content(schema = @Schema(implementation = DeepLinkMoimResponse.class))),
             @ApiResponse(responseCode = "404", description = "해당 모임이 존재하지 않습니다.")
     })
     @GetMapping(value = "/v1/deeplink-info")
-    public Response getMoimInfoByDeepLink(@RequestParam(name = "encryptInfo") @NotNull String encryptInfo) throws Exception {
-        MoimDto moimInfo = moimService.getMoimInfoByMoimId(encryptInfo);
+    public DeepLinkMoimResponse getMoimInfoByDeepLink(@RequestParam(name = "encryptInfo") @NotNull String encryptInfo) throws Exception {
+        MoimDto moimInfo = moimService.getMoimNameAndDeadLine(encryptInfo);
 
-        return Response.success(200, "모임 정보가 조회되었습니다.", moimInfo);
+        return DeepLinkMoimResponse.success(200, "모임 정보가 조회되었습니다.", moimInfo);
 
     }
 
