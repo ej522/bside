@@ -254,7 +254,7 @@ public class MoimController {
     public MoimListResponse getMoimHistoryList(HttpServletRequest token) throws NoResultListException {
         User user = (User) token.getAttribute("user");
 
-        List<MyMoimDto> moimList = moimService.getMoimHistoryList(user.getId());
+        List<MoimDto> moimList = moimService.getMoimHistoryList(user.getId());
 
         return MoimListResponse.success(200, "모임 목록이 조회 되었습니다.", moimList);
     }
@@ -268,7 +268,7 @@ public class MoimController {
     public MoimListResponse getMoimFutureList(HttpServletRequest token) throws NoResultListException {
         User user = (User) token.getAttribute("user");
 
-        List<MyMoimDto> moimList = moimService.getMoimFutureList(user.getId());
+        List<MoimDto> moimList = moimService.getMoimFutureList(user.getId());
 
         return MoimListResponse.success(200, "예정 모임 목록이 조회 되었습니다.", moimList);
     }
@@ -297,7 +297,7 @@ public class MoimController {
             @RequestBody @Validated MoimHistoryRequest request) {
         User user = (User) token.getAttribute("user");
 
-        List<MyMoimDto> result = moimService.deleteMoimHistory(request.moim_id, request.host_id, user.getId());
+        List<MoimDto> result = moimService.deleteMoimHistory(request.moim_id, request.host_id, user.getId());
 
         return MoimListResponse.success(200, "과거 모임이 삭제되었습니다.", result);
 
@@ -315,6 +315,19 @@ public class MoimController {
         return MoimDetailListResponse.success(200, "모임 정보가 조회되었습니다.", moimDetailInfo);
 
     }
+    @Operation(tags = { "Moim" }, summary = "초대장 도착 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임 정보가 조회되었습니다.", content = @Content(schema = @Schema(implementation = InvitedMoimResponse.class))),
+            @ApiResponse(responseCode = "404", description = "해당 모임이 존재하지 않습니다.")
+    })
+    @GetMapping(value = "/v1/deeplink-info")
+    public Response getMoimInfoByDeepLink(@RequestParam(name = "encryptInfo") @NotNull String encryptInfo) throws Exception {
+        MoimDto moimInfo = moimService.getMoimInfoByMoimId(encryptInfo);
+
+        return Response.success(200, "모임 정보가 조회되었습니다.", moimInfo);
+
+    }
+
 
     @Data
     static class deepLinkParticipate {

@@ -32,7 +32,7 @@ public interface MoimRepository {
 
     Boolean alreadyJoinedMoim(Long moimId, Long userId);
 
-    List<MyMoimDto> findMyMoimHistoryList(Long userId);
+    List<MoimDto> findMyMoimHistoryList(Long userId);
 
     List<VotingMoimDto> findVotingMoimHistory(Long user_id);
 
@@ -48,16 +48,16 @@ public interface MoimRepository {
 
     List<MoimOveralScheduleDto> getMoimScheduleInfo(Long moimId);
 
-    List<MyMoimDto> findMyMoimList(Long userId);
+    List<MoimDto> findMyMoimList(Long userId);
 
     int getDateVoteCnt(Long moimId, LocalDateTime selectedDate);
 
     VoteMoimTimeCntDto getTimeVoteCnt(Long moimId, LocalDateTime selectedDate);
 
-    List<MyMoimDto> findMyMoimFutureList(Long userId);
+    List<MoimDto> findMyMoimFutureList(Long userId);
     MoimDateDto findMoimDateByMoimIdAndDate(Long moimId, LocalDateTime selectedDate);
 
-    Moim findMoimByMoimId(Long moimId);
+    MoimDto findMoimByMoimId(Long moimId);
 
     List<MoimMemberDto> findMoimMemberByMoimId(Long moimId);
 

@@ -2,7 +2,7 @@ package com.example.beside.common.response;
 
 import java.util.List;
 
-import com.example.beside.dto.MyMoimDto;
+import com.example.beside.dto.MoimDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,16 +20,16 @@ public class MoimListResponse {
     private String msg;
 
     @Schema(description = "데이터", nullable = true)
-    private List<MyMoimDto> data;
+    private List<MoimDto> data;
 
     @Builder
-    public MoimListResponse(int httpStatusCode, String msg, List<MyMoimDto> data) {
+    public MoimListResponse(int httpStatusCode, String msg, List<MoimDto> data) {
         this.httpStatusCode = httpStatusCode;
         this.msg = msg;
         this.data = data;
     }
 
-    public static MoimListResponse success(int httpStatusCode, String msg, List<MyMoimDto> data) {
+    public static MoimListResponse success(int httpStatusCode, String msg, List<MoimDto> data) {
         return new MoimListResponse(httpStatusCode, msg, data);
     }
 
@@ -37,7 +37,7 @@ public class MoimListResponse {
         return new MoimListResponse(httpStatusCode, errorMessage, null);
     }
 
-    public static MoimListResponse fail(int httpStatusCode, String errorMessage, List<MyMoimDto> data) {
+    public static MoimListResponse fail(int httpStatusCode, String errorMessage, List<MoimDto> data) {
         return new MoimListResponse(httpStatusCode, errorMessage, data);
     }
 }
