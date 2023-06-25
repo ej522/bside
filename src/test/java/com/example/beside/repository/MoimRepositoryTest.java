@@ -399,7 +399,7 @@ public class MoimRepositoryTest {
         moimRepository.fixMoimDate(newMoim, dateTime, 12);
 
         // when
-        List<MyMoimDto> result = moimRepository.findMyMoimHistoryList(findUser2.getId());
+        List<MoimDto> result = moimRepository.findMyMoimHistoryList(findUser2.getId());
 
         // then
         Assertions.assertThat(result.get(0).getFixed_date())

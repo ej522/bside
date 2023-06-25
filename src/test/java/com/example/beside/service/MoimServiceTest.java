@@ -8,7 +8,6 @@ import java.util.List;
 
 import com.example.beside.common.Exception.ExceptionDetail.*;
 
-import com.example.beside.common.response.MoimMemberDto;
 import com.example.beside.domain.*;
 import com.example.beside.dto.*;
 import com.example.beside.repository.MoimRepository;
@@ -477,7 +476,7 @@ public class MoimServiceTest {
         moimRepository.fixMoimDate(newMoim, LocalDateTime.now().minusDays(1), 12);
 
         // when
-        List<MyMoimDto> moimList = moimService.getMoimHistoryList(saveUser1.getId());
+        List<MoimDto> moimList = moimService.getMoimHistoryList(saveUser1.getId());
 
         // then
         assertTrue(moimList.get(0).getMemeber_cnt() > 1);
@@ -647,11 +646,11 @@ public class MoimServiceTest {
         moimRepository.fixMoimDate(newMoim, LocalDateTime.now().minusDays(1), 12);
 
         // when
-        List<MyMoimDto> hostResult = moimService.deleteMoimHistory(moimId,
+        List<MoimDto> hostResult = moimService.deleteMoimHistory(moimId,
                 newMoim.getUser().getId(), saveUser1.getId());
 
         // then
-        List<MyMoimDto> guestResult = moimService.getMoimHistoryList(saveUser2.getId());
+        List<MoimDto> guestResult = moimService.getMoimHistoryList(saveUser2.getId());
         assertTrue(hostResult.size() == 0);
         assertTrue(guestResult.size() != 0);
     }
@@ -681,7 +680,7 @@ public class MoimServiceTest {
         moimRepository.fixMoimDate(newMoim, LocalDateTime.now().plusDays(2), 12);
 
         // when
-        List<MyMoimDto> moimList = moimService.getMoimFutureList(saveUser1.getId());
+        List<MoimDto> moimList = moimService.getMoimFutureList(saveUser1.getId());
 
         // then
         assertTrue(moimList.get(0).getMemeber_cnt() > 1);
@@ -689,7 +688,7 @@ public class MoimServiceTest {
 
     @Test
     @DisplayName("모임id로 모임 상세 조회")
-    void test() throws Exception {
+    void testGetMoimDetailInfo() throws Exception {
         // given
         User saveUser1 = userService.saveUser(user);
         User saveUser2 = userService.saveUser(user2);

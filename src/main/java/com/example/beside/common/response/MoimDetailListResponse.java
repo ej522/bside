@@ -1,13 +1,10 @@
 package com.example.beside.common.response;
 
 import com.example.beside.dto.MoimDetailDto;
-import com.example.beside.dto.MyMoimDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Schema(name = "MyMoimList", description = "모임 상세조회")
 @Getter
