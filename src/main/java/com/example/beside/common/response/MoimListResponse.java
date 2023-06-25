@@ -12,7 +12,7 @@ import lombok.Getter;
 @Schema(name = "MyMoimList", description = "확정 모임 조회")
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class MyMoimListResponse {
+public class MoimListResponse {
     @Schema(description = "상태 코드", nullable = false)
     private int httpStatusCode;
 
@@ -23,21 +23,21 @@ public class MyMoimListResponse {
     private List<MyMoimDto> data;
 
     @Builder
-    public MyMoimListResponse(int httpStatusCode, String msg, List<MyMoimDto> data) {
+    public MoimListResponse(int httpStatusCode, String msg, List<MyMoimDto> data) {
         this.httpStatusCode = httpStatusCode;
         this.msg = msg;
         this.data = data;
     }
 
-    public static MyMoimListResponse success(int httpStatusCode, String msg, List<MyMoimDto> data) {
-        return new MyMoimListResponse(httpStatusCode, msg, data);
+    public static MoimListResponse success(int httpStatusCode, String msg, List<MyMoimDto> data) {
+        return new MoimListResponse(httpStatusCode, msg, data);
     }
 
-    public static MyMoimListResponse fail(int httpStatusCode, String errorMessage) {
-        return new MyMoimListResponse(httpStatusCode, errorMessage, null);
+    public static MoimListResponse fail(int httpStatusCode, String errorMessage) {
+        return new MoimListResponse(httpStatusCode, errorMessage, null);
     }
 
-    public static MyMoimListResponse fail(int httpStatusCode, String errorMessage, List<MyMoimDto> data) {
-        return new MyMoimListResponse(httpStatusCode, errorMessage, data);
+    public static MoimListResponse fail(int httpStatusCode, String errorMessage, List<MyMoimDto> data) {
+        return new MoimListResponse(httpStatusCode, errorMessage, data);
     }
 }
