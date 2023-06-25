@@ -315,9 +315,9 @@ public class MoimController {
         return MoimDetailListResponse.success(200, "모임 정보가 조회되었습니다.", moimDetailInfo);
 
     }
-    @Operation(tags = { "Moim" }, summary = "초대장 도착 조회")
+    @Operation(tags = { "Moim" }, summary = "딥링크를 통한 모임 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "모임 정보가 조회되었습니다.", content = @Content(schema = @Schema(implementation = InvitedMoimResponse.class))),
+            @ApiResponse(responseCode = "200", description = "모임 정보가 조회되었습니다.", content = @Content(schema = @Schema(implementation = Response.class))),
             @ApiResponse(responseCode = "404", description = "해당 모임이 존재하지 않습니다.")
     })
     @GetMapping(value = "/v1/deeplink-info")
