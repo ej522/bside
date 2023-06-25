@@ -537,8 +537,9 @@ public class MoimService {
         return moimDetailDto;
     }
 
-    // 모임정보
-    public MoimDto getMoimInfoByMoimId(String encryptInfo) throws Exception {
+    //모임정보
+    public MoimDto getMoimNameAndDeadLine(String encryptInfo) throws Exception {
+
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
 
         MoimDto moimInfo = moimRepository.findMoimByMoimId(moimId);
@@ -547,10 +548,13 @@ public class MoimService {
             throw new NoResultListException("해당 모임이 존재하지 않습니다.");
         }
 
-        moimInfo.setDead_line_time(
-                Common.calculateDeadLineTime(moimInfo.getCreated_time(), moimInfo.getDead_line_hour()));
+        LocalDateTime deadline = Common.calculateDeadLineTime(moimInfo.getCreated_time(), moimInfo.getDead_line_hour());
 
-        return moimInfo;
+        MoimDto summInfo = new MoimDto();
+        summInfo.setHost_name(moimInfo.getHost_name());
+        summInfo.setDead_line_time(deadline);
+
+        return summInfo;
     }
 
     private List<UserDto> setTimeUserInfo(MoimOveralScheduleDto voteUserInfo, List<UserDto> voteUserInfoList) {

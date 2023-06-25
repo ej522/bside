@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
-@Schema(name = "MyMoimList", description = "확정 모임 조회")
+@Schema(name = "MoimList", description = "모임 여러개 조회")
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MoimListResponse {
