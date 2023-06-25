@@ -355,12 +355,13 @@ public class MoimServiceTest {
 
         // [모임 생성]
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        var moimId = Long.parseLong(encrypt.decrypt(encryptedId));
         // [모임 참여]
         moimService.participateDeepLink(saveUser2, encryptedId);
 
         // when
         MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(saveUser2,
-                encryptedId, normalMoimMemberTime);
+                moimId, normalMoimMemberTime);
 
         // then
         Moim moim = moimService.getMoimInfoWithEncrypedMoimId(encryptedId);
@@ -384,10 +385,11 @@ public class MoimServiceTest {
 
         // 모임 생성
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        var moimId = Long.parseLong(encrypt.decrypt(encryptedId));
 
         // when, then
         assertThrows(AdjustScheduleException.class,
-                () -> moimService.adjustSchedule(saveUser2, encryptedId,
+                () -> moimService.adjustSchedule(saveUser2, moimId,
                         normalMoimMemberTime));
     }
 
@@ -405,12 +407,13 @@ public class MoimServiceTest {
 
         // [모임 생성]
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
+        var moimId = Long.parseLong(encrypt.decrypt(encryptedId));
         // [모임 참여]
         moimService.participateDeepLink(saveUser2, encryptedId);
 
         // when, then
         assertThrows(AdjustScheduleException.class,
-                () -> moimService.adjustSchedule(saveUser2, encryptedId,
+                () -> moimService.adjustSchedule(saveUser2, moimId,
                         wrongMoimMemberTime));
     }
 
@@ -570,7 +573,7 @@ public class MoimServiceTest {
         moimService.participateDeepLink(saveUser2, encryptedId);
 
         // [모임 투표]
-        moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
+        moimService.adjustSchedule(saveUser2, moimId, normalMoimMemberTime);
 
         // when
         List<VoteMoimDateDto> test = moimService.getVoteDateInfo(moimId);
@@ -606,7 +609,7 @@ public class MoimServiceTest {
         moimService.participateDeepLink(saveUser2, encryptedId);
 
         // [모임 투표]
-        moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
+        moimService.adjustSchedule(saveUser2, moimId, normalMoimMemberTime);
 
         // when
         VoteMoimTimeDto test = moimService.getVoteTimeInfo(moimId,
@@ -640,7 +643,7 @@ public class MoimServiceTest {
         moimService.participateDeepLink(saveUser2, encryptedId);
 
         // [모임 투표]
-        moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
+        moimService.adjustSchedule(saveUser2, moimId, normalMoimMemberTime);
 
         // [모임 확정]
         moimRepository.fixMoimDate(newMoim, LocalDateTime.now().minusDays(1), 12);
@@ -701,18 +704,18 @@ public class MoimServiceTest {
         newMoim.setFixed_time("2");
 
         var encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
-        moimService.participateDeepLink(saveUser2, encryptedId);
-        moimService.adjustSchedule(saveUser2, encryptedId, normalMoimMemberTime);
-
         Long moimId = Long.parseLong(encrypt.decrypt(encryptedId));
 
-        //when
+        moimService.participateDeepLink(saveUser2, encryptedId);
+        moimService.adjustSchedule(saveUser2, moimId, normalMoimMemberTime);
+
+        // when
         MoimDetailDto moimDetailDto = moimService.getMoimDetailInfo(moimId);
 
-        //then
+        // then
         assertTrue(moimDetailDto.getMoim_name().equals("테스트 모임"));
-        assertTrue(moimDetailDto.getMemeber_cnt()==2);
-        assertTrue(moimDetailDto.getMoimDateList().size()>0);
-        assertTrue(moimDetailDto.getMoimMemberList().size()>0);
+        assertTrue(moimDetailDto.getMemeber_cnt() == 2);
+        assertTrue(moimDetailDto.getMoimDateList().size() > 0);
+        assertTrue(moimDetailDto.getMoimMemberList().size() > 0);
     }
 }

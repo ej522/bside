@@ -2,6 +2,8 @@ package com.example.beside.domain;
 
 import java.time.LocalDateTime;
 
+import com.example.beside.dto.MoimTImeInfoDto;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -42,5 +44,23 @@ public class MoimMemberTime {
     private Boolean pm_seven;
     private Boolean pm_eigth;
     private Boolean pm_nine;
+
+    // 비즈니스 로직
+    public void setSchedule(LocalDateTime selectedDate, MoimTImeInfoDto moimTimeInfo) {
+        this.selected_date = selectedDate;
+        this.am_nine = moimTimeInfo.isAmNine();
+        this.am_ten = moimTimeInfo.isAmTen();
+        this.am_eleven = moimTimeInfo.isAmEleven();
+        this.noon = moimTimeInfo.isNoon();
+        this.pm_one = moimTimeInfo.isPmOne();
+        this.pm_two = moimTimeInfo.isPmTwo();
+        this.pm_three = moimTimeInfo.isPmThree();
+        this.pm_four = moimTimeInfo.isPmFour();
+        this.pm_five = moimTimeInfo.isPmFive();
+        this.pm_six = moimTimeInfo.isPmSix();
+        this.pm_seven = moimTimeInfo.isPmSeven();
+        this.pm_eigth = moimTimeInfo.isPmEight();
+        this.pm_nine = moimTimeInfo.isPmNine();
+    }
 
 }
