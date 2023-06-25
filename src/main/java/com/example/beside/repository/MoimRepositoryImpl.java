@@ -669,7 +669,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 )).from(qMoim)
                         .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
                         .leftJoin(qUser).on(qUser.id.eq(qMoimMember.user_id))
-                        .where(qMoim.id.eq(moimId))
+                        .where(qMoim.id.eq(moimId).and(qMoimMember.is_accept.eq(true)))
                         .fetch();
 
                 return result;
