@@ -1,8 +1,5 @@
 package com.example.beside.dto;
 
-import com.example.beside.common.response.MoimMemberDto;
-import com.example.beside.domain.Moim;
-import com.example.beside.domain.MoimMember;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -44,7 +41,8 @@ public class MoimDetailDto {
     @Schema(description = "참여 유저 리스트")
     private List<MoimMemberDto> moimMemberList;
 
-    public MoimDetailDto(MoimDto moim, int member_cnt, List<MoimDateDto> moimDateList, List<MoimMemberDto> moimMemberList) {
+    public MoimDetailDto(MoimDto moim, int member_cnt, List<MoimDateDto> moimDateList,
+            List<MoimMemberDto> moimMemberList) {
         this.moim_id = moim.getMoim_id();
         this.moim_name = moim.getMoim_name();
         this.fixed_date = moim.getFixed_date();

@@ -1,4 +1,4 @@
-package com.example.beside.common.response;
+package com.example.beside.common.response.ResponseDetail;
 
 import com.example.beside.dto.UserDto;
 import com.fasterxml.jackson.annotation.JsonInclude;

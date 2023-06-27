@@ -2,8 +2,8 @@ package com.example.beside.api.user;
 
 import com.example.beside.common.Exception.ExceptionDetail.SocialLoginException;
 import com.example.beside.common.Exception.ExceptionDetail.UserNotExistException;
-import com.example.beside.common.response.LoginResponse;
 import com.example.beside.common.response.Response;
+import com.example.beside.common.response.ResponseDetail.LoginResponse;
 import com.example.beside.domain.User;
 import com.example.beside.dto.UserDto;
 import com.example.beside.dto.UserTokenDto;

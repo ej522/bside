@@ -8,11 +8,11 @@ import com.example.beside.common.Exception.ExceptionDetail.PasswordNotCorrectExc
 import com.example.beside.common.Exception.ExceptionDetail.UserNotExistException;
 import com.example.beside.common.Exception.ExceptionDetail.UserValidateNickName;
 import com.example.beside.common.response.Response;
-import com.example.beside.common.response.UserResponse;
-import com.example.beside.common.response.AllUsersResponse;
-import com.example.beside.common.response.BooleanResponse;
-import com.example.beside.common.response.LoginResponse;
-import com.example.beside.common.response.MyFriendResponse;
+import com.example.beside.common.response.ResponseDetail.AllUsersResponse;
+import com.example.beside.common.response.ResponseDetail.BooleanResponse;
+import com.example.beside.common.response.ResponseDetail.LoginResponse;
+import com.example.beside.common.response.ResponseDetail.MyFriendResponse;
+import com.example.beside.common.response.ResponseDetail.UserResponse;
 import com.example.beside.domain.User;
 import com.example.beside.dto.FriendDto;
 import com.example.beside.dto.UserDto;
@@ -68,7 +68,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "존재하지 않는 사용자입니다.")
     })
     @GetMapping(value = "/v1/users")
-    public AllUsersResponse getAllUsers(HttpServletRequest request) {
+    public Response<List<UserDto>> getAllUsers(HttpServletRequest request) {
         List<UserDto> UserDtoList = new ArrayList<>();
         User user_ = (User) request.getAttribute("user");
 

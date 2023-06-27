@@ -8,6 +8,15 @@ import java.util.List;
 
 import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
 import com.example.beside.common.response.*;
+import com.example.beside.common.response.ResponseDetail.DeepLinkMoimResponse;
+import com.example.beside.common.response.ResponseDetail.InvitedMoimResponse;
+import com.example.beside.common.response.ResponseDetail.MoimAdjustScheduleResponse;
+import com.example.beside.common.response.ResponseDetail.MoimDetailListResponse;
+import com.example.beside.common.response.ResponseDetail.MoimListResponse;
+import com.example.beside.common.response.ResponseDetail.MoimParticipateResponse;
+import com.example.beside.common.response.ResponseDetail.VoteMoimDateResponse;
+import com.example.beside.common.response.ResponseDetail.VoteMoimTimeResponse;
+import com.example.beside.common.response.ResponseDetail.VotingMoimResponse;
 import com.example.beside.dto.*;
 
 import com.example.beside.service.FcmPushService;
@@ -297,7 +306,8 @@ public class MoimController {
             @ApiResponse(responseCode = "404", description = "해당 모임이 존재하지 않습니다.")
     })
     @GetMapping(value = "/v1/detail")
-    public MoimDetailListResponse getMoimDetailInfo(HttpServletRequest token, @RequestParam(name = "moim_id") @NotNull Long moim_id) throws NoResultListException {
+    public MoimDetailListResponse getMoimDetailInfo(HttpServletRequest token,
+            @RequestParam(name = "moim_id") @NotNull Long moim_id) throws NoResultListException {
         MoimDetailDto moimDetailInfo = moimService.getMoimDetailInfo(moim_id);
 
         return MoimDetailListResponse.success(200, "모임 정보가 조회되었습니다.", moimDetailInfo);
@@ -310,7 +320,8 @@ public class MoimController {
             @ApiResponse(responseCode = "404", description = "해당 모임이 존재하지 않습니다.")
     })
     @GetMapping(value = "/v1/deeplink-info")
-    public DeepLinkMoimResponse getMoimInfoByDeepLink(@RequestParam(name = "encryptInfo") @NotNull String encryptInfo) throws Exception {
+    public DeepLinkMoimResponse getMoimInfoByDeepLink(@RequestParam(name = "encryptInfo") @NotNull String encryptInfo)
+            throws Exception {
         MoimDto moimInfo = moimService.getMoimNameAndDeadLine(encryptInfo);
 
         return DeepLinkMoimResponse.success(200, "모임 정보가 조회되었습니다.", moimInfo);

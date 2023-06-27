@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.beside.common.response.MoimMemberDto;
 import com.example.beside.dto.*;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -636,18 +635,17 @@ public class MoimRepositoryImpl implements MoimRepository {
                 QUser qUser = QUser.user;
 
                 MoimDto result = queryFactory.select(
-                        Projections.fields(MoimDto.class,
-                                qMoim.id.as("moim_id"),
-                                qMoim.moim_name.as("moim_name"),
-                                qMoim.user.id.as("host_id"),
-                                qUser.name.as("host_name"),
-                                qMoim.dead_line_hour.as("dead_line_hour"),
-                                qMoim.created_time.as("created_time")))
-                        .from(qMoim)
-                        .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
-                        .where(qMoim.id.eq(moimId))
-                        .fetchOne();
-
+                                Projections.fields(MoimDto.class,
+                                                qMoim.id.as("moim_id"),
+                                                qMoim.moim_name.as("moim_name"),
+                                                qMoim.user.id.as("host_id"),
+                                                qUser.name.as("host_name"),
+                                                qMoim.dead_line_hour.as("dead_line_hour"),
+                                                qMoim.created_time.as("created_time")))
+                                .from(qMoim)
+                                .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
+                                .where(qMoim.id.eq(moimId))
+                                .fetchOne();
 
                 return result;
         }
@@ -661,16 +659,16 @@ public class MoimRepositoryImpl implements MoimRepository {
                 QUser qUser = QUser.user;
 
                 List<MoimMemberDto> result = queryFactory.select(
-                        Projections.constructor(MoimMemberDto.class,
-                                qMoimMember.id,
-                                qMoim.id,
-                                qMoimMember.user_id,
-                                qUser.name
-                                )).from(qMoim)
-                        .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
-                        .leftJoin(qUser).on(qUser.id.eq(qMoimMember.user_id))
-                        .where(qMoim.id.eq(moimId).and(qMoimMember.is_accept.eq(true)))
-                        .fetch();
+                                Projections.constructor(MoimMemberDto.class,
+                                                qMoimMember.id,
+                                                qMoim.id,
+                                                qMoimMember.user_id,
+                                                qUser.name))
+                                .from(qMoim)
+                                .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
+                                .leftJoin(qUser).on(qUser.id.eq(qMoimMember.user_id))
+                                .where(qMoim.id.eq(moimId).and(qMoimMember.is_accept.eq(true)))
+                                .fetch();
 
                 return result;
         }
@@ -683,15 +681,15 @@ public class MoimRepositoryImpl implements MoimRepository {
                 QMoimDate qMoimDate = QMoimDate.moimDate;
 
                 List<MoimDateDto> result = queryFactory.select(
-                        Projections.constructor(MoimDateDto.class,
-                                qMoimDate.morning,
-                                qMoimDate.afternoon,
-                                qMoimDate.evening,
-                                qMoimDate.selected_date))
-                        .from(qMoim)
-                        .leftJoin(qMoimDate).on(qMoim.id.eq(qMoimDate.moim.id))
-                        .where(qMoim.id.eq(moimId))
-                        .fetch();
+                                Projections.constructor(MoimDateDto.class,
+                                                qMoimDate.morning,
+                                                qMoimDate.afternoon,
+                                                qMoimDate.evening,
+                                                qMoimDate.selected_date))
+                                .from(qMoim)
+                                .leftJoin(qMoimDate).on(qMoim.id.eq(qMoimDate.moim.id))
+                                .where(qMoim.id.eq(moimId))
+                                .fetch();
 
                 return result;
         }
@@ -703,14 +701,14 @@ public class MoimRepositoryImpl implements MoimRepository {
                 QMoimDate qMoimDate = QMoimDate.moimDate;
 
                 MoimDateDto result = queryFactory.select(
-                        Projections.constructor(MoimDateDto.class,
-                                qMoimDate.morning,
-                                qMoimDate.afternoon,
-                                qMoimDate.evening,
-                                qMoimDate.selected_date))
-                        .from(qMoimDate)
-                        .where(qMoimDate.moim.id.eq(moimId).and(qMoimDate.selected_date.eq(selectedDate)))
-                        .fetchOne();
+                                Projections.constructor(MoimDateDto.class,
+                                                qMoimDate.morning,
+                                                qMoimDate.afternoon,
+                                                qMoimDate.evening,
+                                                qMoimDate.selected_date))
+                                .from(qMoimDate)
+                                .where(qMoimDate.moim.id.eq(moimId).and(qMoimDate.selected_date.eq(selectedDate)))
+                                .fetchOne();
 
                 return result;
         }

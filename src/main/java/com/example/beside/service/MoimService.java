@@ -5,7 +5,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
-import com.example.beside.common.response.MoimMemberDto;
 import com.example.beside.dto.*;
 import com.example.beside.util.Common;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -537,7 +536,7 @@ public class MoimService {
         return moimDetailDto;
     }
 
-    //모임정보
+    // 모임정보
     public MoimDto getMoimNameAndDeadLine(String encryptInfo) throws Exception {
 
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
