@@ -1,8 +1,5 @@
 package com.example.beside.dto;
 
-import com.example.beside.domain.Friend;
-import com.example.beside.domain.User;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -41,5 +38,5 @@ public class FriendDto {
         private String profile_image;
 
     }
-    
+
 }
