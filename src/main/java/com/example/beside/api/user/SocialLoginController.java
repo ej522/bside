@@ -46,7 +46,7 @@ public class SocialLoginController {
             @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다.", content = @Content(schema = @Schema(implementation = LoginResponse.class))),
     })
     @PostMapping(value = "/v1/login/Kakao")
-    public LoginResponse kakaoLogin(@RequestBody @Valid SocialUserRequest request,
+    public Response<UserTokenDto> kakaoLogin(@RequestBody @Valid SocialUserRequest request,
             HttpServletResponse response)
             throws UserNotExistException, SocialLoginException {
         User user = socialLoginService.getKaKaoUserInfo(request.access_token, request.fcm);
@@ -91,7 +91,7 @@ public class SocialLoginController {
             @ApiResponse(responseCode = "200", description = "정상 로그인 되었습니다.", content = @Content(schema = @Schema(implementation = LoginResponse.class))),
     })
     @PostMapping(value = "/v1/login/Apple")
-    public LoginResponse appleLogin(@RequestBody @Valid SocialUserRequest request,
+    public Response<UserTokenDto> appleLogin(@RequestBody @Valid SocialUserRequest request,
             HttpServletResponse response)
             throws Exception {
         User user = socialLoginService.appleLogin(request.access_token, request.fcm);
