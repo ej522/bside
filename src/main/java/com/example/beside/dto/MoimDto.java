@@ -5,7 +5,6 @@ import com.example.beside.domain.User;
 
 import com.example.beside.util.Common;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.PostLoad;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,8 +56,6 @@ public class MoimDto {
 
     @Schema(description = "마감기한", example = "2023-12-20")
     private LocalDateTime dead_line_time;
-
-
 
     public MoimDto(Moim moim, User user, int memeber_cnt) {
         this.moim_id = moim.getId();
