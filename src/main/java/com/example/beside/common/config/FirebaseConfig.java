@@ -25,7 +25,7 @@ public class FirebaseConfig {
 
             FirebaseApp.initializeApp(options);
         } catch (Exception e) {
-            logger.error("firbase init error: ", e.getStackTrace());
+            logger.error("firbase init error: ");
             e.printStackTrace();
         }
     }
