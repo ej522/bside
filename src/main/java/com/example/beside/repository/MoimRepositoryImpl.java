@@ -54,7 +54,6 @@ public class MoimRepositoryImpl implements MoimRepository {
                 return queryFactory.selectFrom(qMoim)
                                 .where(qMoim.fixed_date.isNull())
                                 .fetch();
-                //.and(qMoim.nobody_schedule_selected.eq(false))
 
         }
 
