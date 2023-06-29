@@ -305,48 +305,65 @@ public class MoimService {
     }
 
     // 날짜투표결과
-    public List<VoteMoimDateDto> getVoteDateInfo(Long moimId) throws Exception {
+    public VoteMoimDateDto getVoteDateInfo(Long moimId) throws Exception {
         // 모임 날짜 정보
-        List<MoimOveralDateDto> dateInfo = moimRepository.getMoimOveralInfo(moimId);
+        List<MoimOveralDateDto> dateInfoList = moimRepository.getMoimOveralInfo(moimId);
+
+        if(dateInfoList.size()==0)
+            throw new NoResultListException("해당 모임이 존재하지 않습니다.");
 
         // 투표 인원 정보
-        List<MoimOveralScheduleDto> voteUserInfo = moimRepository.getMoimScheduleInfo(moimId);
+        List<MoimOveralScheduleDto> voteUserInfoList = moimRepository.getMoimScheduleInfo(moimId);
 
-        List<VoteMoimDateDto> dateVoteUserList = new ArrayList<>();
+        VoteMoimDateDto voteMoimDateInfo = new VoteMoimDateDto();
 
-        for (int i = 0; i < dateInfo.size(); i++) {
-            VoteMoimDateDto voteMoimDateDto = new VoteMoimDateDto();
-            voteMoimDateDto.setMoim_id(moimId);
+        //총 투표수
+        int total = 0;
 
-            LocalDateTime selected_date = dateInfo.get(i).getSelected_date();
-            voteMoimDateDto.setSelected_date(selected_date);
+        voteMoimDateInfo.setMoim_id(dateInfoList.get(0).getId());
 
-            voteMoimDateDto.setMorning(dateInfo.get(i).getMorning());
-            voteMoimDateDto.setAfternoon(dateInfo.get(i).getAfternoon());
-            voteMoimDateDto.setEvening(dateInfo.get(i).getEvening());
+        List<VoteMoimDateDto.VoteInfo> voteInfoList = new ArrayList<>();
 
-            // 투표참여 인원
-            int vote_cnt = moimRepository.getDateVoteCnt(moimId, selected_date);
-            voteMoimDateDto.setVote_cnt(vote_cnt);
+        for(int i=0; i<dateInfoList.size(); i++) {
+            VoteMoimDateDto.VoteInfo voteInfo = new VoteMoimDateDto.VoteInfo();
 
-            List<UserDto> userInfoList = new ArrayList<>();
+            LocalDateTime selected_date = dateInfoList.get(i).getSelected_date();
+            voteInfo.setSelected_date(selected_date);
 
-            for (int j = 0; j < voteUserInfo.size(); j++) {
-                LocalDateTime vote_date = voteUserInfo.get(j).getSelected_date();
-                if (selected_date.equals(vote_date)) {
+            //각 날짜 투표수
+            int vote_cnt = 0;
 
-                    UserDto userDto = new UserDto();
-                    userDto.setId(voteUserInfo.get(j).getUser_id());
-                    userDto.setName(voteUserInfo.get(j).getMember_name());
-                    userDto.setProfile_image(voteUserInfo.get(j).getProfile_image());
-                    userInfoList.add(userDto);
+            List<VoteMoimDateDto.UserInfo> userInfoList = new ArrayList<>();
+
+            for(MoimOveralScheduleDto voteUserInfo : voteUserInfoList) {
+                if(voteUserInfo.getSelected_date()==null) {//투표한 사람이 없는 경우
+                    break;
+                }
+
+                if(selected_date.isEqual(voteUserInfo.getSelected_date())) {
+                    VoteMoimDateDto.UserInfo userInfo = new VoteMoimDateDto.UserInfo();
+
+                    //투표자 정보
+                    userInfo.setUser_id(voteUserInfo.getUser_id());
+                    userInfo.setNickname(voteUserInfo.getMember_name());
+                    userInfo.setProfile(voteUserInfo.getProfile_image());
+
+                    userInfoList.add(userInfo);
+
+                    vote_cnt++;
+                    total++;
                 }
             }
-            voteMoimDateDto.setUser_info(userInfoList);
-            dateVoteUserList.add(voteMoimDateDto);
+            voteInfo.setVote_cnt(vote_cnt);
+            voteInfo.setUserInfo(userInfoList);
+
+            voteInfoList.add(voteInfo);
         }
 
-        return dateVoteUserList;
+        voteMoimDateInfo.setTotal(total);
+        voteMoimDateInfo.setVoteList(voteInfoList);
+
+        return voteMoimDateInfo;
 
     }
 

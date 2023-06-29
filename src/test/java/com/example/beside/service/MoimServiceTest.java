@@ -576,14 +576,15 @@ public class MoimServiceTest {
         moimService.adjustSchedule(saveUser2, moimId, normalMoimMemberTime);
 
         // when
-        List<VoteMoimDateDto> test = moimService.getVoteDateInfo(moimId);
+        VoteMoimDateDto result = moimService.getVoteDateInfo(moimId);
 
         // given
-        assertTrue(test.get(0).getSelected_date().equals(LocalDate.parse("2023-03-10",
-                formatter).atStartOfDay()));
-        assertTrue(test.get(0).getVote_cnt().equals(0));
-        assertTrue(test.get(1).getUser_info().get(0).getName().equals("다람쥐"));
-
+        assertTrue(result.getTotal().equals(1));
+        assertTrue(result.getTotal().equals(1));
+        assertTrue(result.getVoteList().get(0).getSelected_date().isEqual(LocalDate.parse("2023-03-10", formatter).atStartOfDay()));
+        assertTrue(result.getVoteList().get(1).getSelected_date().isEqual(LocalDate.parse("2023-03-13", formatter).atStartOfDay()));
+        assertTrue(result.getVoteList().get(0).getVote_cnt().equals(0));
+        assertTrue(result.getVoteList().get(1).getVote_cnt().equals(1));
     }
 
     @Test
