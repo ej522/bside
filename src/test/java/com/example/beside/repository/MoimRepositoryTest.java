@@ -429,9 +429,4 @@ public class MoimRepositoryTest {
         Assertions.assertThat(result.isEvening()).isTrue();
     }
 
-    @Test
-    void test() {
-        moimRepository.deleteMoim(11156L);
-    }
-
 }

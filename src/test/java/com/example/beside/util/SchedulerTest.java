@@ -135,14 +135,14 @@ public class SchedulerTest {
         // 모임 생성
         long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
 
-        Scheduler scheduler = new Scheduler(moimRepository);
+        Scheduler scheduler = new Scheduler(moimRepository, userService, fcmPushService);
 
         // when
         scheduler.deleteNotFixedMoim();
 
         // then
         Moim moimInfo = moimRepository.getMoimInfo(newMoim.getId());
-        Assertions.assertThat(moimInfo.getId()).isNull();
+        Assertions.assertThat(moimInfo).isNull();
 
     }
 }
