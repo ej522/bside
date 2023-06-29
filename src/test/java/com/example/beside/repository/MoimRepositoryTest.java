@@ -407,4 +407,9 @@ public class MoimRepositoryTest {
         Assertions.assertThat(result.get(0).getFixed_time()).isLessThanOrEqualTo("12");
     }
 
+    @Test
+    void test() {
+        moimRepository.deleteMoim(11156L);
+    }
+
 }

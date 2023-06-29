@@ -1,6 +1,7 @@
 package com.example.beside.util;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,6 +119,7 @@ public class SchedulerTest {
         User findUser2 = userRepository.saveUser(user2);
 
         newMoim.setUser(findUser);
+        newMoim.setCreated_time(LocalDateTime.now().minusDays(1));
         newMoim.setDead_line_hour(0);
         newMoim.setNobody_schedule_selected(true);
 
