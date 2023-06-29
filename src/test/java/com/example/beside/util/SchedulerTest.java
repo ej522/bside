@@ -1,6 +1,7 @@
 package com.example.beside.util;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,6 +102,7 @@ public class SchedulerTest {
 
         newMoim.setUser(findUser);
         newMoim.setDead_line_hour(0);
+
         // 모임 생성
         long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
         // 모임 참여
@@ -117,5 +119,30 @@ public class SchedulerTest {
         // then
         Moim moimInfo = moimRepository.getMoimInfo(newMoim.getId());
         Assertions.assertThat(moimInfo.getFixed_date()).isNotEmpty();
+    }
+
+    @Test
+    void  testDeleteNotFixedMoim() throws Exception {
+        // given
+        User findUser = userRepository.saveUser(user);
+        User findUser2 = userRepository.saveUser(user2);
+
+        newMoim.setUser(findUser);
+        newMoim.setCreated_time(LocalDateTime.now().minusDays(1));
+        newMoim.setDead_line_hour(0);
+        newMoim.setNobody_schedule_selected(true);
+
+        // 모임 생성
+        long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
+
+        Scheduler scheduler = new Scheduler(moimRepository, userService, fcmPushService);
+
+        // when
+        scheduler.deleteNotFixedMoim();
+
+        // then
+        Moim moimInfo = moimRepository.getMoimInfo(newMoim.getId());
+        Assertions.assertThat(moimInfo).isNull();
+
     }
 }

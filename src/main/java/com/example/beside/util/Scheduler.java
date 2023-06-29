@@ -47,8 +47,8 @@ public class Scheduler {
             var dead_line_hour = moimInfo.get(0).getDead_line_hour();
             var standardTime = created_time.plusHours(dead_line_hour);
 
-            // 데드라인 지나지 않은 모임
-            if (LocalDateTime.now().isBefore(standardTime))
+            // 데드라인 지나지 않은 모임 또는 투표한 사람이 없는 모임
+            if (LocalDateTime.now().isBefore(standardTime) || moim.getNobody_schedule_selected())
                 continue;
 
             // 최다 선택일 구하기
@@ -74,6 +74,25 @@ public class Scheduler {
             for(MoimMember moimMember : moimMemberList) {
                 guest = userService.chkPushAgree(moimMember.getUser_id());
                 sendFixMoimMessage(guest, moim.getMoim_name(), moim.getEncrypted_id());
+            }
+        }
+
+    }
+
+    @Scheduled(cron = "0 0 1 * * *")
+    public void deleteNotFixedMoim() {
+        // 일정이 확정되지 않은 모임 조회
+        List<Moim> notFixedScheduleMoims = moimRepository.getNotFixedMoims();
+
+        for (var moim : notFixedScheduleMoims) {
+
+            var created_time = moim.getCreated_time();
+            var dead_line_hour = moim.getDead_line_hour();
+            var standardTime = created_time.plusHours(dead_line_hour);
+
+            // 데드라인이 지나고 투표한 사람이 없을 때
+            if (LocalDateTime.now().isAfter(standardTime) && moim.getNobody_schedule_selected()) {
+                moimRepository.deleteMoim(moim.getId());
             }
         }
 

@@ -52,7 +52,7 @@ public class MoimRepositoryImpl implements MoimRepository {
 
                 QMoim qMoim = new QMoim("moim");
                 return queryFactory.selectFrom(qMoim)
-                                .where(qMoim.fixed_date.isNull().and(qMoim.nobody_schedule_selected.eq(false)))
+                                .where(qMoim.fixed_date.isNull())
                                 .fetch();
 
         }
@@ -366,6 +366,31 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .where(qMoimMember.user_id.eq(user_id)
                                                 .and(qMoimMember.moim.id.eq(moim_id)))
                                 .execute();
+
+                return 0;
+        }
+
+        @Override
+        @Transactional
+        public long deleteMoim(Long moimId) {
+                queryFactory = new JPAQueryFactory(em);
+
+                QMoim qMoim = QMoim.moim;
+                QMoimDate qMoimDate = QMoimDate.moimDate;
+                QMoimMember qMoimMember = QMoimMember.moimMember;
+                QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
+
+                //모임 투표한 날짜
+                queryFactory.delete(qMoimMemberTime).where(qMoimMemberTime.moim_id.eq(moimId)).execute();
+                //모임 멤버
+                queryFactory.delete(qMoimMember).where(qMoimMember.moim.id.eq(moimId)).execute();
+                //주최자가 선택한 모임 날짜
+                queryFactory.delete(qMoimDate).where(qMoimDate.moim.id.eq(moimId)).execute();
+                //모임
+                queryFactory.delete(qMoim).where(qMoim.id.eq(moimId)).execute();
+
+                em.flush();
+                em.clear();
 
                 return 0;
         }
