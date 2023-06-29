@@ -58,6 +58,7 @@ public class MoimRepositoryImpl implements MoimRepository {
 
         }
 
+        @Override
         @Transactional
         public void fixMoimDate(Moim moim, LocalDateTime date, int time) {
                 String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -140,7 +141,8 @@ public class MoimRepositoryImpl implements MoimRepository {
                 MoimMember fetchOne = queryFactory.selectFrom(qMoimMember)
                                 .from(qMoimMember)
                                 .where(qMoimMember.moim.id.eq(moimId)
-                                                .and(qMoimMember.user_id.eq(userId)))
+                                                .and(qMoimMember.user_id.eq(userId))
+                                                .and(qMoimMember.is_accept.eq(true)))
                                 .fetchOne();
 
                 if (fetchOne == null)
@@ -149,7 +151,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                 return true;
         }
 
-        public List<MyMoimDto> findMyMoimHistoryList(Long user_id) {
+        public List<MoimDto> findMyMoimHistoryList(Long user_id) {
                 queryFactory = new JPAQueryFactory(em);
 
                 QMoim qMoim = QMoim.moim;
@@ -160,8 +162,8 @@ public class MoimRepositoryImpl implements MoimRepository {
 
                 String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-                List<MyMoimDto> result = queryFactory.select(
-                                Projections.fields(MyMoimDto.class,
+                List<MoimDto> result = queryFactory.select(
+                                Projections.fields(MoimDto.class,
                                                 qMoim.id.as("moim_id"),
                                                 qMoim.moim_name.as("moim_name"),
                                                 qUser.profile_image.as("host_profile_img"),
@@ -176,7 +178,8 @@ public class MoimRepositoryImpl implements MoimRepository {
                                                                 .and(qMoimMember.history_view_yn.eq(true)))))
                                                 .and(qMoim.fixed_date.loe(formattedDate))
                                                 .and(qMoim.fixed_date.isNotNull())
-                                                .and(qMoim.fixed_time.isNotNull()))
+                                                .and(qMoim.fixed_time.isNotNull())
+                                                .and(qMoimMember.is_accept.eq(true)))
                                 .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc())
                                 .fetch();
 
@@ -204,10 +207,11 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .where(qMoim.id.in(
                                                 JPAExpressions.select(qMoimMember.moim.id)
                                                                 .from(qMoimMember)
-                                                                .where(qMoimMember.user_id.eq(user_id)))
+                                                                .where(qMoimMember.user_id.eq(user_id)
+                                                                                .and(qMoimMember.is_accept.eq(true))))
                                                 .and(qMoim.fixed_date.isNull()));
 
-                // 내가 모임장인 모임
+                // // 내가 모임장인 모임
                 JPAQuery<VotingMoimDto> query2 = queryFactory
                                 .select(Projections.fields(VotingMoimDto.class, qUser.id.as("user_id"),
                                                 qUser.name.as("user_name"),
@@ -246,7 +250,8 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 qMoim.moim_name.as("moim_name"),
                                 qUser.name.as("moim_leader"),
                                 qMoim.created_time.as("createdTime"),
-                                qMoim.dead_line_hour.as("dead_line_hour")))
+                                qMoim.dead_line_hour.as("dead_line_hour"),
+                                qMoimMember.is_accept.as("is_accept_this_moim")))
                                 .from(qUser).innerJoin(qMoim)
                                 .on(qUser.id.eq(qMoim.user.id)).leftJoin(qMoimMember)
                                 .on(qMoim.id.eq(qMoimMember.moim.id)).leftJoin(qMoimMemberTime)
@@ -271,6 +276,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                 moimMember.setMoim(moim);
                 moimMember.setJoin_time(LocalDateTime.now());
                 moimMember.setHistory_view_yn(true);
+                moimMember.setIs_accept(true);
 
                 em.persist(moimMember);
                 em.flush();
@@ -278,7 +284,7 @@ public class MoimRepositoryImpl implements MoimRepository {
         }
 
         @Override
-        public long makeMoimMember(String user_id, Moim moim) {
+        public long makeMoimMemberToFriend(String user_id, Moim moim) {
                 User user = em.find(User.class, user_id);
 
                 MoimMember moimMember = new MoimMember();
@@ -287,6 +293,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                 moimMember.setMoim(moim);
                 moimMember.setJoin_time(LocalDateTime.now());
                 moimMember.setHistory_view_yn(true);
+                moimMember.setIs_accept(false);
 
                 em.persist(moimMember);
                 em.flush();
@@ -510,15 +517,15 @@ public class MoimRepositoryImpl implements MoimRepository {
         }
 
         @Override
-        public List<MyMoimDto> findMyMoimList(Long user_id) {
+        public List<MoimDto> findMyMoimList(Long user_id) {
                 queryFactory = new JPAQueryFactory(em);
 
                 QMoim qMoim = QMoim.moim;
                 QMoimMember qMoimMember = QMoimMember.moimMember;
                 QUser qUser = QUser.user;
 
-                List<MyMoimDto> result = queryFactory.select(
-                                Projections.fields(MyMoimDto.class,
+                List<MoimDto> result = queryFactory.select(
+                                Projections.fields(MoimDto.class,
                                                 qMoim.id.as("moim_id"),
                                                 qMoim.moim_name.as("moim_name"),
                                                 qUser.profile_image.as("host_profile_img"),
@@ -611,7 +618,7 @@ public class MoimRepositoryImpl implements MoimRepository {
         }
 
         @Override
-        public List<MyMoimDto> findMyMoimFutureList(Long userId) {
+        public List<MoimDto> findMyMoimFutureList(Long userId) {
                 queryFactory = new JPAQueryFactory(em);
 
                 QMoim qMoim = QMoim.moim;
@@ -622,8 +629,8 @@ public class MoimRepositoryImpl implements MoimRepository {
 
                 String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-                List<MyMoimDto> result = queryFactory.select(
-                                Projections.fields(MyMoimDto.class,
+                List<MoimDto> result = queryFactory.select(
+                                Projections.fields(MoimDto.class,
                                                 qMoim.id.as("moim_id"),
                                                 qMoim.moim_name.as("moim_name"),
                                                 qUser.profile_image.as("host_profile_img"),
@@ -638,9 +645,96 @@ public class MoimRepositoryImpl implements MoimRepository {
                                                                 .and(qMoimMember.history_view_yn.eq(true)))))
                                                 .and(qMoim.fixed_date.goe(formattedDate))
                                                 .and(qMoim.fixed_date.isNotNull())
-                                                .and(qMoim.fixed_time.isNotNull()))
+                                                .and(qMoim.fixed_time.isNotNull())
+                                                .and(qMoimMember.is_accept.eq(true)))
                                 .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc())
                                 .fetch();
+
+                return result;
+        }
+
+        @Override
+        public MoimDto findMoimByMoimId(Long moimId) {
+                queryFactory = new JPAQueryFactory(em);
+
+                QMoim qMoim = QMoim.moim;
+                QUser qUser = QUser.user;
+
+                MoimDto result = queryFactory.select(
+                                Projections.fields(MoimDto.class,
+                                                qMoim.id.as("moim_id"),
+                                                qMoim.moim_name.as("moim_name"),
+                                                qMoim.user.id.as("host_id"),
+                                                qUser.name.as("host_name"),
+                                                qMoim.dead_line_hour.as("dead_line_hour"),
+                                                qMoim.created_time.as("created_time")))
+                                .from(qMoim)
+                                .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
+                                .where(qMoim.id.eq(moimId))
+                                .fetchOne();
+
+                return result;
+        }
+
+        @Override
+        public List<MoimMemberDto> findMoimMemberByMoimId(Long moimId) {
+                queryFactory = new JPAQueryFactory(em);
+
+                QMoim qMoim = QMoim.moim;
+                QMoimMember qMoimMember = QMoimMember.moimMember;
+                QUser qUser = QUser.user;
+
+                List<MoimMemberDto> result = queryFactory.select(
+                                Projections.constructor(MoimMemberDto.class,
+                                                qMoimMember.id,
+                                                qMoim.id,
+                                                qMoimMember.user_id,
+                                                qUser.name))
+                                .from(qMoim)
+                                .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
+                                .leftJoin(qUser).on(qUser.id.eq(qMoimMember.user_id))
+                                .where(qMoim.id.eq(moimId).and(qMoimMember.is_accept.eq(true)))
+                                .fetch();
+
+                return result;
+        }
+
+        @Override
+        public List<MoimDateDto> findMoimDateByMoimId(Long moimId) {
+                queryFactory = new JPAQueryFactory(em);
+
+                QMoim qMoim = QMoim.moim;
+                QMoimDate qMoimDate = QMoimDate.moimDate;
+
+                List<MoimDateDto> result = queryFactory.select(
+                                Projections.constructor(MoimDateDto.class,
+                                                qMoimDate.morning,
+                                                qMoimDate.afternoon,
+                                                qMoimDate.evening,
+                                                qMoimDate.selected_date))
+                                .from(qMoim)
+                                .leftJoin(qMoimDate).on(qMoim.id.eq(qMoimDate.moim.id))
+                                .where(qMoim.id.eq(moimId))
+                                .fetch();
+
+                return result;
+        }
+
+        @Override
+        public MoimDateDto findMoimDateByMoimIdAndDate(Long moimId, LocalDateTime selectedDate) {
+                queryFactory = new JPAQueryFactory(em);
+
+                QMoimDate qMoimDate = QMoimDate.moimDate;
+
+                MoimDateDto result = queryFactory.select(
+                                Projections.constructor(MoimDateDto.class,
+                                                qMoimDate.morning,
+                                                qMoimDate.afternoon,
+                                                qMoimDate.evening,
+                                                qMoimDate.selected_date))
+                                .from(qMoimDate)
+                                .where(qMoimDate.moim.id.eq(moimId).and(qMoimDate.selected_date.eq(selectedDate)))
+                                .fetchOne();
 
                 return result;
         }

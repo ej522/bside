@@ -19,7 +19,7 @@ public class AppInfoRepositoryImpl implements AppInfoRepository {
 
     @Override
     public AppInfo getAppTermInfo() {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        queryFactory = new JPAQueryFactory(em);
         QAppInfo qAppInfo = QAppInfo.appInfo;
 
         AppInfo result = queryFactory.select(qAppInfo)

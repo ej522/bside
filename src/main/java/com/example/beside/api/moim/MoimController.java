@@ -8,9 +8,19 @@ import java.util.List;
 
 import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
 import com.example.beside.common.response.*;
+import com.example.beside.common.response.ResponseDetail.DeepLinkMoimResponse;
+import com.example.beside.common.response.ResponseDetail.InvitedMoimResponse;
+import com.example.beside.common.response.ResponseDetail.MoimAdjustScheduleResponse;
+import com.example.beside.common.response.ResponseDetail.MoimDetailListResponse;
+import com.example.beside.common.response.ResponseDetail.MoimListResponse;
+import com.example.beside.common.response.ResponseDetail.MoimParticipateResponse;
+import com.example.beside.common.response.ResponseDetail.VoteMoimDateResponse;
+import com.example.beside.common.response.ResponseDetail.VoteMoimTimeResponse;
+import com.example.beside.common.response.ResponseDetail.VotingMoimResponse;
 import com.example.beside.dto.*;
 
-import com.example.beside.repository.MoimRepository;
+import com.example.beside.service.FcmPushService;
+import com.example.beside.service.UserService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +50,85 @@ import lombok.RequiredArgsConstructor;
 public class MoimController {
 
     private final MoimService moimService;
-    private final MoimRepository repository;
+    private final FcmPushService fcmPushService;
+    private final UserService userService;
+
+    @Operation(tags = { "Moim" }, summary = "시간 투표 결과 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임 시간 투표 결과가 조회되었습니다.", content = @Content(schema = @Schema(implementation = VoteMoimTimeResponse.class))),
+    })
+    @GetMapping(value = "/v1/result-time-vote")
+    public Response<VoteMoimTimeDto> getVoteTimeInfo(
+            @RequestParam(name = "moim_id") @NotNull Long moim_id,
+            @RequestParam(name = "selected_date") @NotNull String selected_date) throws Exception {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        VoteMoimTimeDto voteTimeInfo = moimService.getVoteTimeInfo(moim_id,
+                LocalDate.parse(selected_date, formatter).atStartOfDay());
+
+        return VoteMoimTimeResponse.success(200, "모임 시간 투표 결과가 조회되었습니다.", voteTimeInfo);
+    }
+
+    @Operation(tags = { "Moim" }, summary = "모임 주최자가 등록한 모임 일정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "주최자가 등록한 모임일정이 조회되었습니다.", content = @Content(schema = @Schema(implementation = MoimListResponse.class))),
+    })
+    @GetMapping(value = "/v1/host-moim-info")
+    public Response<MoimParticipateInfoDto> getHostSelectMoimDate(HttpServletRequest token,
+            @RequestParam(name = "moim_id") @NotNull Long moim_id) throws Exception {
+        User user = (User) token.getAttribute("user");
+
+        MoimParticipateInfoDto moimInfo = moimService.getHostSelectMoimDate(user, moim_id);
+
+        return MoimParticipateResponse.success(200, "주최자가 등록한 모임일정이 조회되었습니다.", moimInfo);
+    }
+
+    @Operation(tags = { "Moim" }, summary = "날짜 투표 결과 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임 날짜 투표 결과가 조회되었습니다.", content = @Content(schema = @Schema(implementation = VoteMoimDateResponse.class))),
+    })
+    @GetMapping(value = "/v1/result-date-vote")
+    public Response<List<VoteMoimDateDto>> getVoteMoimDateList(@RequestParam(name = "moim_id") @NotNull Long moim_id)
+            throws Exception {
+        List<VoteMoimDateDto> dateVoteInfo = moimService.getVoteDateInfo(moim_id);
+
+        return VoteMoimDateResponse.success(200, "모임 날짜 투표 결과가 조회되었습니다.", dateVoteInfo);
+    }
+
+    @Operation(tags = { "Moim" }, summary = "초대받은 모임 참여하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임에 참여 됐습니다.", content = @Content(schema = @Schema(implementation = MoimParticipateResponse.class))),
+            @ApiResponse(responseCode = "400", description = "모임은 최대 10명 까지 가능합니다."),
+            @ApiResponse(responseCode = "400_1", description = "모임 주최자는 모임 멤버로 참여할 수 없습니다."),
+            @ApiResponse(responseCode = "400_2", description = "해당 모임에 이미 참여하고 있습니다.")
+    })
+    @PostMapping(value = "/v1/participate-invited")
+    public Response<MoimParticipateInfoDto> InvitedMoimParticipate(HttpServletRequest token,
+            @RequestBody @Validated InvitedLinkParticipate request) throws Exception {
+        User user_ = (User) token.getAttribute("user");
+
+        MoimParticipateInfoDto participateMoim = moimService.participateInvitedMoim(user_, request.getMoimId());
+
+        return MoimParticipateResponse.success(200, "모임에 참여 됐습니다.", participateMoim);
+    }
+
+    @Operation(tags = { "Moim" }, summary = "딥링크 모임 참여하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임에 참여 됐습니다.", content = @Content(schema = @Schema(implementation = MoimParticipateResponse.class))),
+            @ApiResponse(responseCode = "400", description = "모임은 최대 10명 까지 가능합니다."),
+            @ApiResponse(responseCode = "400_1", description = "모임 주최자는 모임 멤버로 참여할 수 없습니다."),
+            @ApiResponse(responseCode = "400_2", description = "해당 모임에 이미 참여하고 있습니다.")
+    })
+    @PostMapping(value = "/v1/participate-deep-link")
+    public Response<MoimParticipateInfoDto> deepLinkParticipate(HttpServletRequest token,
+            @RequestBody @Validated deepLinkParticipate request) throws Exception {
+        User user_ = (User) token.getAttribute("user");
+        String encrptedInfo = request.getEncrptedInfo();
+
+        MoimParticipateInfoDto participateMoim = moimService.participateDeepLink(user_, encrptedInfo);
+
+        return MoimParticipateResponse.success(200, "모임에 참여 됐습니다.", participateMoim);
+    }
 
     @Operation(tags = { "Moim" }, summary = "모임 생성하기")
     @ApiResponses(value = {
@@ -79,30 +167,12 @@ public class MoimController {
         return Response.success(200, "모임 생성을 완료했습니다", encryptedMoimId);
     }
 
-    @Operation(tags = { "Moim" }, summary = "딥링크 모임 참여하기")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "모임에 참여 됐습니다.", content = @Content(schema = @Schema(implementation = MoimParticipateResponse.class))),
-            @ApiResponse(responseCode = "400", description = "모임은 최대 10명 까지 가능합니다."),
-            @ApiResponse(responseCode = "400_1", description = "모임 주최자는 모임 멤버로 참여할 수 없습니다."),
-            @ApiResponse(responseCode = "400_2", description = "해당 모임에 이미 참여하고 있습니다.")
-    })
-    @PostMapping(value = "/v1/participate")
-    public MoimParticipateResponse participateMoim(HttpServletRequest token,
-            @RequestBody @Validated MoimParticipateRequest request) throws Exception {
-        User user_ = (User) token.getAttribute("user");
-        String encrptedInfo = request.getEncrptedInfo();
-
-        MoimParticipateInfoDto participateMoim = moimService.participateMoim(user_, encrptedInfo);
-
-        return MoimParticipateResponse.success(200, "모임에 참여 됐습니다.", participateMoim);
-    }
-
     @Operation(tags = { "Moim" }, summary = "내 모임 친구 초대하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "모임을 초대 했습니다", content = @Content(schema = @Schema(implementation = MoimParticipateResponse.class))),
     })
     @PostMapping(value = "/v1/invite-my-moim")
-    public MoimParticipateResponse inviteMyMoim(HttpServletRequest token,
+    public Response<MoimParticipateInfoDto> inviteMyMoim(HttpServletRequest token,
             @RequestBody @Validated InviteMyMoimRequest request)
             throws NumberFormatException, Exception {
         User user_ = (User) token.getAttribute("user");
@@ -111,6 +181,21 @@ public class MoimController {
         List<String> friend_id_list = request.getFriend_id_list();
 
         MoimParticipateInfoDto participateMoim = moimService.inviteMyMoim(user_, encrptedMoimInfo, friend_id_list);
+
+        for (String friend_id : friend_id_list) {
+            User msgUserInfo = userService.chkPushAgree(Long.valueOf(friend_id));
+
+            if (msgUserInfo != null) {
+                if (msgUserInfo.getFcm() != null) {
+                    fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), "모임 초대",
+                            "띵동! " + msgUserInfo.getName() + "님,\n"
+                                    + user_.getName() + "에게 MOIM 초대장이 왔어요",
+                            encrptedMoimInfo, "invite");
+                }
+            }
+
+        }
+
         return MoimParticipateResponse.success(200, "모임에 참여 됐습니다.", participateMoim);
     }
 
@@ -121,63 +206,35 @@ public class MoimController {
             @ApiResponse(responseCode = "400_2", description = "불가능한 일자를 선택했습니다"),
     })
     @PostMapping(value = "/v1/adjust-schedule")
-    public MoimAdjustScheduleResponse adjustSchedule(HttpServletRequest token,
+    public Response<MoimAdjustScheduleDto> adjustSchedule(HttpServletRequest token,
             @RequestBody @Validated AdjustScheduleRequest request) throws Exception {
         User user_ = (User) token.getAttribute("user");
-        String encrptedInfo = request.getEncrptedInfo();
 
-        // 선택 시간 정보
-        List<MoimTimeInfo> moimTimeList = request.getMoim_time_list();
-        var moimMemberTimeList = new ArrayList<MoimMemberTime>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        var moimTimeInfos = new ArrayList<MoimMemberTime>();
+        var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        for (MoimTimeInfo moimTime : moimTimeList) {
-            var temp = new MoimMemberTime();
-            LocalDateTime selectedDate = LocalDate.parse(moimTime.selectedDate, formatter).atStartOfDay();
-            temp.setSelected_date(selectedDate);
+        Long moimId = request.getMoim_id();
+        List<MoimTImeInfoDto> moimTimeList = request.getMoim_time_list();
 
-            temp.setAm_nine(moimTime.amNine);
-            temp.setAm_ten(moimTime.amTen);
-            temp.setAm_eleven(moimTime.amEleven);
-            temp.setNoon(moimTime.noon);
-            temp.setPm_one(moimTime.pmOne);
-            temp.setPm_two(moimTime.pmTwo);
-            temp.setPm_three(moimTime.pmThree);
-            temp.setPm_four(moimTime.pmFour);
-            temp.setPm_five(moimTime.pmFive);
-            temp.setPm_six(moimTime.pmSix);
-            temp.setPm_seven(moimTime.pmSeven);
-            temp.setPm_eigth(moimTime.pmEight);
-            temp.setPm_nine(moimTime.pmNine);
+        for (MoimTImeInfoDto moimTime : moimTimeList) {
+            var scheduleInfo = new MoimMemberTime();
+            var selectedDate = LocalDate.parse(moimTime.getSelectedDate(), formatter).atStartOfDay();
 
-            moimMemberTimeList.add(temp);
+            scheduleInfo.setSchedule(selectedDate, moimTime);
+            moimTimeInfos.add(scheduleInfo);
         }
 
-        MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(user_, encrptedInfo, moimMemberTimeList);
+        MoimAdjustScheduleDto adjustSchedule = moimService.adjustSchedule(user_, moimId, moimTimeInfos);
 
         return MoimAdjustScheduleResponse.success(200, "모임 스케줄을 등록 했습니다.", adjustSchedule);
     }
 
-    @Operation(tags = { "Moim" }, summary = "과거 약속 모임 목록")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "과거 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MoimListResponse.class))),
-            @ApiResponse(responseCode = "404", description = "과거 모임 목록이 없습니다.")
-    })
-    @GetMapping(value = "/v1/moim-history")
-    public MoimListResponse getMoimHistoryList(HttpServletRequest token) throws NoResultListException {
-        User user = (User) token.getAttribute("user");
-
-        List<MyMoimDto> moimList = moimService.getMoimHistoryList(user.getId());
-
-        return MoimListResponse.success(200, "모임 목록이 조회 되었습니다.", moimList);
-    }
-
     @Operation(tags = { "Moim" }, summary = "투표중인 모임 목록")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "투퓨중인 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = VotingMoimResponse.class))),
+            @ApiResponse(responseCode = "200", description = "투표중인 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = VotingMoimResponse.class))),
     })
-    @GetMapping(value = "/v1/voting-moim-list")
-    public VotingMoimResponse getVotingMoimList(HttpServletRequest token) {
+    @GetMapping(value = "/v1/list-voting")
+    public Response<List<VotingMoimDto>> getVotingMoimList(HttpServletRequest token) {
         User user = (User) token.getAttribute("user");
 
         List<VotingMoimDto> votingMoimList = moimService.getVotingMoimList(user.getId());
@@ -185,59 +242,18 @@ public class MoimController {
         return VotingMoimResponse.success(200, "모임 목록이 조회 되었습니다.", votingMoimList);
     }
 
-    @Operation(tags = { "Moim" }, summary = "모임 주최자가 등록한 모임 일정")
+    @Operation(tags = { "Moim" }, summary = "과거 약속 모임 목록")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "주최자가 등록한 모임일정이 조회되었습니다.", content = @Content(schema = @Schema(implementation = MoimListResponse.class))),
+            @ApiResponse(responseCode = "200", description = "과거 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MoimListResponse.class))),
+            @ApiResponse(responseCode = "404", description = "과거 모임 목록이 없습니다.")
     })
-    @PostMapping(value = "/v1/host-select-date")
-    public MoimParticipateResponse getHostSelectMoimDate(HttpServletRequest token,
-            @RequestBody @Validated MoimParticipateRequest request) throws Exception {
+    @GetMapping(value = "/v1/list-past")
+    public Response<List<MoimDto>> getMoimHistoryList(HttpServletRequest token) throws NoResultListException {
         User user = (User) token.getAttribute("user");
 
-        MoimParticipateInfoDto moimInfo = moimService.getHostSelectMoimDate(user, request.encrptedInfo);
+        List<MoimDto> moimList = moimService.getMoimHistoryList(user.getId());
 
-        return MoimParticipateResponse.success(200, "주최자가 등록한 모임일정이 조회되었습니다.", moimInfo);
-    }
-
-    @Operation(tags = { "Moim" }, summary = "날짜 투표 결과 조회")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "모임 날짜 투표 결과가 조회되었습니다.", content = @Content(schema = @Schema(implementation = VoteMoimDateResponse.class))),
-    })
-    @PostMapping(value = "/v1/date-vote")
-    public VoteMoimDateResponse getVoteMoimDateList(@RequestBody @Validated MoimParticipateRequest request)
-            throws Exception {
-        List<VoteMoimDateDto> dateVoteInfo = moimService.getVoteDateInfo(request.encrptedInfo);
-
-        return VoteMoimDateResponse.success(200, "모임 날짜 투표 결과가 조회되었습니다.", dateVoteInfo);
-    }
-
-    @Operation(tags = { "Moim" }, summary = "시간 투표 결과 조회")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "모임 시간 투표 결과가 조회되었습니다.", content = @Content(schema = @Schema(implementation = VoteMoimTimeResponse.class))),
-    })
-    @PostMapping(value = "/v1/time-vote")
-    public VoteMoimTimeResponse getVoteTimeInfo(@RequestBody @Validated TimeVoteRequest request) throws Exception {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        VoteMoimTimeDto voteTimeInfo = moimService.getVoteTimeInfo(request.moim_id,
-                LocalDate.parse(request.selected_date, formatter).atStartOfDay());
-
-        return VoteMoimTimeResponse.success(200, "모임 시간 투표 결과가 조회되었습니다.", voteTimeInfo);
-    }
-
-    @Operation(tags = { "Moim" }, summary = "특정 모임 삭제")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "과거 모임이 삭제되었습니다.", content = @Content(schema = @Schema(implementation = MoimListResponse.class))),
-    })
-    @DeleteMapping(value = "/v1/delete/moim-history")
-    public MoimListResponse deleteMoimHistory(HttpServletRequest token,
-            @RequestBody @Validated MoimHistoryRequest request) {
-        User user = (User) token.getAttribute("user");
-
-        List<MyMoimDto> result = moimService.deleteMoimHistory(request.moim_id, request.host_id, user.getId());
-
-        return MoimListResponse.success(200, "과거 모임이 삭제되었습니다.", result);
-
+        return MoimListResponse.success(200, "모임 목록이 조회 되었습니다.", moimList);
     }
 
     @Operation(tags = { "Moim" }, summary = "예정된 약속 모임 목록")
@@ -245,22 +261,23 @@ public class MoimController {
             @ApiResponse(responseCode = "200", description = "예정 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = MoimListResponse.class))),
             @ApiResponse(responseCode = "404", description = "예정 모임 목록이 없습니다.")
     })
-    @GetMapping(value = "/v1/moim-future")
-    public MoimListResponse getMoimFutureList(HttpServletRequest token) throws NoResultListException {
+    @GetMapping(value = "/v1/list-scheduled")
+    public Response<List<MoimDto>> getMoimFutureList(HttpServletRequest token) throws NoResultListException {
         User user = (User) token.getAttribute("user");
 
-        List<MyMoimDto> moimList = moimService.getMoimFutureList(user.getId());
+        List<MoimDto> moimList = moimService.getMoimFutureList(user.getId());
 
         return MoimListResponse.success(200, "예정 모임 목록이 조회 되었습니다.", moimList);
     }
 
-    @Operation(tags = { "Moim" }, summary = "초대된 모임 모록")
+    @Operation(tags = { "Moim" }, summary = "초대된 모임 목록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "초대 모임이 조회되었습니다", content = @Content(schema = @Schema(implementation = InvitedMoimResponse.class))),
             @ApiResponse(responseCode = "404", description = "초대 모임 목록이 없습니다.")
     })
-    @GetMapping(value = "/v1/invited-moim-list")
-    public InvitedMoimResponse getInvitedMoimList(HttpServletRequest token) throws NoResultListException {
+    @GetMapping(value = "/v1/list-invited")
+    public Response<List<InvitedMoimListDto>> getInvitedMoimList(HttpServletRequest token)
+            throws NoResultListException {
         User user = (User) token.getAttribute("user");
 
         List<InvitedMoimListDto> invitedMoimList = moimService.getInvitedMoimList(user.getId());
@@ -269,11 +286,61 @@ public class MoimController {
 
     }
 
+    @Operation(tags = { "Moim" }, summary = "특정 모임 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "과거 모임이 삭제되었습니다.", content = @Content(schema = @Schema(implementation = MoimListResponse.class))),
+    })
+    @DeleteMapping(value = "/v1/delete/moim-history")
+    public Response<List<MoimDto>> deleteMoimHistory(HttpServletRequest token,
+            @RequestBody @Validated MoimHistoryRequest request) {
+        User user = (User) token.getAttribute("user");
+
+        List<MoimDto> result = moimService.deleteMoimHistory(request.moim_id, request.host_id, user.getId());
+
+        return MoimListResponse.success(200, "과거 모임이 삭제되었습니다.", result);
+
+    }
+
+    @Operation(tags = { "Moim" }, summary = "모임 상세 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임 정보가 조회되었습니다.", content = @Content(schema = @Schema(implementation = InvitedMoimResponse.class))),
+            @ApiResponse(responseCode = "404", description = "해당 모임이 존재하지 않습니다.")
+    })
+    @GetMapping(value = "/v1/detail")
+    public Response<MoimDetailDto> getMoimDetailInfo(HttpServletRequest token,
+            @RequestParam(name = "moim_id") @NotNull Long moim_id) throws NoResultListException {
+        MoimDetailDto moimDetailInfo = moimService.getMoimDetailInfo(moim_id);
+
+        return MoimDetailListResponse.success(200, "모임 정보가 조회되었습니다.", moimDetailInfo);
+
+    }
+
+    @Operation(tags = { "Moim" }, summary = "딥링크를 통한 모임 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임 정보가 조회되었습니다.", content = @Content(schema = @Schema(implementation = DeepLinkMoimResponse.class))),
+            @ApiResponse(responseCode = "404", description = "해당 모임이 존재하지 않습니다.")
+    })
+    @GetMapping(value = "/v1/deeplink-info")
+    public Response<MoimDto> getMoimInfoByDeepLink(@RequestParam(name = "encryptInfo") @NotNull String encryptInfo)
+            throws Exception {
+        MoimDto moimInfo = moimService.getMoimNameAndDeadLine(encryptInfo);
+
+        return DeepLinkMoimResponse.success(200, "모임 정보가 조회되었습니다.", moimInfo);
+
+    }
+
     @Data
-    static class MoimParticipateRequest {
+    static class deepLinkParticipate {
         @NotNull
         @Schema(description = "모임방 정보", example = "CbXrx470K6OcAZWiy94SPw==", type = "String")
         private String encrptedInfo;
+    }
+
+    @Data
+    static class InvitedLinkParticipate {
+        @NotNull
+        @Schema(description = "모임방 정보", example = "2752", type = "String")
+        private Long moimId;
     }
 
     @Data
@@ -322,70 +389,13 @@ public class MoimController {
     @Data
     static class AdjustScheduleRequest {
         @NotNull
-        @Schema(description = "모임방 정보", example = "CbXrx470K6OcAZWiy94SPw==", type = "String")
-        private String encrptedInfo;
-
-        @NotNull
-        @Schema(description = "모임시간 정보", type = "MoimTimeInfo")
-        private List<MoimTimeInfo> moim_time_list;
-
-    }
-
-    @Data
-    static class MoimTimeInfo {
-        @NonNull
-        @Schema(description = "선택일", example = "2023-03-10", type = "String")
-        private String selectedDate;
-
-        @Schema(description = "오전 9시", example = "true", type = "Boolean")
-        private boolean amNine;
-
-        @Schema(description = "오전 10시", example = "true", type = "Boolean")
-        private boolean amTen;
-
-        @Schema(description = "오전 11시", example = "true", type = "Boolean")
-        private boolean amEleven;
-
-        @Schema(description = "정오", example = "true", type = "Boolean")
-        private boolean noon;
-
-        @Schema(description = "오후 1시", example = "true", type = "Boolean")
-        private boolean pmOne;
-
-        @Schema(description = "오후 2시", example = "true", type = "Boolean")
-        private boolean pmTwo;
-
-        @Schema(description = "오후 3시", example = "true", type = "Boolean")
-        private boolean pmThree;
-
-        @Schema(description = "오후 4시", example = "true", type = "Boolean")
-        private boolean pmFour;
-
-        @Schema(description = "오후 5시", example = "true", type = "Boolean")
-        private boolean pmFive;
-
-        @Schema(description = "오후 6시", example = "true", type = "Boolean")
-        private boolean pmSix;
-
-        @Schema(description = "오후 7시", example = "true", type = "Boolean")
-        private boolean pmSeven;
-
-        @Schema(description = "오후 8시", example = "true", type = "Boolean")
-        private boolean pmEight;
-
-        @Schema(description = "오후 9시", example = "true", type = "Boolean")
-        private boolean pmNine;
-    }
-
-    @Data
-    static class TimeVoteRequest {
-        @NotNull
         @Schema(description = "모임 아이디", example = "1")
         private Long moim_id;
 
         @NotNull
-        @Schema(description = "선택된 날짜", example = "2023-03-10", type = "String")
-        private String selected_date;
+        @Schema(description = "모임시간 정보", type = "MoimTimeInfo")
+        private List<MoimTImeInfoDto> moim_time_list;
+
     }
 
     @Data

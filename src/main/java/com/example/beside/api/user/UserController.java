@@ -8,11 +8,11 @@ import com.example.beside.common.Exception.ExceptionDetail.PasswordNotCorrectExc
 import com.example.beside.common.Exception.ExceptionDetail.UserNotExistException;
 import com.example.beside.common.Exception.ExceptionDetail.UserValidateNickName;
 import com.example.beside.common.response.Response;
-import com.example.beside.common.response.UserResponse;
-import com.example.beside.common.response.AllUsersResponse;
-import com.example.beside.common.response.BooleanResponse;
-import com.example.beside.common.response.LoginResponse;
-import com.example.beside.common.response.MyFriendResponse;
+import com.example.beside.common.response.ResponseDetail.AllUsersResponse;
+import com.example.beside.common.response.ResponseDetail.BooleanResponse;
+import com.example.beside.common.response.ResponseDetail.LoginResponse;
+import com.example.beside.common.response.ResponseDetail.MyFriendResponse;
+import com.example.beside.common.response.ResponseDetail.UserResponse;
 import com.example.beside.domain.User;
 import com.example.beside.dto.FriendDto;
 import com.example.beside.dto.UserDto;
@@ -68,7 +68,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "존재하지 않는 사용자입니다.")
     })
     @GetMapping(value = "/v1/users")
-    public AllUsersResponse getAllUsers(HttpServletRequest request) {
+    public Response<List<UserDto>> getAllUsers(HttpServletRequest request) {
         List<UserDto> UserDtoList = new ArrayList<>();
         User user_ = (User) request.getAttribute("user");
 
@@ -89,7 +89,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "비밀번호가 일치하지 않습니다.")
     })
     @PostMapping(value = "/v1/login")
-    public LoginResponse login(@RequestBody @Validated LoginUserRequest requset, HttpServletResponse response)
+    public Response<UserTokenDto> login(@RequestBody @Validated LoginUserRequest requset, HttpServletResponse response)
             throws PasswordException, UserNotExistException, PasswordNotCorrectException {
 
         User user = new User();
@@ -114,7 +114,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "올바른 형식의 이메일, 패스워드야 합니다")
     })
     @PostMapping(value = "/v1/signup")
-    public LoginResponse createUser(@RequestBody @Validated CreateUserRequest requset,
+    public Response<UserTokenDto> createUser(@RequestBody @Validated CreateUserRequest requset,
             HttpServletResponse response)
             throws PasswordException, UserNotExistException, UserValidateNickName, PasswordNotCorrectException {
         User user = new User();
@@ -162,7 +162,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "이메일 전송이 실패했습니다.")
     })
     @PostMapping(value = "/v1/signup/verify-code")
-    public BooleanResponse checkVerificationCode(@RequestBody @Validated EmailValidateRequest request)
+    public Response<Boolean> checkVerificationCode(@RequestBody @Validated EmailValidateRequest request)
             throws EmailValidateException {
 
         Boolean isValid = emailService.checkEmailValidate(request.getEmail(), request.getValidateCode());
@@ -192,7 +192,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "닉네임이 변경 되었습니다.", content = @Content(schema = @Schema(implementation = UserResponse.class))),
             @ApiResponse(responseCode = "400", description = "닉네임은 8자 이내여야 합니다.") })
     @PutMapping(value = "/v1/update/nickname")
-    public UserResponse updateNickname(HttpServletRequest token,
+    public Response<UserDto> updateNickname(HttpServletRequest token,
             @RequestBody @Validated UpdateUserNicknameRequest request)
             throws Exception {
         User user = (User) token.getAttribute("user");
@@ -213,7 +213,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "알람 상태가 변경 되었습니다.", content = @Content(schema = @Schema(implementation = UserResponse.class))) })
     @PutMapping(value = "/v1/update/alarm-state")
-    public UserResponse updateAlarmState(HttpServletRequest token,
+    public Response<UserDto> updateAlarmState(HttpServletRequest token,
             @RequestBody @Validated UpdateAlarmStateRequest request) {
 
         User user = (User) token.getAttribute("user");
@@ -239,7 +239,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "해당 이메일이 존재합니다", content = @Content(schema = @Schema(implementation = BooleanResponse.class))),
             @ApiResponse(responseCode = "400", description = "해당 이메일이 존재하지 않습니다") })
     @PostMapping(value = "/v1/check-email")
-    public BooleanResponse checkEmailAccount(@RequestBody @Validated EmailRequest request)
+    public Response<Boolean> checkEmailAccount(@RequestBody @Validated EmailRequest request)
             throws UserNotExistException {
         var email = request.getEmail();
         var user = userService.findUserByEmail(email);
@@ -258,23 +258,15 @@ public class UserController {
         List<String> profileList = new ArrayList<String>();
 
         String img = "";
-        img = "https://moim.life/profile/green.jpg";
+        img = "https://moim.life/profile/char1.png";
         profileList.add(img);
-        img = "https://moim.life/profile/heart.jpg";
+        img = "https://moim.life/profile/char2.png";
         profileList.add(img);
-        img = "https://moim.life/profile/lightgreen.jpg";
+        img = "https://moim.life/profile/char3.png";
         profileList.add(img);
-        img = "https://moim.life/profile/lightpurple.jpg";
+        img = "https://moim.life/profile/char4.png";
         profileList.add(img);
-        img = "https://moim.life/profile/purple_bubble.jpg";
-        profileList.add(img);
-        img = "https://moim.life/profile/purple_diamond.jpg";
-        profileList.add(img);
-        img = "https://moim.life/profile/purple_flower.jpg";
-        profileList.add(img);
-        img = "https://moim.life/profile/skyblue.jpg";
-        profileList.add(img);
-        img = "https://moim.life/profile/yellow.jpg";
+        img = "https://moim.life/profile/char5.png";
         profileList.add(img);
 
         return Response.success(200, "프로필 이미지가 조회 되었습니다.", profileList);
@@ -284,7 +276,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "프로필이 수정되었습니다.", content = @Content(schema = @Schema(implementation = UserResponse.class))), })
     @PutMapping("/v1/update/profile-image")
-    public UserResponse updateProfileImage(HttpServletRequest token,
+    public Response<UserDto> updateProfileImage(HttpServletRequest token,
             @RequestBody @Validated UpdateUserProfileImage updateUserProfileImage) throws Exception {
         User user = (User) token.getAttribute("user");
 
@@ -360,7 +352,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "친구 목록이 조회되었습니다.", content = @Content(schema = @Schema(implementation = MyFriendResponse.class))),
             @ApiResponse(responseCode = "404", description = "친구 목록이 없습니다.") })
     @GetMapping("/v1/my-friend")
-    public MyFriendResponse getMyfriendList(HttpServletRequest token) throws NoResultListException {
+    public Response<FriendDto> getMyfriendList(HttpServletRequest token) throws NoResultListException {
         User user = (User) token.getAttribute("user");
         // List<FriendDto> friendDtoList = userService.findFriendByUserId(user);
         FriendDto friendDto = userService.findFriendByUserId(user);
@@ -380,7 +372,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 정보가 조회되었습니다.", content = @Content(schema = @Schema(implementation = UserResponse.class))), })
     @GetMapping("/v1/user-info")
-    public UserResponse getUserInfo(HttpServletRequest token, HttpServletResponse response) {
+    public Response<UserDto> getUserInfo(HttpServletRequest token, HttpServletResponse response) {
         User user = (User) token.getAttribute("user");
 
         User userInfo = userService.findUserById(user.getId());

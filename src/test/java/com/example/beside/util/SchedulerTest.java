@@ -6,6 +6,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.beside.service.FcmPushService;
+import com.example.beside.service.UserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,11 @@ public class SchedulerTest {
     @Autowired
     private UserRepositoryImpl userRepository;
 
+    @Autowired
+    private  UserService userService;
+    @Autowired
+    private FcmPushService fcmPushService;
+
     private User user;
     private User user2;
     private Moim newMoim;
@@ -46,11 +53,13 @@ public class SchedulerTest {
         user.setName("부엉이");
         user.setEmail("test-user@google.com");
         user.setPassword("Moim@0303");
+        user.setPush_alarm(false);
 
         user2 = new User();
         user2.setName("강아지");
         user2.setEmail("test-user@2google.com");
         user2.setPassword("Moim@0303");
+        user.setPush_alarm(false);
 
         // 모임 세팅
         newMoim = new Moim();
@@ -102,7 +111,7 @@ public class SchedulerTest {
         var moimMember = moimRepository.getMoimMemberByMemberId(moimId, findUser2.getId());
         // 상세 모임 일정 등록
         moimRepository.saveSchedule(moimMember, normalMoimMemberTime);
-        Scheduler scheduler = new Scheduler(moimRepository);
+        Scheduler scheduler = new Scheduler(moimRepository, userService, fcmPushService);
 
         // when
         scheduler.fixMoimSchedulering();

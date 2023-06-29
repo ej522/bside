@@ -8,12 +8,7 @@ import com.example.beside.domain.MoimDate;
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.MoimMemberTime;
 import com.example.beside.domain.User;
-import com.example.beside.dto.InvitedMoimListDto;
-import com.example.beside.dto.MoimOveralDateDto;
-import com.example.beside.dto.MoimOveralScheduleDto;
-import com.example.beside.dto.MyMoimDto;
-import com.example.beside.dto.VoteMoimTimeCntDto;
-import com.example.beside.dto.VotingMoimDto;
+import com.example.beside.dto.*;
 
 public interface MoimRepository {
     // CREATE
@@ -21,11 +16,13 @@ public interface MoimRepository {
 
     long makeMoimMember(User user, Moim moim);
 
-    long makeMoimMember(String friend, Moim moim);
+    long makeMoimMemberToFriend(String friend, Moim moim);
 
     long makeFriend(Long friend_id, Long moim_id, User user);
 
     long saveSchedule(MoimMember moimMember, List<MoimMemberTime> moimTimeInfos);
+
+    void fixMoimDate(Moim moim, LocalDateTime date, int time);
 
     // READ
     Moim getMoimInfo(Long moimId);
@@ -34,7 +31,7 @@ public interface MoimRepository {
 
     Boolean alreadyJoinedMoim(Long moimId, Long userId);
 
-    List<MyMoimDto> findMyMoimHistoryList(Long userId);
+    List<MoimDto> findMyMoimHistoryList(Long userId);
 
     List<VotingMoimDto> findVotingMoimHistory(Long user_id);
 
@@ -50,13 +47,21 @@ public interface MoimRepository {
 
     List<MoimOveralScheduleDto> getMoimScheduleInfo(Long moimId);
 
-    List<MyMoimDto> findMyMoimList(Long userId);
+    List<MoimDto> findMyMoimList(Long userId);
 
     int getDateVoteCnt(Long moimId, LocalDateTime selectedDate);
 
     VoteMoimTimeCntDto getTimeVoteCnt(Long moimId, LocalDateTime selectedDate);
 
-    List<MyMoimDto> findMyMoimFutureList(Long userId);
+    List<MoimDto> findMyMoimFutureList(Long userId);
+
+    MoimDateDto findMoimDateByMoimIdAndDate(Long moimId, LocalDateTime selectedDate);
+
+    MoimDto findMoimByMoimId(Long moimId);
+
+    List<MoimMemberDto> findMoimMemberByMoimId(Long moimId);
+
+    List<MoimDateDto> findMoimDateByMoimId(Long moimId);
 
     // UPDATE
     long deleteHostHistory(Long userId, Long moimId);

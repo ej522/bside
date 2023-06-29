@@ -19,7 +19,7 @@ public interface UserRepository {
 
     Optional<User> findUserNickname(String nickName);
 
-    List<FriendDto> findFriendByUserId(Long user_id);
+    List<FriendDto.FriendInfo> findFriendByUserId(Long user_id);
 
     List<User> findUserAll();
 
@@ -37,5 +37,5 @@ public interface UserRepository {
     // DELETE
     void deleteUser(User user);
 
-    List<FriendDto.FriendInfo> test(Long user_id);
+    //List<FriendDto.FriendInfo> test(Long user_id);
 }
