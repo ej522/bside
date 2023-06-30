@@ -345,38 +345,6 @@ public class MoimRepositoryTest {
     }
 
     @Test
-    @DisplayName("시간을 투표한 인원이 몇 명인지 알 수 있는가?")
-    void testGetTimeVoteCnt() throws Exception {
-        // given
-        User findUser = userRepository.saveUser(user);
-        User findUser2 = userRepository.saveUser(user2);
-
-        newMoim.setUser(findUser);
-        // 모임 생성
-        long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
-        newMoim.setId(moimId);
-
-        // 모임 참여
-        moimRepository.makeMoimMember(findUser2, newMoim);
-
-        // 모임 멤버 조회
-        var moimMember = moimRepository.getMoimMemberByMemberId(moimId, findUser2.getId());
-
-        moimRepository.saveSchedule(moimMember, normalMoimMemberTime);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        // when
-        VoteMoimTimeCntDto test = moimRepository.getTimeVoteCnt(moimId,
-                LocalDate.parse("2023-03-10", formatter).atStartOfDay());
-
-        // then
-        Assertions.assertThat(test.getAm_nine_cnt()).isEqualTo(0);
-        Assertions.assertThat(test.getAm_ten_cnt()).isEqualTo(0);
-        Assertions.assertThat(test.getPm_eight_cnt()).isEqualTo(1);
-        Assertions.assertThat(test.getPm_nine_cnt()).isEqualTo(1);
-    }
-
-    @Test
     @DisplayName("과거 모임 목록을 조회할 수 있는가?")
     void testGetFindMyMoimHistoryList() throws Exception {
         // given

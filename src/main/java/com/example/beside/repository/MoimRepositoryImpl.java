@@ -565,60 +565,6 @@ public class MoimRepositoryImpl implements MoimRepository {
         }
 
         @Override
-        public VoteMoimTimeCntDto getTimeVoteCnt(Long moim_id, LocalDateTime select_date) {
-                queryFactory = new JPAQueryFactory(em);
-
-                QMoim qMoim = QMoim.moim;
-                QMoimDate qMoimDate = QMoimDate.moimDate;
-                QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
-
-                VoteMoimTimeCntDto result = queryFactory.select(
-                                Projections.constructor(VoteMoimTimeCntDto.class,
-                                                qMoimMemberTime.selected_date,
-                                                getTimeCnt(qMoimMemberTime.am_nine.eq(true)),
-                                                getTimeCnt(qMoimMemberTime.am_ten.eq(true)),
-                                                getTimeCnt(qMoimMemberTime.am_eleven.eq(true)),
-                                                getTimeCnt(qMoimMemberTime.noon.eq(true)),
-                                                getTimeCnt(qMoimMemberTime.pm_one.eq(true)),
-                                                getTimeCnt(qMoimMemberTime.pm_two.eq(true)),
-                                                getTimeCnt(qMoimMemberTime.pm_three.eq(true)),
-                                                getTimeCnt(qMoimMemberTime.pm_four.eq(true)),
-                                                getTimeCnt(qMoimMemberTime.pm_five.eq(true)),
-                                                getTimeCnt(qMoimMemberTime.pm_six.eq(true)),
-                                                getTimeCnt(qMoimMemberTime.pm_seven.eq(true)),
-                                                getTimeCnt(qMoimMemberTime.pm_eigth.eq(true)),
-                                                getTimeCnt(qMoimMemberTime.pm_nine.eq(true))))
-                                .from(qMoim)
-                                .leftJoin(qMoimDate).on(qMoim.id.eq(qMoimDate.moim.id))
-                                .leftJoin(qMoimMemberTime)
-                                .on(qMoim.id.eq(qMoimMemberTime.moim_id)
-                                                .and(qMoimDate.selected_date.eq(qMoimMemberTime.selected_date)))
-                                .where(qMoim.id.eq(moim_id).and(qMoimMemberTime.selected_date.eq(select_date)))
-                                .groupBy(qMoimMemberTime.selected_date)
-                                .fetchOne();
-
-                if (result == null) {
-                        result = new VoteMoimTimeCntDto();
-                        result.setSelected_date(select_date);
-                        result.setAm_nine_cnt(0);
-                        result.setAm_ten_cnt(0);
-                        result.setAm_eleven_cnt(0);
-                        result.setNoon_cnt(0);
-                        result.setPm_one_cnt(0);
-                        result.setPm_two_cnt(0);
-                        result.setPm_three_cnt(0);
-                        result.setPm_four_cnt(0);
-                        result.setPm_five_cnt(0);
-                        result.setPm_six_cnt(0);
-                        result.setPm_seven_cnt(0);
-                        result.setPm_eight_cnt(0);
-                        result.setPm_nine_cnt(0);
-                }
-
-                return result;
-        }
-
-        @Override
         public List<MoimDto> findMyMoimFutureList(Long userId) {
                 queryFactory = new JPAQueryFactory(em);
 

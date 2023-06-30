@@ -51,8 +51,6 @@ public interface MoimRepository {
 
     int getDateVoteCnt(Long moimId, LocalDateTime selectedDate);
 
-    VoteMoimTimeCntDto getTimeVoteCnt(Long moimId, LocalDateTime selectedDate);
-
     List<MoimDto> findMyMoimFutureList(Long userId);
 
     MoimDateDto findMoimDateByMoimIdAndDate(Long moimId, LocalDateTime selectedDate);
