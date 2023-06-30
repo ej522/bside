@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.beside.dto.*;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 
@@ -112,7 +114,7 @@ public class MoimRepositoryImpl implements MoimRepository {
         }
 
         @Override
-        public List<MoimOveralDateDto> getMoimOveralInfo(Long moinId) {
+        public List<MoimOveralDateDto> getMoimOveralInfo(Long moinId, LocalDateTime selected_date) {
                 queryFactory = new JPAQueryFactory(em);
 
                 QMoimDate qMoimDate = QMoimDate.moimDate;
@@ -125,7 +127,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .from(qMoim)
                                 .leftJoin(qMoimDate).on(qMoim.id.eq(qMoimDate.moim.id))
                                 .leftJoin(qUser).on(qMoim.user.id.eq(qUser.id))
-                                .where(qMoim.id.eq(moinId))
+                                .where(qMoim.id.eq(moinId), dateEq(selected_date, qMoimDate))
                                 .fetch();
 
                 return result;
@@ -741,5 +743,10 @@ public class MoimRepositoryImpl implements MoimRepository {
         private NumberExpression<Integer> getTimeCnt(Object object) {
                 return Expressions
                                 .numberTemplate(Integer.class, "count(case when {0} then 1 end)", object);
+        }
+
+        private BooleanExpression dateEq(LocalDateTime selected_date, QMoimDate qMoimDate) {
+
+                return selected_date == null ? null : qMoimDate.selected_date.eq(selected_date);
         }
 }

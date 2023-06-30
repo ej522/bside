@@ -13,30 +13,45 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VoteMoimDateDto {
+
     @NotEmpty
-    @Schema(description = "모임 아이디", example = "1")
+    @Schema(description = "모임 ID", example = "1")
     private Long moim_id;
 
     @NotEmpty
-    @Schema(description = "선택된 날짜", example = "2023-05-26")
-    private LocalDateTime selected_date;
+    @Schema(description = "총 투표수", example = "5")
+    private Integer total;
 
-    @NotEmpty
-    @Schema(description = "오전", example = "true")
-    private Boolean morning;
+    @Schema
+    private List<DateVoteInfo> voteList;
 
-    @NotEmpty
-    @Schema(description = "오후", example = "true")
-    private Boolean afternoon;
+    @Data
+    public static class DateVoteInfo {
+        @NotEmpty
+        @Schema(description = "선택한 날짜", example = "2023-01-01")
+        private LocalDateTime selected_date;
 
-    @NotEmpty
-    @Schema(description = "저녁", example = "true")
-    private Boolean evening;
+        @NotEmpty
+        @Schema(description = "투표 수", example = "1")
+        private Integer vote_cnt;
 
-    @NotEmpty
-    @Schema(description = "투표한 인원", example = "1")
-    private Integer vote_cnt;
+        @Schema(description = "해당 날짜에 투표한 유저 정보")
+        private List<DateUserInfo> userInfoList;
 
-    @Schema(description = "유저정보")
-    private List<UserDto> user_info;
+    }
+
+    @Data
+    public static class DateUserInfo {
+        @NotEmpty
+        @Schema(description = "유저ID", example = "1")
+        private Long user_id;
+
+        @NotEmpty
+        @Schema(description = "유저 닉네임", example = "닉네임")
+        private String nickname;
+
+        @Schema(description = "유저 프로필", example = "https://moim.life/profile/green.jpg")
+        private String profile;
+    }
+
 }

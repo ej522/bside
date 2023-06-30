@@ -27,7 +27,7 @@ public interface MoimRepository {
     // READ
     Moim getMoimInfo(Long moimId);
 
-    List<MoimOveralDateDto> getMoimOveralInfo(Long moimId);
+    List<MoimOveralDateDto> getMoimOveralInfo(Long moimId, LocalDateTime selected_date);
 
     Boolean alreadyJoinedMoim(Long moimId, Long userId);
 

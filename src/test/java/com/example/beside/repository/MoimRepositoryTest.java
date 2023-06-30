@@ -159,7 +159,8 @@ public class MoimRepositoryTest {
         moimRepository.makeMoimMember(savedUser, newMoim);
 
         // when
-        List<MoimOveralDateDto> moimOveralInfo = moimRepository.getMoimOveralInfo(moimId);
+        List<MoimOveralDateDto> moimOveralInfo = moimRepository.getMoimOveralInfo(moimId, null);
+        System.out.println("moimOveralInfo="+moimOveralInfo);
 
         // then
         Assertions.assertThat(moimOveralInfo.get(0).getId()).isEqualTo(moimId);
