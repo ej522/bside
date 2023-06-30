@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,10 +23,10 @@ public class VoteMoimDateDto {
     private Integer total;
 
     @Schema
-    private List<VoteInfo> voteList;
+    private List<DateVoteInfo> voteList;
 
     @Data
-    public static class VoteInfo {
+    public static class DateVoteInfo {
         @NotEmpty
         @Schema(description = "선택한 날짜", example = "2023-01-01")
         private LocalDateTime selected_date;
@@ -37,12 +36,12 @@ public class VoteMoimDateDto {
         private Integer vote_cnt;
 
         @Schema(description = "해당 날짜에 투표한 유저 정보")
-        private List<UserInfo> userInfo;
+        private List<DateUserInfo> userInfoList;
 
     }
 
     @Data
-    public static class UserInfo {
+    public static class DateUserInfo {
         @NotEmpty
         @Schema(description = "유저ID", example = "1")
         private Long user_id;

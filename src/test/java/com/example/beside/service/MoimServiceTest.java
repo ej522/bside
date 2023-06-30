@@ -613,12 +613,16 @@ public class MoimServiceTest {
         moimService.adjustSchedule(saveUser2, moimId, normalMoimMemberTime);
 
         // when
-        VoteMoimTimeDto test = moimService.getVoteTimeInfo(moimId,
+        VoteMoimTimeDto result = moimService.getVoteTimeInfo(moimId,
                 LocalDate.parse("2023-03-13", formatter).atStartOfDay());
 
         // then
-        assertTrue(test.getTime_info().get(0).getVote_cnt() == 0); // am_9
-        assertTrue(test.getTime_info().get(4).getVote_cnt() == 1); // pm_1
+        assertTrue(result.getTotal()==2);
+        assertTrue(result.getMorning()!=null);
+        assertTrue(result.getAfternoon()!=null);
+        assertTrue(result.getEvening()==null);
+        assertTrue(result.getMorning().get(0).getVote_cnt()==0);  //am9
+        assertTrue(result.getAfternoon().get(1).getVote_cnt()>0); //pm1
 
     }
 
