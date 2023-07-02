@@ -645,36 +645,6 @@ public class MoimService {
         return summInfo;
     }
 
-    private List<UserDto> setTimeUserInfo(MoimOveralScheduleDto voteUserInfo, List<UserDto> voteUserInfoList) {
-        UserDto userDto = new UserDto();
-        userDto.setId(voteUserInfo.getUser_id());
-        userDto.setName(voteUserInfo.getMember_name());
-        userDto.setProfile_image(voteUserInfo.getProfile_image());
-
-        voteUserInfoList.add(userDto);
-
-        return voteUserInfoList;
-    }
-
-    // private VoteMoimTimeDetailDto setTimeInfo(int time, int cnt) {
-    // VoteMoimTimeDetailDto timeInfo = new VoteMoimTimeDetailDto();
-    // timeInfo.setTime(time);
-    // timeInfo.setVote_cnt(cnt);
-    //
-    // return timeInfo;
-    // }
-    //
-    // private List<VoteMoimTimeDetailDto>
-    // setVoteTimeInfoList(List<VoteMoimTimeDetailDto> timeInfoList,
-    // VoteMoimTimeDetailDto timeInfo, List<UserDto> useInfoList) {
-    // timeInfo.setUser_info(useInfoList);
-    //
-    // timeInfoList.add(timeInfo);
-    //
-    // return timeInfoList;
-    //
-    // }
-
     private List<VoteMoimTimeDto.TimeVoteInfo> setVoteTimeInfo(List<VoteMoimTimeDto.TimeVoteInfo> timeList,
             VoteMoimTimeDto.TimeVoteInfo timeVoteInfo,
             Integer time, Integer vote_cnt, List<VoteMoimTimeDto.TimeUserInfo> userInfoList) {
