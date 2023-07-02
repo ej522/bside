@@ -498,17 +498,17 @@ public class MoimServiceTest {
         newMoim.setDead_line_hour(5);
 
         Moim newMoim2 = new Moim();
-        newMoim.setUser(saveUser1);
-        newMoim.setMoim_name("테스트 모임2");
-        newMoim.setDead_line_hour(5);
+        newMoim2.setUser(saveUser1);
+        newMoim2.setMoim_name("테스트 모임2");
+        newMoim2.setDead_line_hour(5);
 
         // [모임 생성]
         String encryptedId = moimService.makeMoim(saveUser1, newMoim, normalMoimDates);
         // [모임 참여 -> 친구 생성]
         moimService.participateDeepLink(saveUser2, encryptedId);
-
         // [모임 생성]
         String encryptedId2 = moimService.makeMoim(saveUser1, newMoim2, normalMoimDates);
+
         List<String> friendIdList = new ArrayList<>();
         friendIdList.add(String.valueOf(saveUser2.getId()));
         // [모임 초대]
@@ -581,8 +581,10 @@ public class MoimServiceTest {
         // given
         assertTrue(result.getTotal().equals(1));
         assertTrue(result.getTotal().equals(1));
-        assertTrue(result.getVoteList().get(0).getSelected_date().isEqual(LocalDate.parse("2023-03-10", formatter).atStartOfDay()));
-        assertTrue(result.getVoteList().get(1).getSelected_date().isEqual(LocalDate.parse("2023-03-13", formatter).atStartOfDay()));
+        assertTrue(result.getVoteList().get(0).getSelected_date()
+                .isEqual(LocalDate.parse("2023-03-10", formatter).atStartOfDay()));
+        assertTrue(result.getVoteList().get(1).getSelected_date()
+                .isEqual(LocalDate.parse("2023-03-13", formatter).atStartOfDay()));
         assertTrue(result.getVoteList().get(0).getVote_cnt().equals(0));
         assertTrue(result.getVoteList().get(1).getVote_cnt().equals(1));
     }
@@ -617,12 +619,12 @@ public class MoimServiceTest {
                 LocalDate.parse("2023-03-13", formatter).atStartOfDay());
 
         // then
-        assertTrue(result.getTotal()==2);
-        assertTrue(result.getMorning()!=null);
-        assertTrue(result.getAfternoon()!=null);
-        assertTrue(result.getEvening()==null);
-        assertTrue(result.getMorning().get(0).getVote_cnt()==0);  //am9
-        assertTrue(result.getAfternoon().get(1).getVote_cnt()>0); //pm1
+        assertTrue(result.getTotal() == 2);
+        assertTrue(result.getMorning() != null);
+        assertTrue(result.getAfternoon() != null);
+        assertTrue(result.getEvening() == null);
+        assertTrue(result.getMorning().get(0).getVote_cnt() == 0); // am9
+        assertTrue(result.getAfternoon().get(1).getVote_cnt() > 0); // pm1
 
     }
 
