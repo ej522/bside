@@ -310,7 +310,7 @@ public class MoimService {
         // 모임 날짜 정보
         List<MoimOveralDateDto> dateInfoList = moimRepository.getMoimOveralInfo(moimId, null);
 
-        if(dateInfoList.size()==0)
+        if (dateInfoList.size() == 0)
             throw new NoResultListException("해당 모임이 존재하지 않습니다.");
 
         // 투표 인원 정보
@@ -318,33 +318,33 @@ public class MoimService {
 
         VoteMoimDateDto voteMoimDateInfo = new VoteMoimDateDto();
 
-        //총 투표수
+        // 총 투표수
         int total = 0;
 
         voteMoimDateInfo.setMoim_id(dateInfoList.get(0).getId());
 
         List<VoteMoimDateDto.DateVoteInfo> voteInfoList = new ArrayList<>();
 
-        for(int i=0; i<dateInfoList.size(); i++) {
+        for (int i = 0; i < dateInfoList.size(); i++) {
             VoteMoimDateDto.DateVoteInfo voteInfo = new VoteMoimDateDto.DateVoteInfo();
 
             LocalDateTime selected_date = dateInfoList.get(i).getSelected_date();
             voteInfo.setSelected_date(selected_date);
 
-            //각 날짜 투표수
+            // 각 날짜 투표수
             int vote_cnt = 0;
 
             List<VoteMoimDateDto.DateUserInfo> userInfoList = new ArrayList<>();
 
-            for(MoimOveralScheduleDto voteUserInfo : voteUserInfoList) {
-                if(voteUserInfo.getSelected_date()==null) {//투표한 사람이 없는 경우
+            for (MoimOveralScheduleDto voteUserInfo : voteUserInfoList) {
+                if (voteUserInfo.getSelected_date() == null) {// 투표한 사람이 없는 경우
                     break;
                 }
 
-                if(selected_date.isEqual(voteUserInfo.getSelected_date())) {
+                if (selected_date.isEqual(voteUserInfo.getSelected_date())) {
                     VoteMoimDateDto.DateUserInfo userInfo = new VoteMoimDateDto.DateUserInfo();
 
-                    //투표자 정보
+                    // 투표자 정보
                     userInfo.setUser_id(voteUserInfo.getUser_id());
                     userInfo.setNickname(voteUserInfo.getMember_name());
                     userInfo.setProfile(voteUserInfo.getProfile_image());
@@ -372,7 +372,7 @@ public class MoimService {
     public VoteMoimTimeDto getVoteTimeInfo(Long moimId, LocalDateTime selected_date) throws Exception {
         // 모임 날짜 정보
         List<MoimOveralDateDto> dateInfoList = moimRepository.getMoimOveralInfo(moimId, selected_date);
-        if(dateInfoList.size()==0)
+        if (dateInfoList.size() == 0)
             throw new NoResultListException("잘못된 날짜를 선택하셨습니다.");
 
         // 투표 인원 정보
@@ -385,7 +385,7 @@ public class MoimService {
         moimTimeInfo.setMoim_id(voteUserInfoList.get(0).getMoim_id());
         moimTimeInfo.setSelected_date(selected_date);
 
-        //시간
+        // 시간
         VoteMoimTimeDto.TimeVoteInfo am9Info = new VoteMoimTimeDto.TimeVoteInfo();
         VoteMoimTimeDto.TimeVoteInfo am10Info = new VoteMoimTimeDto.TimeVoteInfo();
         VoteMoimTimeDto.TimeVoteInfo am11Info = new VoteMoimTimeDto.TimeVoteInfo();
@@ -428,100 +428,100 @@ public class MoimService {
         List<VoteMoimTimeDto.TimeUserInfo> pm20userInfoList = new ArrayList<>();
         List<VoteMoimTimeDto.TimeUserInfo> pm21userInfoList = new ArrayList<>();
 
-        for(MoimOveralScheduleDto voteUserInfo : voteUserInfoList) {
-            if(voteUserInfo.getSelected_date()==null) {//투표한 사람이 없는 경우
+        for (MoimOveralScheduleDto voteUserInfo : voteUserInfoList) {
+            if (voteUserInfo.getSelected_date() == null) {// 투표한 사람이 없는 경우
                 break;
             }
 
             VoteMoimTimeDto.TimeUserInfo userInfo = new VoteMoimTimeDto.TimeUserInfo();
 
-            //해당 날짜의 시간에 투표한 인원
-            if(selected_date.isEqual(voteUserInfo.getSelected_date())) {
-                if(voteUserInfo.getAm_nine()) {
+            // 해당 날짜의 시간에 투표한 인원
+            if (selected_date.isEqual(voteUserInfo.getSelected_date())) {
+                if (voteUserInfo.getAm_nine()) {
                     am9userInfoList = setVoteTimeUserInfoList(userInfo, voteUserInfo, am9userInfoList);
 
                     am9Cnt++;
                     total++;
                 }
 
-                if(voteUserInfo.getAm_ten()) {
+                if (voteUserInfo.getAm_ten()) {
                     am10userInfoList = setVoteTimeUserInfoList(userInfo, voteUserInfo, am10userInfoList);
 
                     am10Cnt++;
                     total++;
                 }
 
-                if(voteUserInfo.getAm_eleven()) {
+                if (voteUserInfo.getAm_eleven()) {
                     am11userInfoList = setVoteTimeUserInfoList(userInfo, voteUserInfo, am11userInfoList);
 
                     am11Cnt++;
                     total++;
                 }
 
-                if(voteUserInfo.getNoon()) {
+                if (voteUserInfo.getNoon()) {
                     pm12userInfoList = setVoteTimeUserInfoList(userInfo, voteUserInfo, pm12userInfoList);
 
                     pm12Cnt++;
                     total++;
                 }
 
-                if(voteUserInfo.getPm_one()) {
+                if (voteUserInfo.getPm_one()) {
                     pm13userInfoList = setVoteTimeUserInfoList(userInfo, voteUserInfo, pm13userInfoList);
 
                     pm13Cnt++;
                     total++;
                 }
 
-                if(voteUserInfo.getPm_two()) {
+                if (voteUserInfo.getPm_two()) {
                     pm14userInfoList = setVoteTimeUserInfoList(userInfo, voteUserInfo, pm14userInfoList);
 
                     pm14Cnt++;
                     total++;
                 }
 
-                if(voteUserInfo.getPm_three()) {
+                if (voteUserInfo.getPm_three()) {
                     pm15userInfoList = setVoteTimeUserInfoList(userInfo, voteUserInfo, pm15userInfoList);
 
                     pm15Cnt++;
                     total++;
                 }
 
-                if(voteUserInfo.getPm_four()) {
+                if (voteUserInfo.getPm_four()) {
                     pm16userInfoList = setVoteTimeUserInfoList(userInfo, voteUserInfo, pm16userInfoList);
 
                     pm16Cnt++;
                     total++;
                 }
 
-                if(voteUserInfo.getPm_five()) {
+                if (voteUserInfo.getPm_five()) {
                     pm17userInfoList = setVoteTimeUserInfoList(userInfo, voteUserInfo, pm17userInfoList);
 
                     pm17Cnt++;
                     total++;
                 }
 
-                if(voteUserInfo.getPm_six()) {
+                if (voteUserInfo.getPm_six()) {
                     pm18userInfoList = setVoteTimeUserInfoList(userInfo, voteUserInfo, pm18userInfoList);
 
                     pm18Cnt++;
                     total++;
                 }
 
-                if(voteUserInfo.getPm_seven()) {
+                if (voteUserInfo.getPm_seven()) {
                     pm19userInfoList = setVoteTimeUserInfoList(userInfo, voteUserInfo, pm19userInfoList);
 
                     pm19Cnt++;
                     total++;
                 }
 
-                if(voteUserInfo.getPm_eight()) {
+                if (voteUserInfo.getPm_eight()) {
                     pm20userInfoList = setVoteTimeUserInfoList(userInfo, voteUserInfo, pm20userInfoList);
 
                     pm20Cnt++;
                     total++;
                 }
 
-                if(voteUserInfo.getPm_nine()) {
+                if (voteUserInfo.getPm_nine()) {
                     pm21userInfoList = setVoteTimeUserInfoList(userInfo, voteUserInfo, pm21userInfoList);
 
                     pm21Cnt++;
@@ -531,8 +531,8 @@ public class MoimService {
 
         }
 
-        //오전
-        if(dateInfoList.get(0).getMorning()) {
+        // 오전
+        if (dateInfoList.get(0).getMorning()) {
             List<VoteMoimTimeDto.TimeVoteInfo> moringList = new ArrayList<>();
             moringList = setVoteTimeInfo(moringList, am9Info, 9, am9Cnt, am9userInfoList);
             moringList = setVoteTimeInfo(moringList, am10Info, 10, am10Cnt, am10userInfoList);
@@ -540,27 +540,26 @@ public class MoimService {
             moimTimeInfo.setMorning(moringList);
         }
 
-
-        //오후
-        if(dateInfoList.get(0).getAfternoon()) {
+        // 오후
+        if (dateInfoList.get(0).getAfternoon()) {
             List<VoteMoimTimeDto.TimeVoteInfo> afternoonList = new ArrayList<>();
-            afternoonList = setVoteTimeInfo(afternoonList, pm12Info,12, pm12Cnt, pm12userInfoList);
-            afternoonList = setVoteTimeInfo(afternoonList, pm13Info,13, pm13Cnt, pm13userInfoList);
-            afternoonList = setVoteTimeInfo(afternoonList, pm14Info,14, pm14Cnt, pm14userInfoList);
-            afternoonList = setVoteTimeInfo(afternoonList, pm15Info,15, pm15Cnt, pm15userInfoList);
-            afternoonList = setVoteTimeInfo(afternoonList, pm16Info,16, pm16Cnt, pm16userInfoList);
-            afternoonList = setVoteTimeInfo(afternoonList, pm17Info,17, pm17Cnt, pm17userInfoList);
+            afternoonList = setVoteTimeInfo(afternoonList, pm12Info, 12, pm12Cnt, pm12userInfoList);
+            afternoonList = setVoteTimeInfo(afternoonList, pm13Info, 13, pm13Cnt, pm13userInfoList);
+            afternoonList = setVoteTimeInfo(afternoonList, pm14Info, 14, pm14Cnt, pm14userInfoList);
+            afternoonList = setVoteTimeInfo(afternoonList, pm15Info, 15, pm15Cnt, pm15userInfoList);
+            afternoonList = setVoteTimeInfo(afternoonList, pm16Info, 16, pm16Cnt, pm16userInfoList);
+            afternoonList = setVoteTimeInfo(afternoonList, pm17Info, 17, pm17Cnt, pm17userInfoList);
 
             moimTimeInfo.setAfternoon(afternoonList);
         }
 
-        //저녁
-        if(dateInfoList.get(0).getEvening()) {
+        // 저녁
+        if (dateInfoList.get(0).getEvening()) {
             List<VoteMoimTimeDto.TimeVoteInfo> eveningList = new ArrayList<>();
-            eveningList = setVoteTimeInfo(eveningList, pm18Info,18, pm18Cnt, pm18userInfoList);
-            eveningList = setVoteTimeInfo(eveningList, pm19Info,19, pm19Cnt, pm19userInfoList);
-            eveningList = setVoteTimeInfo(eveningList, pm20Info,20, pm20Cnt, pm20userInfoList);
-            eveningList = setVoteTimeInfo(eveningList, pm21Info,21, pm21Cnt, pm21userInfoList);
+            eveningList = setVoteTimeInfo(eveningList, pm18Info, 18, pm18Cnt, pm18userInfoList);
+            eveningList = setVoteTimeInfo(eveningList, pm19Info, 19, pm19Cnt, pm19userInfoList);
+            eveningList = setVoteTimeInfo(eveningList, pm20Info, 20, pm20Cnt, pm20userInfoList);
+            eveningList = setVoteTimeInfo(eveningList, pm21Info, 21, pm21Cnt, pm21userInfoList);
 
             moimTimeInfo.setEvening(eveningList);
         }
@@ -657,26 +656,28 @@ public class MoimService {
         return voteUserInfoList;
     }
 
-//    private VoteMoimTimeDetailDto setTimeInfo(int time, int cnt) {
-//        VoteMoimTimeDetailDto timeInfo = new VoteMoimTimeDetailDto();
-//        timeInfo.setTime(time);
-//        timeInfo.setVote_cnt(cnt);
-//
-//        return timeInfo;
-//    }
-//
-//    private List<VoteMoimTimeDetailDto> setVoteTimeInfoList(List<VoteMoimTimeDetailDto> timeInfoList,
-//            VoteMoimTimeDetailDto timeInfo, List<UserDto> useInfoList) {
-//        timeInfo.setUser_info(useInfoList);
-//
-//        timeInfoList.add(timeInfo);
-//
-//        return timeInfoList;
-//
-//    }
+    // private VoteMoimTimeDetailDto setTimeInfo(int time, int cnt) {
+    // VoteMoimTimeDetailDto timeInfo = new VoteMoimTimeDetailDto();
+    // timeInfo.setTime(time);
+    // timeInfo.setVote_cnt(cnt);
+    //
+    // return timeInfo;
+    // }
+    //
+    // private List<VoteMoimTimeDetailDto>
+    // setVoteTimeInfoList(List<VoteMoimTimeDetailDto> timeInfoList,
+    // VoteMoimTimeDetailDto timeInfo, List<UserDto> useInfoList) {
+    // timeInfo.setUser_info(useInfoList);
+    //
+    // timeInfoList.add(timeInfo);
+    //
+    // return timeInfoList;
+    //
+    // }
 
-    private List<VoteMoimTimeDto.TimeVoteInfo> setVoteTimeInfo(List<VoteMoimTimeDto.TimeVoteInfo> timeList, VoteMoimTimeDto.TimeVoteInfo timeVoteInfo,
-                                                         Integer time, Integer vote_cnt, List<VoteMoimTimeDto.TimeUserInfo> userInfoList) {
+    private List<VoteMoimTimeDto.TimeVoteInfo> setVoteTimeInfo(List<VoteMoimTimeDto.TimeVoteInfo> timeList,
+            VoteMoimTimeDto.TimeVoteInfo timeVoteInfo,
+            Integer time, Integer vote_cnt, List<VoteMoimTimeDto.TimeUserInfo> userInfoList) {
         timeVoteInfo.setSelected_time(time);
         timeVoteInfo.setVote_cnt(vote_cnt);
         timeVoteInfo.setUserInfo(userInfoList);
@@ -686,8 +687,9 @@ public class MoimService {
         return timeList;
     }
 
-    private List<VoteMoimTimeDto.TimeUserInfo> setVoteTimeUserInfoList(VoteMoimTimeDto.TimeUserInfo userInfo, MoimOveralScheduleDto voteUserInfo,
-                                                                       List<VoteMoimTimeDto.TimeUserInfo> userInfoList) {
+    private List<VoteMoimTimeDto.TimeUserInfo> setVoteTimeUserInfoList(VoteMoimTimeDto.TimeUserInfo userInfo,
+            MoimOveralScheduleDto voteUserInfo,
+            List<VoteMoimTimeDto.TimeUserInfo> userInfoList) {
 
         userInfo.setUser_id(voteUserInfo.getUser_id());
         userInfo.setNickname(voteUserInfo.getMember_name());
