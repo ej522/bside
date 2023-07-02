@@ -39,7 +39,6 @@ public class VotingMoimDto {
     @Schema(description = "데드 라인 시간", example = "2023-12-20")
     private int dead_line_hour;
 
-    @NotEmpty
     @Schema(description = "모임 확정 시간", example = "2023-12-20")
     private LocalDateTime dead_line_time;
 
@@ -50,7 +49,7 @@ public class VotingMoimDto {
         this.moim_name = newDto.moim_name;
         this.created_time = newDto.created_time;
         this.dead_line_hour = newDto.dead_line_hour;
-        this.dead_line_time = calculateDeadLineTime(created_time, dead_line_hour);
+        this.dead_line_time = calculateDeadLineTime(newDto.created_time, newDto.dead_line_hour);
     }
 
     @PostLoad
