@@ -350,7 +350,6 @@ public class MoimController {
         private String moimName;
 
         @NotNull
-        @Max(48)
         @Schema(description = "데드라인 시간", example = "5", type = "int")
         private int deadLineHour;
 
