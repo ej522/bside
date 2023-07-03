@@ -607,21 +607,61 @@ public class MoimService {
 
     // 모임 상세정보
     public MoimDetailDto getMoimDetailInfo(Long moim_id) throws NoResultListException {
-        // 모임
+
+        MoimDetailDto moimDetailDto = new MoimDetailDto();
+
+        //모임 정보
         MoimDto moimInfo = moimRepository.findMoimByMoimId(moim_id);
         if (moimInfo.getMoim_id() == null)
             throw new NoResultListException("해당 모임이 존재하지 않습니다.");
 
-        // 선택된 모임
+        LocalDateTime deadline = Common.calculateDeadLineTime(moimInfo.getCreated_time(), moimInfo.getDead_line_hour());
+        moimInfo.setDead_line_time(deadline);
+
+        moimDetailDto.setMoimInfo(moimInfo);
+
+        //모임장이 선택한 일자
         List<MoimDateDto> moimDateList = moimRepository.findMoimDateByMoimId(moim_id);
 
+        //모임 멤버
         List<MoimMemberDto> moimMembers = moimRepository.findMoimMemberByMoimId(moim_id);
 
-        int moim_cnt = moimRepository.findMemberCount(moim_id);
-        // 주최자 더해줌
-        moim_cnt += 1;
+        //모임 멤버 인원수
+        int member_cnt = 0;
 
-        MoimDetailDto moimDetailDto = new MoimDetailDto(moimInfo, moim_cnt, moimDateList, moimMembers);
+        List<SimpleUserDto> moimMemberList = new ArrayList<>();
+        List<SimpleUserDto> nonResponseMemList = new ArrayList<>();
+
+        for(MoimMemberDto moimMemberDto : moimMembers) {
+            //참여 인원, 초대 수락O
+            if(moimMemberDto.getIs_accept()) {
+                SimpleUserDto moimMember = new SimpleUserDto();
+                moimMember.setUser_id(moimMemberDto.getUser_id());
+                moimMember.setNickname(moimMemberDto.getUser_name());
+                moimMember.setProfile(moimMemberDto.getProfile());
+
+                moimMemberList.add(moimMember);
+            }
+
+            //무응답 인원, 초대 수락X
+            if(!moimMemberDto.getIs_accept()) {
+                SimpleUserDto nonResponseMem = new SimpleUserDto();
+                nonResponseMem.setUser_id(moimMemberDto.getUser_id());
+                nonResponseMem.setNickname(moimMemberDto.getUser_name());
+                nonResponseMem.setProfile(moimMemberDto.getProfile());
+
+                nonResponseMemList.add(nonResponseMem);
+
+            }
+
+        }
+
+        member_cnt = moimMemberList.size() + 1; //주최자도 더해줌
+        moimInfo.setMemeber_cnt(member_cnt);
+
+        moimDetailDto.setMoimDateList(moimDateList);
+        moimDetailDto.setMoimMemberList(moimMemberList);
+        moimDetailDto.setNonResponseList(nonResponseMemList);
 
         return moimDetailDto;
     }
@@ -645,35 +685,6 @@ public class MoimService {
 
         return summInfo;
     }
-
-    private List<UserDto> setTimeUserInfo(MoimOveralScheduleDto voteUserInfo, List<UserDto> voteUserInfoList) {
-        UserDto userDto = new UserDto();
-        userDto.setId(voteUserInfo.getUser_id());
-        userDto.setName(voteUserInfo.getMember_name());
-        userDto.setProfile_image(voteUserInfo.getProfile_image());
-
-        voteUserInfoList.add(userDto);
-
-        return voteUserInfoList;
-    }
-
-//    private VoteMoimTimeDetailDto setTimeInfo(int time, int cnt) {
-//        VoteMoimTimeDetailDto timeInfo = new VoteMoimTimeDetailDto();
-//        timeInfo.setTime(time);
-//        timeInfo.setVote_cnt(cnt);
-//
-//        return timeInfo;
-//    }
-//
-//    private List<VoteMoimTimeDetailDto> setVoteTimeInfoList(List<VoteMoimTimeDetailDto> timeInfoList,
-//            VoteMoimTimeDetailDto timeInfo, List<UserDto> useInfoList) {
-//        timeInfo.setUser_info(useInfoList);
-//
-//        timeInfoList.add(timeInfo);
-//
-//        return timeInfoList;
-//
-//    }
 
     private List<VoteMoimTimeDto.TimeVoteInfo> setVoteTimeInfo(List<VoteMoimTimeDto.TimeVoteInfo> timeList, VoteMoimTimeDto.TimeVoteInfo timeVoteInfo,
                                                          Integer time, Integer vote_cnt, List<VoteMoimTimeDto.TimeUserInfo> userInfoList) {
