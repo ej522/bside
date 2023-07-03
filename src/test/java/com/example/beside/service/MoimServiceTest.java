@@ -720,8 +720,8 @@ public class MoimServiceTest {
         MoimDetailDto moimDetailDto = moimService.getMoimDetailInfo(moimId);
 
         // then
-        assertTrue(moimDetailDto.getMoim_name().equals("테스트 모임"));
-        assertTrue(moimDetailDto.getMemeber_cnt() == 2);
+        assertTrue(moimDetailDto.getMoimInfo().getMoim_name().equals("테스트 모임"));
+        assertTrue(moimDetailDto.getMoimInfo().getMemeber_cnt() == 2);
         assertTrue(moimDetailDto.getMoimDateList().size() > 0);
         assertTrue(moimDetailDto.getMoimMemberList().size() > 0);
     }

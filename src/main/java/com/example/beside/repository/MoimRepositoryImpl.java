@@ -607,8 +607,11 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 Projections.fields(MoimDto.class,
                                                 qMoim.id.as("moim_id"),
                                                 qMoim.moim_name.as("moim_name"),
+                                                qMoim.fixed_date.as("fixed_date"),
+                                                qMoim.fixed_time.as("fixed_time"),
                                                 qMoim.user.id.as("host_id"),
                                                 qUser.name.as("host_name"),
+                                                qUser.profile_image.as("host_profile_img"),
                                                 qMoim.dead_line_hour.as("dead_line_hour"),
                                                 qMoim.created_time.as("created_time")))
                                 .from(qMoim)
@@ -632,12 +635,14 @@ public class MoimRepositoryImpl implements MoimRepository {
                                                 qMoimMember.id,
                                                 qMoim.id,
                                                 qMoimMember.user_id,
-                                                qUser.name))
+                                                qUser.name,
+                                                qUser.profile_image,
+                                                qMoimMember.is_accept))
                                 .from(qMoim)
                                 .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
                                 .leftJoin(qUser).on(qUser.id.eq(qMoimMember.user_id))
-                                .where(qMoim.id.eq(moimId).and(qMoimMember.is_accept.eq(true)))
-                                .fetch();
+                                .where(qMoim.id.eq(moimId))
+                                .fetch();       //.and(qMoimMember.is_accept.eq(true))
 
                 return result;
         }

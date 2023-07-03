@@ -27,10 +27,6 @@ public class MoimDto {
     private String moim_name;
 
     @NotEmpty
-    @Schema(description = "모임 주최자 프로필 이미지", example = "https://moim.life/profile/green.jpg")
-    private String host_profile_img;
-
-    @NotEmpty
     @Schema(description = "모임 확정 날짜", example = "2023-12-20")
     private String fixed_date;
 
@@ -47,6 +43,10 @@ public class MoimDto {
 
     @Schema(description = "주최자 닉네임", example = "닉네임")
     private String host_name;
+
+    @NotEmpty
+    @Schema(description = "모임 주최자 프로필 이미지", example = "https://moim.life/profile/green.jpg")
+    private String host_profile_img;
 
     @Schema(description = "데드라인 시간", example = "1")
     private int dead_line_hour;
