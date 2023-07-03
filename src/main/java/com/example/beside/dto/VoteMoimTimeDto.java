@@ -13,18 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VoteMoimTimeDto {
-//    @NotEmpty
-//    @Schema(description = "모임 아이디", example = "1")
-//    private Long moim_id;
-//
-//    @NotEmpty
-//    @Schema(description = "모임 날짜", example = "2023-03-03")
-//    private LocalDateTime selected_date;
-//
-//    @NotEmpty
-//    @Schema(description = "투표 시간 정보")
-//    private List<VoteMoimTimeDetailDto> time_info;
-
     @NotEmpty
     @Schema(description = "모임 ID", example = "1")
     private Long moim_id;
@@ -57,21 +45,21 @@ public class VoteMoimTimeDto {
         private Integer vote_cnt;
 
         @Schema(description = "유저정보")
-        private List<TimeUserInfo> userInfo;
+        private List<SimpleUserDto> userInfo;
     }
 
-    @Data
-    public static class TimeUserInfo {
-        @NotEmpty
-        @Schema(description = "유저ID", example = "1")
-        private Long user_id;
-
-        @NotEmpty
-        @Schema(description = "유저 닉네임", example = "닉네임")
-        private String nickname;
-
-        @Schema(description = "유저 프로필", example = "https://moim.life/profile/green.jpg")
-        private String profile;
-    }
+//    @Data
+//    public static class TimeUserInfo {
+//        @NotEmpty
+//        @Schema(description = "유저ID", example = "1")
+//        private Long user_id;
+//
+//        @NotEmpty
+//        @Schema(description = "유저 닉네임", example = "닉네임")
+//        private String nickname;
+//
+//        @Schema(description = "유저 프로필", example = "https://moim.life/profile/green.jpg")
+//        private String profile;
+//    }
 
 }

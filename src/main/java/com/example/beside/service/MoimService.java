@@ -334,7 +334,7 @@ public class MoimService {
             // 각 날짜 투표수
             int vote_cnt = 0;
 
-            List<VoteMoimDateDto.DateUserInfo> userInfoList = new ArrayList<>();
+            List<SimpleUserDto> userInfoList = new ArrayList<>();
 
             for (MoimOveralScheduleDto voteUserInfo : voteUserInfoList) {
                 if (voteUserInfo.getSelected_date() == null) {// 투표한 사람이 없는 경우
@@ -342,7 +342,7 @@ public class MoimService {
                 }
 
                 if (selected_date.isEqual(voteUserInfo.getSelected_date())) {
-                    VoteMoimDateDto.DateUserInfo userInfo = new VoteMoimDateDto.DateUserInfo();
+                    SimpleUserDto userInfo = new SimpleUserDto();
 
                     // 투표자 정보
                     userInfo.setUser_id(voteUserInfo.getUser_id());
@@ -414,26 +414,26 @@ public class MoimService {
         int pm20Cnt = 0;
         int pm21Cnt = 0;
 
-        List<VoteMoimTimeDto.TimeUserInfo> am9userInfoList = new ArrayList<>();
-        List<VoteMoimTimeDto.TimeUserInfo> am10userInfoList = new ArrayList<>();
-        List<VoteMoimTimeDto.TimeUserInfo> am11userInfoList = new ArrayList<>();
-        List<VoteMoimTimeDto.TimeUserInfo> pm12userInfoList = new ArrayList<>();
-        List<VoteMoimTimeDto.TimeUserInfo> pm13userInfoList = new ArrayList<>();
-        List<VoteMoimTimeDto.TimeUserInfo> pm14userInfoList = new ArrayList<>();
-        List<VoteMoimTimeDto.TimeUserInfo> pm15userInfoList = new ArrayList<>();
-        List<VoteMoimTimeDto.TimeUserInfo> pm16userInfoList = new ArrayList<>();
-        List<VoteMoimTimeDto.TimeUserInfo> pm17userInfoList = new ArrayList<>();
-        List<VoteMoimTimeDto.TimeUserInfo> pm18userInfoList = new ArrayList<>();
-        List<VoteMoimTimeDto.TimeUserInfo> pm19userInfoList = new ArrayList<>();
-        List<VoteMoimTimeDto.TimeUserInfo> pm20userInfoList = new ArrayList<>();
-        List<VoteMoimTimeDto.TimeUserInfo> pm21userInfoList = new ArrayList<>();
+        List<SimpleUserDto> am9userInfoList = new ArrayList<>();
+        List<SimpleUserDto> am10userInfoList = new ArrayList<>();
+        List<SimpleUserDto> am11userInfoList = new ArrayList<>();
+        List<SimpleUserDto> pm12userInfoList = new ArrayList<>();
+        List<SimpleUserDto> pm13userInfoList = new ArrayList<>();
+        List<SimpleUserDto> pm14userInfoList = new ArrayList<>();
+        List<SimpleUserDto> pm15userInfoList = new ArrayList<>();
+        List<SimpleUserDto> pm16userInfoList = new ArrayList<>();
+        List<SimpleUserDto> pm17userInfoList = new ArrayList<>();
+        List<SimpleUserDto> pm18userInfoList = new ArrayList<>();
+        List<SimpleUserDto> pm19userInfoList = new ArrayList<>();
+        List<SimpleUserDto> pm20userInfoList = new ArrayList<>();
+        List<SimpleUserDto> pm21userInfoList = new ArrayList<>();
 
         for (MoimOveralScheduleDto voteUserInfo : voteUserInfoList) {
             if (voteUserInfo.getSelected_date() == null) {// 투표한 사람이 없는 경우
                 break;
             }
 
-            VoteMoimTimeDto.TimeUserInfo userInfo = new VoteMoimTimeDto.TimeUserInfo();
+            SimpleUserDto userInfo = new SimpleUserDto();
 
             // 해당 날짜의 시간에 투표한 인원
             if (selected_date.isEqual(voteUserInfo.getSelected_date())) {
@@ -687,7 +687,7 @@ public class MoimService {
 
 
     private List<VoteMoimTimeDto.TimeVoteInfo> setVoteTimeInfo(List<VoteMoimTimeDto.TimeVoteInfo> timeList, VoteMoimTimeDto.TimeVoteInfo timeVoteInfo,
-                                                         Integer time, Integer vote_cnt, List<VoteMoimTimeDto.TimeUserInfo> userInfoList) {
+                                                         Integer time, Integer vote_cnt, List<SimpleUserDto> userInfoList) {
         timeVoteInfo.setSelected_time(time);
         timeVoteInfo.setVote_cnt(vote_cnt);
         timeVoteInfo.setUserInfo(userInfoList);
@@ -697,9 +697,9 @@ public class MoimService {
         return timeList;
     }
 
-    private List<VoteMoimTimeDto.TimeUserInfo> setVoteTimeUserInfoList(VoteMoimTimeDto.TimeUserInfo userInfo,
+    private List<SimpleUserDto> setVoteTimeUserInfoList(SimpleUserDto userInfo,
             MoimOveralScheduleDto voteUserInfo,
-            List<VoteMoimTimeDto.TimeUserInfo> userInfoList) {
+            List<SimpleUserDto> userInfoList) {
 
         userInfo.setUser_id(voteUserInfo.getUser_id());
         userInfo.setNickname(voteUserInfo.getMember_name());
