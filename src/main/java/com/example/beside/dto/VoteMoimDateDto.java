@@ -22,6 +22,10 @@ public class VoteMoimDateDto {
     @Schema(description = "총 투표수", example = "5")
     private Integer total;
 
+    @NotEmpty
+    @Schema(description = "나의 투표여부", example = "true")
+    private Boolean myVote_yn;
+
     @Schema
     private List<DateVoteInfo> voteList;
 

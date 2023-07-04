@@ -88,9 +88,11 @@ public class MoimController {
             @ApiResponse(responseCode = "200", description = "모임 날짜 투표 결과가 조회되었습니다.", content = @Content(schema = @Schema(implementation = VoteMoimDateResponse.class))),
     })
     @GetMapping(value = "/v1/result-date-vote")
-    public Response<VoteMoimDateDto> getVoteMoimDateList(@RequestParam(name = "moim_id") @NotNull Long moim_id)
+    public Response<VoteMoimDateDto> getVoteMoimDateList(HttpServletRequest token,
+                                                         @RequestParam(name = "moim_id") @NotNull Long moim_id)
             throws Exception {
-        VoteMoimDateDto dateVoteInfo = moimService.getVoteDateInfo(moim_id);
+        User user = (User) token.getAttribute("user");
+        VoteMoimDateDto dateVoteInfo = moimService.getVoteDateInfo(moim_id, user.getId());
 
         return VoteMoimDateResponse.success(200, "모임 날짜 투표 결과가 조회되었습니다.", dateVoteInfo);
     }
