@@ -1,5 +1,6 @@
 package com.example.beside.service;
 
+import com.example.beside.common.response.Response;
 import org.springframework.stereotype.Service;
 
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -10,15 +11,20 @@ import com.google.firebase.messaging.Notification;
 @Service
 public class FcmPushService {
 
-    public void sendFcmPushNotification(String fcmToken, String title, String body, String encrptedInfo, String type) throws FirebaseMessagingException {
-        Message message = Message.builder()
-                .setNotification(Notification.builder().setTitle(title).setBody(body).build())
-                .setToken(fcmToken)
-                .putData("encrptedInfo", encrptedInfo)
-                .putData("linkTo", type)
-                .build();
+    public String sendFcmPushNotification(String fcmToken, String title, String body, String encrptedInfo, String type) throws FirebaseMessagingException {
+        try {
+            Message message = Message.builder()
+                    .setNotification(Notification.builder().setTitle(title).setBody(body).build())
+                    .setToken(fcmToken)
+                    .putData("encrptedInfo", encrptedInfo)
+                    .putData("linkTo", type)
+                    .build();
 
-        String response = FirebaseMessaging.getInstance().send(message);
-        System.out.println("Successfully sent message: " + response);
+            String response = FirebaseMessaging.getInstance().send(message);
+
+            return response;
+        } catch (Exception e) {
+            return "error";
+        }
     }
 }

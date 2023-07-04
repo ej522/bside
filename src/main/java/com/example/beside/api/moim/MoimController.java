@@ -182,21 +182,24 @@ public class MoimController {
 
         MoimParticipateInfoDto participateMoim = moimService.inviteMyMoim(user_, encrptedMoimInfo, friend_id_list);
 
-        for (String friend_id : friend_id_list) {
-            User msgUserInfo = userService.chkPushAgree(Long.valueOf(friend_id));
+        try {
+            for (String friend_id : friend_id_list) {
+                User msgUserInfo = userService.chkPushAgree(Long.valueOf(friend_id));
 
-            if (msgUserInfo != null) {
-                if (msgUserInfo.getFcm() != null) {
-                    fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), "모임 초대",
-                            "띵동! " + msgUserInfo.getName() + "님,\n"
-                                    + user_.getName() + "에게 MOIM 초대장이 왔어요",
-                            encrptedMoimInfo, "invite");
+                if (msgUserInfo != null) {
+                    if (msgUserInfo.getFcm() != null) {
+                        fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), "모임 초대",
+                                "띵동! " + msgUserInfo.getName() + "님,\n"
+                                        + user_.getName() + "에게 MOIM 초대장이 왔어요",
+                                encrptedMoimInfo, "invite");
+                    }
                 }
             }
-
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        } finally {
+            return MoimParticipateResponse.success(200, "모임에 참여 됐습니다.", participateMoim);
         }
-
-        return MoimParticipateResponse.success(200, "모임에 참여 됐습니다.", participateMoim);
     }
 
     @Operation(tags = { "Moim" }, summary = "참여 모임 일정 정하기")
