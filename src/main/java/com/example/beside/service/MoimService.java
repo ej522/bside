@@ -306,7 +306,7 @@ public class MoimService {
     }
 
     // 날짜투표결과
-    public VoteMoimDateDto getVoteDateInfo(Long moimId) throws Exception {
+    public VoteMoimDateDto getVoteDateInfo(Long moimId, Long userId) throws Exception {
         // 모임 날짜 정보
         List<MoimOveralDateDto> dateInfoList = moimRepository.getMoimOveralInfo(moimId, null);
 
@@ -320,6 +320,9 @@ public class MoimService {
 
         // 총 투표수
         int total = 0;
+
+        //투표여부
+        Boolean vote_yn = false;
 
         voteMoimDateInfo.setMoim_id(dateInfoList.get(0).getId());
 
@@ -351,6 +354,10 @@ public class MoimService {
 
                     userInfoList.add(userInfo);
 
+                    if(userId.equals(voteUserInfo.getUser_id())) {
+                        vote_yn = true;
+                    }
+
                     vote_cnt++;
                     total++;
                 }
@@ -361,6 +368,7 @@ public class MoimService {
             voteInfoList.add(voteInfo);
         }
 
+        voteMoimDateInfo.setMyVote_yn(vote_yn);
         voteMoimDateInfo.setTotal(total);
         voteMoimDateInfo.setVoteList(voteInfoList);
 
