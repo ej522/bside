@@ -92,6 +92,11 @@ public class MoimService {
         Moim moim = getMoimInfoWithMoimId(moimId);
         participateMoimValidate(user, moimId, moim);
 
+        MoimMember memberInfo = moimRepository.getMoimMemberByMemberId(moimId, user.getId());
+        if(memberInfo==null) {
+            throw new NoResultListException("초대 받은 모임이 아니거나 초대 경로가 잘못되었습니다.");
+        }
+
         moimRepository.updateMemberAccept(user.getId(), moimId);
 
         // 모임 종합 정보 조회
