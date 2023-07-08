@@ -324,6 +324,10 @@ public class MoimService {
         //투표여부
         Boolean vote_yn = false;
 
+        //호스트인 경우
+        if(dateInfoList.get(0).getUser_id().equals(userId))
+            vote_yn = true;
+
         voteMoimDateInfo.setMoim_id(dateInfoList.get(0).getId());
 
         List<VoteMoimDateDto.DateVoteInfo> voteInfoList = new ArrayList<>();
