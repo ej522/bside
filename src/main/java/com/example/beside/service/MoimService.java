@@ -92,8 +92,7 @@ public class MoimService {
         Moim moim = getMoimInfoWithMoimId(moimId);
         participateMoimValidate(user, moimId, moim);
 
-        // 모임 멤버 추가
-        moimRepository.makeMoimMember(user, moim);
+        moimRepository.updateMemberAccept(user.getId(), moimId);
 
         // 모임 종합 정보 조회
         List<MoimOveralDateDto> moimOveralInfo = moimRepository.getMoimOveralInfo(moimId, null);
