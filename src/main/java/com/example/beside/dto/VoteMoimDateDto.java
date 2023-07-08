@@ -40,22 +40,8 @@ public class VoteMoimDateDto {
         private Integer vote_cnt;
 
         @Schema(description = "해당 날짜에 투표한 유저 정보")
-        private List<DateUserInfo> userInfoList;
+        private List<SimpleUserDto> userInfoList;
 
-    }
-
-    @Data
-    public static class DateUserInfo {
-        @NotEmpty
-        @Schema(description = "유저ID", example = "1")
-        private Long user_id;
-
-        @NotEmpty
-        @Schema(description = "유저 닉네임", example = "닉네임")
-        private String nickname;
-
-        @Schema(description = "유저 프로필", example = "https://moim.life/profile/green.jpg")
-        private String profile;
     }
 
 }

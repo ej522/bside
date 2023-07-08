@@ -25,4 +25,10 @@ public class MoimMemberDto {
     @NotEmpty
     @Schema(description = "유저 이름", example = "닉네임")
     private String user_name;
+
+    @Schema(description = "유저 프로필", example = "닉네임")
+    private String profile;
+
+    @Schema(description = "응답여부", example = "true")
+    private Boolean is_accept;
 }

@@ -192,37 +192,37 @@ public class MoimRepositoryImpl implements MoimRepository {
                 queryFactory = new JPAQueryFactory(em);
 
                 QMoim qMoim = QMoim.moim;
-                QUser qUser = QUser.user;
                 QMoimMember qMoimMember = QMoimMember.moimMember;
 
-                // 내가 참여한 모임
+                // 모임원
                 JPAQuery<VotingMoimDto> query1 = queryFactory
-                                .select(Projections.fields(VotingMoimDto.class, qUser.id.as("user_id"),
-                                                qUser.name.as("user_name"),
+                                .select(Projections.fields(VotingMoimDto.class,
+                                                qMoim.user.id.as("user_id"),
+                                                qMoim.user.name.as("user_name"),
                                                 qMoim.id.as("moim_id"),
                                                 qMoim.moim_name.as("moim_name"),
                                                 qMoim.created_time.as("created_time"),
                                                 qMoim.dead_line_hour.as("dead_line_hour")))
-                                .from(qMoim)
-                                .innerJoin(qUser).on(qUser.id.eq(qMoim.user.id))
-                                .where(qMoim.id.in(
-                                                JPAExpressions.select(qMoimMember.moim.id)
-                                                                .from(qMoimMember)
-                                                                .where(qMoimMember.user_id.eq(user_id)
-                                                                                .and(qMoimMember.is_accept.eq(true))))
-                                                .and(qMoim.fixed_date.isNull()));
+                                .from(qMoim).innerJoin(qMoimMember)
+                                .on(qMoim.id.eq(qMoimMember.moim.id))
+                                .where(qMoim.user.id.ne(user_id)
+                                                .and(qMoim.fixed_date.isNull())
+                                                .and(qMoimMember.user_id.eq(user_id))
+                                                .and(qMoimMember.is_accept.isTrue()));
 
-                // // 내가 모임장인 모임
+                // 모임장
                 JPAQuery<VotingMoimDto> query2 = queryFactory
-                                .select(Projections.fields(VotingMoimDto.class, qUser.id.as("user_id"),
-                                                qUser.name.as("user_name"),
+                                .select(Projections.fields(VotingMoimDto.class,
+                                                qMoim.user.id.as("user_id"),
+                                                qMoim.user.name.as("user_name"),
                                                 qMoim.id.as("moim_id"),
                                                 qMoim.moim_name.as("moim_name"),
                                                 qMoim.created_time.as("created_time"),
                                                 qMoim.dead_line_hour.as("dead_line_hour")))
-                                .from(qMoim)
-                                .innerJoin(qUser).on(qUser.id.eq(qMoim.user.id))
-                                .where(qMoim.user.id.eq(user_id).and(qMoim.fixed_date.isNull()));
+                                .from(qMoim).innerJoin(qMoimMember)
+                                .on(qMoim.id.eq(qMoimMember.moim.id))
+                                .where(qMoim.user.id.eq(user_id)
+                                                .and(qMoim.fixed_date.isNull()));
 
                 // UINON ALL
                 List<VotingMoimDto> result = query1.fetch();
@@ -241,25 +241,21 @@ public class MoimRepositoryImpl implements MoimRepository {
         public List<InvitedMoimListDto> getInvitedMoimList(Long user_id) {
                 queryFactory = new JPAQueryFactory(em);
 
-                QUser qUser = QUser.user;
                 QMoim qMoim = QMoim.moim;
                 QMoimMember qMoimMember = QMoimMember.moimMember;
-                QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
 
                 List<InvitedMoimListDto> result = queryFactory.select(Projections.constructor(InvitedMoimListDto.class,
                                 qMoim.id.as("moim_id"),
                                 qMoim.moim_name.as("moim_name"),
-                                qUser.name.as("moim_leader"),
+                                qMoim.user.name.as("moim_leader"),
                                 qMoim.created_time.as("createdTime"),
-                                qMoim.dead_line_hour.as("dead_line_hour"),
-                                qMoimMember.is_accept.as("is_accept_this_moim")))
-                                .from(qUser).innerJoin(qMoim)
-                                .on(qUser.id.eq(qMoim.user.id)).leftJoin(qMoimMember)
-                                .on(qMoim.id.eq(qMoimMember.moim.id)).leftJoin(qMoimMemberTime)
-                                .on(qMoimMember.id.eq(qMoimMemberTime.moim_member.id))
-                                .where(qMoimMember.user_id.eq(user_id)
+                                qMoim.dead_line_hour.as("dead_line_hour")))
+                                .from(qMoim).leftJoin(qMoimMember)
+                                .on(qMoim.id.eq(qMoimMember.moim.id))
+                                .where(qMoim.user.id.ne(user_id)
                                                 .and(qMoim.fixed_date.isNull()
-                                                                .and(qMoimMemberTime.selected_date.isNull())))
+                                                                .and(qMoimMember.user_id.eq(user_id))
+                                                                .and(qMoimMember.is_accept.isFalse())))
                                 .fetch();
 
                 return result;
@@ -382,13 +378,13 @@ public class MoimRepositoryImpl implements MoimRepository {
                 QMoimMember qMoimMember = QMoimMember.moimMember;
                 QMoimMemberTime qMoimMemberTime = QMoimMemberTime.moimMemberTime;
 
-                //모임 투표한 날짜
+                // 모임 투표한 날짜
                 queryFactory.delete(qMoimMemberTime).where(qMoimMemberTime.moim_id.eq(moimId)).execute();
-                //모임 멤버
+                // 모임 멤버
                 queryFactory.delete(qMoimMember).where(qMoimMember.moim.id.eq(moimId)).execute();
-                //주최자가 선택한 모임 날짜
+                // 주최자가 선택한 모임 날짜
                 queryFactory.delete(qMoimDate).where(qMoimDate.moim.id.eq(moimId)).execute();
-                //모임
+                // 모임
                 queryFactory.delete(qMoim).where(qMoim.id.eq(moimId)).execute();
 
                 em.flush();
@@ -611,8 +607,11 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 Projections.fields(MoimDto.class,
                                                 qMoim.id.as("moim_id"),
                                                 qMoim.moim_name.as("moim_name"),
+                                                qMoim.fixed_date.as("fixed_date"),
+                                                qMoim.fixed_time.as("fixed_time"),
                                                 qMoim.user.id.as("host_id"),
                                                 qUser.name.as("host_name"),
+                                                qUser.profile_image.as("host_profile_img"),
                                                 qMoim.dead_line_hour.as("dead_line_hour"),
                                                 qMoim.created_time.as("created_time")))
                                 .from(qMoim)
@@ -636,12 +635,14 @@ public class MoimRepositoryImpl implements MoimRepository {
                                                 qMoimMember.id,
                                                 qMoim.id,
                                                 qMoimMember.user_id,
-                                                qUser.name))
+                                                qUser.name,
+                                                qUser.profile_image,
+                                                qMoimMember.is_accept))
                                 .from(qMoim)
                                 .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
                                 .leftJoin(qUser).on(qUser.id.eq(qMoimMember.user_id))
-                                .where(qMoim.id.eq(moimId).and(qMoimMember.is_accept.eq(true)))
-                                .fetch();
+                                .where(qMoim.id.eq(moimId))
+                                .fetch();       //.and(qMoimMember.is_accept.eq(true))
 
                 return result;
         }

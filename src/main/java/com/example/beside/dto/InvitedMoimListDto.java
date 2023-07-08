@@ -33,17 +33,13 @@ public class InvitedMoimListDto {
     @Schema(description = "마감기한", example = "YYYY-MM-DD HH24:mi:ss")
     private LocalDateTime deadLineTime;
 
-    @Schema(description = "모임 참여 여부", example = "true")
-    private Boolean is_accept_this_moim;
-
     public InvitedMoimListDto(Long moim_id, String moim_name, String moim_leader, LocalDateTime createdTime,
-            int dead_line_hour, Boolean is_accept_this_moim) {
+            int dead_line_hour) {
         this.moim_id = moim_id;
         this.moim_name = moim_name;
         this.moim_leader = moim_leader;
         this.createdTime = createdTime;
         this.dead_line_hour = dead_line_hour;
         this.deadLineTime = createdTime.plusHours(dead_line_hour);
-        this.is_accept_this_moim = is_accept_this_moim;
     }
 }
