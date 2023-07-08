@@ -62,10 +62,14 @@ public interface MoimRepository {
     List<MoimDateDto> findMoimDateByMoimId(Long moimId);
 
     // UPDATE
-    long deleteHostHistory(Long userId, Long moimId);
+    void deleteHostHistory(Long userId, Long moimId);
 
-    long deleteGusetHistory(Long userId, Long moimId);
+    void deleteGusetHistory(Long userId, Long moimId);
 
-    long deleteMoim(Long moimId);
+    void updateMemberAccept(Long userId, Long moimId);
+
+
+    //delete
+    void deleteMoim(Long moimId);
 
 }

@@ -338,7 +338,7 @@ public class MoimRepositoryImpl implements MoimRepository {
 
         @Override
         @Transactional
-        public long deleteHostHistory(Long user_id, Long moim_id) {
+        public void deleteHostHistory(Long user_id, Long moim_id) {
                 queryFactory = new JPAQueryFactory(em);
 
                 QMoim qMoim = QMoim.moim;
@@ -348,13 +348,11 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .where(qMoim.user.id.eq(user_id)
                                                 .and(qMoim.id.eq(moim_id)))
                                 .execute();
-
-                return 0;
         }
 
         @Override
         @Transactional
-        public long deleteGusetHistory(Long user_id, Long moim_id) {
+        public void deleteGusetHistory(Long user_id, Long moim_id) {
                 queryFactory = new JPAQueryFactory(em);
 
                 QMoimMember qMoimMember = QMoimMember.moimMember;
@@ -364,13 +362,25 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .where(qMoimMember.user_id.eq(user_id)
                                                 .and(qMoimMember.moim.id.eq(moim_id)))
                                 .execute();
-
-                return 0;
         }
 
         @Override
         @Transactional
-        public long deleteMoim(Long moimId) {
+        public void updateMemberAccept(Long userId, Long moimId) {
+                queryFactory = new JPAQueryFactory(em);
+
+                QMoimMember qMoimMember = QMoimMember.moimMember;
+
+                queryFactory.update(qMoimMember)
+                        .set(qMoimMember.is_accept, true)
+                        .where(qMoimMember.user_id.eq(userId)
+                                .and(qMoimMember.moim.id.eq(moimId)))
+                        .execute();
+        }
+
+        @Override
+        @Transactional
+        public void deleteMoim(Long moimId) {
                 queryFactory = new JPAQueryFactory(em);
 
                 QMoim qMoim = QMoim.moim;
@@ -389,8 +399,6 @@ public class MoimRepositoryImpl implements MoimRepository {
 
                 em.flush();
                 em.clear();
-
-                return 0;
         }
 
         /**
