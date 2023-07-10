@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.beside.service.FcmPushService;
+import com.example.beside.service.MoimService;
 import com.example.beside.service.UserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,8 +36,12 @@ public class SchedulerTest {
 
     @Autowired
     private  UserService userService;
+
     @Autowired
     private FcmPushService fcmPushService;
+
+    @Autowired
+    private MoimService moimService;
 
     private User user;
     private User user2;
@@ -111,7 +116,7 @@ public class SchedulerTest {
         var moimMember = moimRepository.getMoimMemberByMemberId(moimId, findUser2.getId());
         // 상세 모임 일정 등록
         moimRepository.saveSchedule(moimMember, normalMoimMemberTime);
-        Scheduler scheduler = new Scheduler(moimRepository, userService, fcmPushService);
+        Scheduler scheduler = new Scheduler(moimRepository, userService, fcmPushService, moimService);
 
         // when
         scheduler.fixMoimSchedulering();
@@ -135,7 +140,7 @@ public class SchedulerTest {
         // 모임 생성
         long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
 
-        Scheduler scheduler = new Scheduler(moimRepository, userService, fcmPushService);
+        Scheduler scheduler = new Scheduler(moimRepository, userService, fcmPushService, moimService);
 
         // when
         scheduler.deleteNotFixedMoim();

@@ -20,11 +20,11 @@ public class FcmPushService {
                     .putData("linkTo", type)
                     .build();
 
-            String response = FirebaseMessaging.getInstance().send(message);
+            FirebaseMessaging.getInstance().send(message);
 
-            return response;
+            return "Success";
         } catch (Exception e) {
-            return "error";
+            return e.getMessage();
         }
     }
 }

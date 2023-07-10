@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
+import com.example.beside.domain.*;
 import com.example.beside.dto.*;
 import com.example.beside.util.Common;
 import com.example.beside.util.PasswordConverter;
@@ -15,11 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.beside.common.Exception.ExceptionDetail.AdjustScheduleException;
 import com.example.beside.common.Exception.ExceptionDetail.InviteMyMoimException;
 import com.example.beside.common.Exception.ExceptionDetail.MoimParticipateException;
-import com.example.beside.domain.Moim;
-import com.example.beside.domain.MoimDate;
-import com.example.beside.domain.MoimMember;
-import com.example.beside.domain.MoimMemberTime;
-import com.example.beside.domain.User;
 import com.example.beside.repository.MoimRepository;
 import com.example.beside.repository.UserRepository;
 import com.example.beside.util.Encrypt;
@@ -699,6 +695,39 @@ public class MoimService {
         summInfo.setDead_line_time(deadline);
 
         return summInfo;
+    }
+
+    //알람 저장
+    @Transactional
+    public void saveAlarmData(User sendUser, User receiveUser, Moim moim, String type, String status, String error_msg) {
+        Alarm alarmInfo = new Alarm();
+
+        //모임관련 정보
+        alarmInfo.setMoim_id(moim.getId());
+        alarmInfo.setMoim_name(moim.getMoim_name());
+
+        //메세지 받는 사람 정보
+        alarmInfo.setUser_id(receiveUser.getId());
+        alarmInfo.setUser_name(receiveUser.getName());
+
+        //보내는 사람 정보
+        alarmInfo.setFriend_id(sendUser.getId());
+        alarmInfo.setFriend_name(sendUser.getName());
+
+        //알람 타입: invite(초대) / confirm(확정) / accept(수락)
+        alarmInfo.setType(type);
+
+        //알람 전송 시간
+        alarmInfo.setAlarm_time(LocalDateTime.now());
+
+        //알람 상태 초기: send(성공), error(실패)
+        alarmInfo.setStatus(status);
+
+        //에러 발생시 메세지
+        alarmInfo.setError_msg(error_msg);
+
+        moimRepository.insertAlarm(alarmInfo);
+
     }
 
 

@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.beside.domain.*;
 import com.example.beside.dto.*;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -14,18 +15,6 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.example.beside.domain.Friend;
-import com.example.beside.domain.Moim;
-import com.example.beside.domain.MoimDate;
-import com.example.beside.domain.MoimMember;
-import com.example.beside.domain.MoimMemberTime;
-import com.example.beside.domain.QFriend;
-import com.example.beside.domain.QMoim;
-import com.example.beside.domain.QMoimDate;
-import com.example.beside.domain.QMoimMember;
-import com.example.beside.domain.QMoimMemberTime;
-import com.example.beside.domain.QUser;
-import com.example.beside.domain.User;
 import com.example.beside.util.Encrypt;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
@@ -70,6 +59,13 @@ public class MoimRepositoryImpl implements MoimRepository {
                 findMoim.setFixed_time(formattedTime);
 
                 em.persist(findMoim);
+        }
+
+        @Override
+        //@Transactional
+        public void insertAlarm(Alarm alarm) {
+                em.persist(alarm);
+                em.flush();
         }
 
         /**

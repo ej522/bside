@@ -185,15 +185,29 @@ public class MoimController {
         MoimParticipateInfoDto participateMoim = moimService.inviteMyMoim(user_, encrptedMoimInfo, friend_id_list);
 
         try {
+            Moim moim = new Moim();
+            moim.setId(participateMoim.getMoim_id());
+            moim.setMoim_name(participateMoim.getMoim_name());
+
+            String type = "invite";
+
             for (String friend_id : friend_id_list) {
                 User msgUserInfo = userService.chkPushAgree(Long.valueOf(friend_id));
 
                 if (msgUserInfo != null) {
                     if (msgUserInfo.getFcm() != null) {
-                        fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), "모임 초대",
+                        String result = fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), "모임 초대",
                                 "띵동! " + msgUserInfo.getName() + "님,\n"
                                         + user_.getName() + "에게 MOIM 초대장이 왔어요",
-                                encrptedMoimInfo, "invite");
+                                encrptedMoimInfo, type);
+
+                        if(result.equals("Success")) {
+                            //성공시
+                            moimService.saveAlarmData(user_, msgUserInfo, moim, type, "send", null);
+                        } else {
+                            //실패시
+                            moimService.saveAlarmData(user_, msgUserInfo, moim, type, "error", result);
+                        }
                     }
                 }
             }
