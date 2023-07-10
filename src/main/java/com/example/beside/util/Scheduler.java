@@ -13,8 +13,8 @@ import java.util.stream.IntStream;
 
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.User;
+import com.example.beside.repository.FcmPushRepository;
 import com.example.beside.service.FcmPushService;
-import com.example.beside.service.MoimService;
 import com.example.beside.service.UserService;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,7 +33,6 @@ public class Scheduler {
     private final MoimRepositoryImpl moimRepository;
     private final UserService userService;
     private final FcmPushService fcmPushService;
-    private final MoimService moimService;
 
     // 초, 분, 시, 일, 월, 주 순서
     @Scheduled(cron = "0 */30 * * * *")
@@ -70,11 +69,10 @@ public class Scheduler {
             User host = userService.chkPushAgree(moim.getUser().getId());
             sendFixMoimMessage(host, moim, moim.getEncrypted_id());
 
-            User guest = new User();
             //참여자
             List<MoimMember> moimMemberList = moim.getMoim_member();
             for(MoimMember moimMember : moimMemberList) {
-                guest = userService.chkPushAgree(moimMember.getUser_id());
+                User guest = userService.chkPushAgree(moimMember.getUser_id());
                 sendFixMoimMessage(guest, moim, moim.getEncrypted_id());
             }
         }
@@ -200,9 +198,9 @@ public class Scheduler {
                 String result = fcmPushService.sendFcmPushNotification(user.getFcm(), "일정 확인", "띵동! " + moim.getMoim_name() + "MOIM의 정해진 날짜와 시간을 확인하세요!", encrptedInfo, type);
 
                 if(result.equals("Success")) {
-                    moimService.saveAlarmData(null, user, moim, type, "send", null);
+                    fcmPushService.saveAlarmData(null, user, moim, type, "send", null);
                 } else {
-                    moimService.saveAlarmData(null, user, moim, type, "error", result);
+                    fcmPushService.saveAlarmData(null, user, moim, type, "error", result);
                 }
             }
         }

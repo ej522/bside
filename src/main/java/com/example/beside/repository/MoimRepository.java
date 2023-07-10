@@ -20,8 +20,6 @@ public interface MoimRepository {
 
     void fixMoimDate(Moim moim, LocalDateTime date, int time);
 
-    void insertAlarm(Alarm alarm);
-
     // READ
     Moim getMoimInfo(Long moimId);
 

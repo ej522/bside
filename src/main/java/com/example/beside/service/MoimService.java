@@ -697,40 +697,6 @@ public class MoimService {
         return summInfo;
     }
 
-    //알람 저장
-    @Transactional
-    public void saveAlarmData(User sendUser, User receiveUser, Moim moim, String type, String status, String error_msg) {
-        Alarm alarmInfo = new Alarm();
-
-        //모임관련 정보
-        alarmInfo.setMoim_id(moim.getId());
-        alarmInfo.setMoim_name(moim.getMoim_name());
-
-        //메세지 받는 사람 정보
-        alarmInfo.setUser_id(receiveUser.getId());
-        alarmInfo.setUser_name(receiveUser.getName());
-
-        //보내는 사람 정보
-        alarmInfo.setFriend_id(sendUser.getId());
-        alarmInfo.setFriend_name(sendUser.getName());
-
-        //알람 타입: invite(초대) / confirm(확정) / accept(수락)
-        alarmInfo.setType(type);
-
-        //알람 전송 시간
-        alarmInfo.setAlarm_time(LocalDateTime.now());
-
-        //알람 상태 초기: send(성공), error(실패)
-        alarmInfo.setStatus(status);
-
-        //에러 발생시 메세지
-        alarmInfo.setError_msg(error_msg);
-
-        moimRepository.insertAlarm(alarmInfo);
-
-    }
-
-
     private List<VoteMoimTimeDto.TimeVoteInfo> setVoteTimeInfo(List<VoteMoimTimeDto.TimeVoteInfo> timeList, VoteMoimTimeDto.TimeVoteInfo timeVoteInfo,
                                                          Integer time, Integer vote_cnt, List<SimpleUserDto> userInfoList) {
         timeVoteInfo.setSelected_time(time);

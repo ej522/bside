@@ -201,10 +201,6 @@ public class UserService {
             return null;
         }
 
-//        if(userInfo.getFcm() == null){
-//            throw new RuntimeException("fcm토큰이 없습니다.");
-//        }
-
         return userInfo;
     }
 }

@@ -111,6 +111,26 @@ public class MoimController {
 
         MoimParticipateInfoDto participateMoim = moimService.participateInvitedMoim(user_, request.getMoimId());
 
+        Moim moim = moimService.getMoimInfoWithMoimId(request.getMoimId());
+
+        User hostInfo = userService.chkPushAgree(participateMoim.getMoim_leader_id());
+
+        if(hostInfo!=null) {
+            if(hostInfo.getFcm()!=null) {
+                String type = "accept";
+
+                String result = fcmPushService.sendFcmPushNotification(hostInfo.getFcm(), "친구 입장",
+                        "띵동!" + hostInfo.getName() + "님,\n" + user_.getName() + "님이 " + participateMoim.getMoim_name() +"에 입장했어요",
+                        moim.getEncrypted_id(), type);
+
+                if(result.equals("Success")) {
+                    fcmPushService.saveAlarmData(user_, hostInfo, moim, type, "success", null);
+                } else {
+                    fcmPushService.saveAlarmData(user_, hostInfo, moim, type, "error", result);
+                }
+            }
+        }
+
         return MoimParticipateResponse.success(200, "모임에 참여 됐습니다.", participateMoim);
     }
 
@@ -128,6 +148,28 @@ public class MoimController {
         String encrptedInfo = request.getEncrptedInfo();
 
         MoimParticipateInfoDto participateMoim = moimService.participateDeepLink(user_, encrptedInfo);
+
+        User hostInfo = userService.chkPushAgree(participateMoim.getMoim_leader_id());
+
+        if(hostInfo!=null) {
+            if(hostInfo.getFcm()!=null) {
+                Moim moim = new Moim();
+                moim.setId(participateMoim.getMoim_id());
+                moim.setMoim_name(participateMoim.getMoim_name());
+
+                String type = "accept";
+
+                String result = fcmPushService.sendFcmPushNotification(hostInfo.getFcm(), "친구 입장",
+                        "띵동!" + hostInfo.getName() + "님,\n" + user_.getName() + "님이 " + participateMoim.getMoim_name() +"에 입장했어요",
+                        encrptedInfo, type);
+
+                if(result.equals("Success")) {
+                    fcmPushService.saveAlarmData(user_, hostInfo, moim, type, "success", null);
+                } else {
+                    fcmPushService.saveAlarmData(user_, hostInfo, moim, type, "error", result);
+                }
+            }
+        }
 
         return MoimParticipateResponse.success(200, "모임에 참여 됐습니다.", participateMoim);
     }
@@ -203,10 +245,10 @@ public class MoimController {
 
                         if(result.equals("Success")) {
                             //성공시
-                            moimService.saveAlarmData(user_, msgUserInfo, moim, type, "send", null);
+                            fcmPushService.saveAlarmData(user_, msgUserInfo, moim, type, "send", null);
                         } else {
                             //실패시
-                            moimService.saveAlarmData(user_, msgUserInfo, moim, type, "error", result);
+                            fcmPushService.saveAlarmData(user_, msgUserInfo, moim, type, "error", result);
                         }
                     }
                 }

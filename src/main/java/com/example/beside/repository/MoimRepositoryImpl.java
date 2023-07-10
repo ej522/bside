@@ -61,13 +61,6 @@ public class MoimRepositoryImpl implements MoimRepository {
                 em.persist(findMoim);
         }
 
-        @Override
-        //@Transactional
-        public void insertAlarm(Alarm alarm) {
-                em.persist(alarm);
-                em.flush();
-        }
-
         /**
          * moim
          */
