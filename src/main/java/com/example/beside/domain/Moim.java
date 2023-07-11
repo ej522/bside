@@ -24,7 +24,7 @@ public class Moim {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "moim", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "moim", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<MoimMember> moim_member = new ArrayList<>();
 
     @OneToMany(mappedBy = "moim", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

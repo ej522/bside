@@ -6,7 +6,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.beside.repository.FcmPushRepository;
 import com.example.beside.service.FcmPushService;
+import com.example.beside.service.MoimService;
 import com.example.beside.service.UserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +37,7 @@ public class SchedulerTest {
 
     @Autowired
     private  UserService userService;
+
     @Autowired
     private FcmPushService fcmPushService;
 

@@ -3,11 +3,7 @@ package com.example.beside.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.beside.domain.Moim;
-import com.example.beside.domain.MoimDate;
-import com.example.beside.domain.MoimMember;
-import com.example.beside.domain.MoimMemberTime;
-import com.example.beside.domain.User;
+import com.example.beside.domain.*;
 import com.example.beside.dto.*;
 
 public interface MoimRepository {

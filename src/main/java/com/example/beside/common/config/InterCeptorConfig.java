@@ -49,7 +49,11 @@ public class InterCeptorConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/moim/v1/detail")
                 // 소셜
                 .addPathPatterns("/api/social/v1/unlink/Kakao")
-                .addPathPatterns("/api/social/v1/logout/kakao");
+                .addPathPatterns("/api/social/v1/logout/kakao")
+                //알람
+                .addPathPatterns("/api/alarm/v1/all")
+                .addPathPatterns("/api/alarm/v1/type")
+                .addPathPatterns("/api/alarm/v1/update-status");
     }
 
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.example.beside.domain.AlarmInfo;
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.User;
 import com.example.beside.service.FcmPushService;
@@ -64,16 +65,17 @@ public class Scheduler {
 
             moimRepository.fixMoimDate(moim, fixedDate, fixedTime);
 
+            String type = AlarmInfo.CONFIRM.name();
+
             //주최자
             User host = userService.chkPushAgree(moim.getUser().getId());
-            sendFixMoimMessage(host, moim.getMoim_name(), moim.getEncrypted_id());
+            sendFixMoimMessage(host, moim, moim.getEncrypted_id(), type);
 
-            User guest = new User();
             //참여자
             List<MoimMember> moimMemberList = moim.getMoim_member();
             for(MoimMember moimMember : moimMemberList) {
-                guest = userService.chkPushAgree(moimMember.getUser_id());
-                sendFixMoimMessage(guest, moim.getMoim_name(), moim.getEncrypted_id());
+                User guest = userService.chkPushAgree(moimMember.getUser_id());
+                sendFixMoimMessage(guest, moim, moim.getEncrypted_id(), type);
             }
         }
 
@@ -191,10 +193,18 @@ public class Scheduler {
         return maxSelectedTime.get(0);
     }
 
-    private void sendFixMoimMessage(User user, String moim_name, String encrptedInfo) throws FirebaseMessagingException {
+    private void sendFixMoimMessage(User user, Moim moim, String encrptedInfo, String type) throws FirebaseMessagingException {
         if(user != null) {
             if(user.getFcm()!=null) {
-                fcmPushService.sendFcmPushNotification(user.getFcm(), "일정 확인", "띵동! " + moim_name + "MOIM의 정해진 날짜와 시간을 확인하세요!", encrptedInfo, "confirm");
+                String result = fcmPushService.sendFcmPushNotification(user.getFcm(), Common.getPushTitle(type),
+                        Common.getPushContent(null, null, moim.getMoim_name(), type),
+                        encrptedInfo, type);
+
+                if(result.equals(AlarmInfo.SUCCESS.name())) {
+                    fcmPushService.saveAlarmData(null, user, moim, type, AlarmInfo.SUCCESS.name(), null);
+                } else {
+                    fcmPushService.saveAlarmData(null, user, moim, type, AlarmInfo.ERROR.name(), result);
+                }
             }
         }
     }

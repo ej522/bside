@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
+import com.example.beside.domain.*;
 import com.example.beside.dto.*;
 import com.example.beside.util.Common;
 import com.example.beside.util.PasswordConverter;
@@ -15,11 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.beside.common.Exception.ExceptionDetail.AdjustScheduleException;
 import com.example.beside.common.Exception.ExceptionDetail.InviteMyMoimException;
 import com.example.beside.common.Exception.ExceptionDetail.MoimParticipateException;
-import com.example.beside.domain.Moim;
-import com.example.beside.domain.MoimDate;
-import com.example.beside.domain.MoimMember;
-import com.example.beside.domain.MoimMemberTime;
-import com.example.beside.domain.User;
 import com.example.beside.repository.MoimRepository;
 import com.example.beside.repository.UserRepository;
 import com.example.beside.util.Encrypt;
@@ -700,7 +696,6 @@ public class MoimService {
 
         return summInfo;
     }
-
 
     private List<VoteMoimTimeDto.TimeVoteInfo> setVoteTimeInfo(List<VoteMoimTimeDto.TimeVoteInfo> timeList, VoteMoimTimeDto.TimeVoteInfo timeVoteInfo,
                                                          Integer time, Integer vote_cnt, List<SimpleUserDto> userInfoList) {
