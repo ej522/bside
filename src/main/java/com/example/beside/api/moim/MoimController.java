@@ -17,17 +17,15 @@ import com.example.beside.common.response.ResponseDetail.MoimParticipateResponse
 import com.example.beside.common.response.ResponseDetail.VoteMoimDateResponse;
 import com.example.beside.common.response.ResponseDetail.VoteMoimTimeResponse;
 import com.example.beside.common.response.ResponseDetail.VotingMoimResponse;
+import com.example.beside.domain.*;
 import com.example.beside.dto.*;
 
 import com.example.beside.service.FcmPushService;
 import com.example.beside.service.UserService;
+import com.example.beside.util.Common;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.beside.domain.Moim;
-import com.example.beside.domain.MoimDate;
-import com.example.beside.domain.MoimMemberTime;
-import com.example.beside.domain.User;
 import com.example.beside.service.MoimService;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -38,7 +36,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -117,16 +114,16 @@ public class MoimController {
 
         if(hostInfo!=null) {
             if(hostInfo.getFcm()!=null) {
-                String type = "accept";
+                String type = AlarmInfo.ACCEPT.name();
 
-                String result = fcmPushService.sendFcmPushNotification(hostInfo.getFcm(), "친구 입장",
-                        "띵동!" + hostInfo.getName() + "님,\n" + user_.getName() + "님이 " + participateMoim.getMoim_name() +"에 입장했어요",
+                String result = fcmPushService.sendFcmPushNotification(hostInfo.getFcm(), Common.getPushTitle(type),
+                        Common.getPushContent(hostInfo.getName(), user_.getName(), moim.getMoim_name(), type),
                         moim.getEncrypted_id(), type);
 
-                if(result.equals("Success")) {
-                    fcmPushService.saveAlarmData(user_, hostInfo, moim, type, "success", null);
+                if(result.equals(AlarmInfo.SUCCESS.name())) {
+                    fcmPushService.saveAlarmData(user_, hostInfo, moim, type, AlarmInfo.SUCCESS.name(), null);
                 } else {
-                    fcmPushService.saveAlarmData(user_, hostInfo, moim, type, "error", result);
+                    fcmPushService.saveAlarmData(user_, hostInfo, moim, type, AlarmInfo.ERROR.name(), result);
                 }
             }
         }
@@ -157,16 +154,16 @@ public class MoimController {
                 moim.setId(participateMoim.getMoim_id());
                 moim.setMoim_name(participateMoim.getMoim_name());
 
-                String type = "accept";
+                String type = AlarmInfo.ACCEPT.name();
 
-                String result = fcmPushService.sendFcmPushNotification(hostInfo.getFcm(), "친구 입장",
-                        "띵동!" + hostInfo.getName() + "님,\n" + user_.getName() + "님이 " + participateMoim.getMoim_name() +"에 입장했어요",
+                String result = fcmPushService.sendFcmPushNotification(hostInfo.getFcm(), Common.getPushTitle(type),
+                        Common.getPushContent(hostInfo.getName(), user_.getName(), moim.getMoim_name(), type),
                         encrptedInfo, type);
 
-                if(result.equals("Success")) {
-                    fcmPushService.saveAlarmData(user_, hostInfo, moim, type, "success", null);
+                if(result.equals(AlarmInfo.SUCCESS.name())) {
+                    fcmPushService.saveAlarmData(user_, hostInfo, moim, type, AlarmInfo.SUCCESS.name(), null);
                 } else {
-                    fcmPushService.saveAlarmData(user_, hostInfo, moim, type, "error", result);
+                    fcmPushService.saveAlarmData(user_, hostInfo, moim, type, AlarmInfo.ERROR.name(), result);
                 }
             }
         }
@@ -231,24 +228,25 @@ public class MoimController {
             moim.setId(participateMoim.getMoim_id());
             moim.setMoim_name(participateMoim.getMoim_name());
 
-            String type = "invite";
+            String type = AlarmInfo.INVITE.name();
 
             for (String friend_id : friend_id_list) {
                 User msgUserInfo = userService.chkPushAgree(Long.valueOf(friend_id));
 
                 if (msgUserInfo != null) {
                     if (msgUserInfo.getFcm() != null) {
-                        String result = fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), "모임 초대",
-                                "띵동! " + msgUserInfo.getName() + "님,\n"
-                                        + user_.getName() + "에게 MOIM 초대장이 왔어요",
+                        String result = fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), Common.getPushTitle(type),
+                                Common.getPushContent(msgUserInfo.getName(), user_.getName(), null, type),
                                 encrptedMoimInfo, type);
 
-                        if(result.equals("Success")) {
+                        System.out.println("result="+result);
+
+                        if(result.equals(AlarmInfo.SUCCESS.name())) {
                             //성공시
-                            fcmPushService.saveAlarmData(user_, msgUserInfo, moim, type, "send", null);
+                            fcmPushService.saveAlarmData(user_, msgUserInfo, moim, type, AlarmInfo.SUCCESS.name(), null);
                         } else {
                             //실패시
-                            fcmPushService.saveAlarmData(user_, msgUserInfo, moim, type, "error", result);
+                            fcmPushService.saveAlarmData(user_, msgUserInfo, moim, type, AlarmInfo.ERROR.name(), result);
                         }
                     }
                 }

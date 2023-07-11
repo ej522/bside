@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import com.example.beside.common.Exception.ExceptionDetail.PasswordException;
 import com.example.beside.common.Exception.ExceptionDetail.UserValidateNickName;
+import com.example.beside.domain.AlarmInfo;
 
 public class Common {
 
@@ -86,5 +87,33 @@ public class Common {
     public static LocalDateTime calculateDeadLineTime(LocalDateTime createdTime, int deadLineHour) {
         LocalDateTime plusedTime = createdTime.plusHours(deadLineHour);
         return plusedTime;
+    }
+
+    public static String getPushTitle(String type) {
+        String title = "";
+
+        if(type.equals(AlarmInfo.ACCEPT.name())) {
+            title = "친구 입장";
+        } else if(type.equals(AlarmInfo.INVITE.name())) {
+            title = "모임 초대";
+        } else if (type.equals(AlarmInfo.CONFIRM.name())) {
+            title = "일정 확인";
+        }
+
+        return title;
+    }
+
+    public static String getPushContent(String receiver, String sender, String moim_name, String type) {
+        String content = "";
+
+        if(type.equals(AlarmInfo.ACCEPT.name())) {
+            content = "띵동!" + receiver + "님,\n" + sender + "님이 " + moim_name +"에 입장했어요";
+        } else if(type.equals(AlarmInfo.INVITE.name())) {
+            content = "띵똥! " + receiver + "님,\n" + sender + "에게 MOIM 초대장이 왔어요!";
+        } else if (type.equals(AlarmInfo.CONFIRM.name())) {
+            content = "띵똥! " + moim_name + " MOIM의 정해진 날짜와 시간을 확인하세요!";
+        }
+
+        return content;
     }
 }

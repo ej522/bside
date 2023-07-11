@@ -22,13 +22,13 @@ public class Alarm {
 
     private String moim_name;
 
-    private long user_id;
+    private long receive_id;
 
-    private String user_name;
+    private String receive_name;
 
-    private long friend_id;
+    private long send_id;
 
-    private String friend_name;
+    private String send_name;
 
     private String type;
 
