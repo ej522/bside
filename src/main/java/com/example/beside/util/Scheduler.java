@@ -44,6 +44,8 @@ public class Scheduler {
             // 모임 정보 조회
             List<MoimOveralScheduleDto> moimInfo = moimRepository.getMoimScheduleInfo(moim.getId());
 
+            if(moimInfo.size()==0) continue;
+
             var created_time = moimInfo.get(0).getCreated_time();
             var dead_line_hour = moimInfo.get(0).getDead_line_hour();
             var standardTime = created_time.plusHours(dead_line_hour);

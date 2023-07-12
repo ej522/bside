@@ -80,31 +80,9 @@ public class FcmPushService {
 
     }
 
-    //알람 전체 조회
-    public List<AlarmDto> getAlarmAllList(User user) throws NoResultListException {
-        List<Alarm> alarmList = fcmPushRepository.getAlarmAllList(user.getId());
-
-        List<AlarmDto> alarmInfoList = new ArrayList<>();
-
-        if(alarmList.size()==0) {
-            throw new NoResultListException("알람 목록이 없습니다.");
-        } else {
-            for(Alarm alarm : alarmList) {
-                String title = Common.getPushTitle(alarm.getType());
-                String content = Common.getPushContent(alarm.getReceive_name(), alarm.getSend_name(), alarm.getMoim_name(), alarm.getType());
-
-                AlarmDto alarmInfo = new AlarmDto(alarm, title, content);
-
-                alarmInfoList.add(alarmInfo);
-            }
-        }
-
-        return  alarmInfoList;
-    }
-
-    //타입별 조회
+    //알람 조회
     public List<AlarmDto> getAlarmTypeList(User user, String type) throws NoResultListException {
-        List<Alarm> alarmList = fcmPushRepository.getAlarmByType(user.getId(), type);
+        List<Alarm> alarmList = fcmPushRepository.getAlarmListByType(user.getId(), type);
 
         List<AlarmDto> alarmInfoList = new ArrayList<>();
 
@@ -126,11 +104,7 @@ public class FcmPushService {
 
     //알람 상태 변경
     @Transactional
-    public List<AlarmDto> updateAlarmStatus(long alarm_id, User user, String status) throws NoResultListException {
+    public void updateAlarmStatus(long alarm_id, User user, String status) throws NoResultListException {
         fcmPushRepository.updateAlarmStatus(alarm_id, user.getId(), status);
-
-        List<AlarmDto> alarmList = getAlarmAllList(user);
-
-        return alarmList;
     }
 }

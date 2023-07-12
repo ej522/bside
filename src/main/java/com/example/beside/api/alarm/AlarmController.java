@@ -27,28 +27,14 @@ import java.util.List;
 public class AlarmController {
     private final FcmPushService fcmPushService;
 
-    @Operation(tags = { "Fcm Alarm Info" }, summary = "알람 전체 조회")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "알람이 조회되었습니다.", content = @Content(schema = @Schema(implementation = AlarmInfoResponse.class))),
-            @ApiResponse(responseCode = "400", description = "알람 목록이 없습니다."),
-    })
-    @GetMapping("/v1/all")
-    public Response<List<AlarmDto>> getAlarmAllList(HttpServletRequest token) throws NoResultListException {
-        User user = (User) token.getAttribute("user");
-
-        List<AlarmDto> alarmList = fcmPushService.getAlarmAllList(user);
-
-        return AlarmInfoResponse.success(200, "알람이 조회되었습니다.", alarmList);
-    }
-
-    @Operation(tags = { "Fcm Alarm Info" }, summary = "알람 유형별 조회")
+    @Operation(tags = { "Fcm Alarm Info" }, summary = "알람 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "알람이 조회되었습니다.", content = @Content(schema = @Schema(implementation = AlarmInfoResponse.class))),
             @ApiResponse(responseCode = "400", description = "알람 목록이 없습니다.")
     })
-    @GetMapping("/v1/type")
+    @GetMapping("/v1/list/{type}")
     public Response<List<AlarmDto>> getAlarmTypeList(HttpServletRequest token,
-                                                     @RequestParam(name = "type") String type) throws NoResultListException {
+                                                     @RequestParam(name = "type", required = false) String type) throws NoResultListException {
         User user = (User) token.getAttribute("user");
 
         List<AlarmDto> alarmList = fcmPushService.getAlarmTypeList(user, type);
@@ -58,16 +44,16 @@ public class AlarmController {
 
     @Operation(tags = { "Fcm Alarm Info" }, summary = "알람 상태 수정")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "알람 상태가 수정되었습니다.", content = @Content(schema = @Schema(implementation = AlarmDto.class))),
+            @ApiResponse(responseCode = "200", description = "알람 상태가 수정되었습니다."),
             @ApiResponse(responseCode = "400", description = "알람 목록이 없습니다."),
     })
     @PostMapping("v1/update-status")
-    public Response<List<AlarmDto>> updateAlarmStatus(HttpServletRequest token, @RequestBody AlarmRequest request) throws NoResultListException {
+    public Response<?> updateAlarmStatus(HttpServletRequest token, @RequestBody AlarmRequest request) throws NoResultListException {
         User user = (User) token.getAttribute("user");
 
-        List<AlarmDto> alarmList = fcmPushService.updateAlarmStatus(request.alarm_id, user, request.status);
+        fcmPushService.updateAlarmStatus(request.alarm_id, user, request.status);
 
-        return AlarmInfoResponse.success(200, "알람 상태가 수정되었습니다.", alarmList);
+        return AlarmInfoResponse.success(200, "알람 상태가 수정되었습니다.", null);
     }
 
     @Data

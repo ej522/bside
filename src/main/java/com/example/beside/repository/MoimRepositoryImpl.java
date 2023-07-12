@@ -503,7 +503,9 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
                                 .leftJoin(qMoimMemberTime).on(qMoimMember.id.eq(qMoimMemberTime.moim_member.id))
                                 .leftJoin(qUser).on(qMoimMember.user_id.eq(qUser.id))
-                                .where(qMoim.id.eq(moimId))
+                                .where(qMoim.id.eq(moimId)
+                                        .and(qMoimMember.is_accept.eq(true))
+                                        .and(qMoimMemberTime.id.isNotNull()))
                                 .orderBy(qMoimMemberTime.selected_date.asc())
                                 .fetch();
 

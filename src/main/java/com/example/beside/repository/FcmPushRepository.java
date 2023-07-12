@@ -9,11 +9,10 @@ public interface FcmPushRepository {
     void insertAlarm(Alarm alarm);
 
     //read
-    List<Alarm> getAlarmAllList(long user_id);
 
-    List<Alarm> getAlarmByType(long user_id, String type);
+    List<Alarm> getAlarmListByType(long user_id, String type);
 
     //update
-    Alarm updateAlarmStatus(long alarm_id, long user_id, String status);
+    void updateAlarmStatus(long alarm_id, long user_id, String status);
 
 }
