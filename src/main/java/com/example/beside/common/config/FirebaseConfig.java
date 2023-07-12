@@ -11,6 +11,7 @@ import java.util.List;
 
 @Configuration
 public class FirebaseConfig {
+    /*
     @PostConstruct
     public void init(){
         try{
@@ -27,10 +28,11 @@ public class FirebaseConfig {
                 FirebaseOptions options = new FirebaseOptions.Builder()
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                         .build();
-                FirebaseApp.initializeApp(options);
+                firebaseApp = FirebaseApp.initializeApp(options);
             }
         }catch (Exception e){
             e.printStackTrace();
         }
     }
+     */
 }
