@@ -8,6 +8,10 @@ import com.example.beside.domain.User;
 import com.example.beside.dto.AlarmDto;
 import com.example.beside.repository.FcmPushRepository;
 import com.example.beside.util.Common;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +21,7 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.FileInputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +32,20 @@ import java.util.List;
 public class FcmPushService {
 
     private final FcmPushRepository fcmPushRepository;
+
+    @PostConstruct
+    public void init(){
+        try{
+            FileInputStream serviceAccount =
+                    new FileInputStream("src/main/resources/serviceAccountKey.json");
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build();
+            FirebaseApp.initializeApp(options);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public String sendFcmPushNotification(String fcmToken, String title, String body, String encrptedInfo, String type) throws FirebaseMessagingException {
         try {
