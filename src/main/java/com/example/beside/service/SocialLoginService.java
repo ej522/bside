@@ -98,6 +98,7 @@ public class SocialLoginService {
         }
 
         userInfo.setProfile_image(null);
+        userInfo.setFcm(fcm);
         return userRepository.saveUser(userInfo);
     }
 
@@ -203,6 +204,7 @@ public class SocialLoginService {
         }
 
         userInfo.setProfile_image(null);
+        userInfo.setFcm(fcm);
         return userRepository.saveUser(userInfo);
     }
 
