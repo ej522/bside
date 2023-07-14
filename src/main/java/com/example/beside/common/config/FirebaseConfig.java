@@ -36,14 +36,13 @@ public class FirebaseConfig {
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                         .build();
 
-                if(firebaseApps.isEmpty()){
-                    log.info("=======init starttttt=======");
-                    firebaseApp = FirebaseApp.initializeApp(options);
-                    log.info("=======init enddddd=======");
-                }
+                log.info("=======init starttttt=======");
+                firebaseApp = FirebaseApp.initializeApp(options);
+                log.info("=======init enddddd=======");
 
             }
         }catch (Exception e){
+            log.info("!!error!!");
             e.printStackTrace();
         }
     }
