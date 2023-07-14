@@ -43,6 +43,7 @@ public class FirebaseConfig {
             }
         }catch (Exception e){
             log.info("!!error!!");
+            log.info(e.getMessage());
             e.printStackTrace();
         }
     }
