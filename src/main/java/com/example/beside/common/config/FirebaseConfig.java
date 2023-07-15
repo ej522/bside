@@ -20,31 +20,26 @@ public class FirebaseConfig {
     public void init(){
 
         try{
-            log.info("try문");
             FirebaseApp firebaseApp = null;
             List<FirebaseApp> firebaseApps = FirebaseApp.getApps();
             if(firebaseApps != null && !firebaseApps.isEmpty()) {
-                log.info("not empty");
                 for(FirebaseApp app : firebaseApps) {
                     if(app.getName().equals(FirebaseApp.DEFAULT_APP_NAME))
                         firebaseApp = app;
                 }
             } else {
-                log.info("empty");
                 ClassPathResource serviceAccount =
                         new ClassPathResource("serviceAccountKey.json");
                 FirebaseOptions options = new FirebaseOptions.Builder()
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount.getInputStream()))
                         .build();
-
-                log.info("=======init starttttt=======");
+                log.info("======init start======");
                 firebaseApp = FirebaseApp.initializeApp(options);
-                log.info("=======init enddddd=======");
+                log.info("======init end=====");
 
             }
         }catch (Exception e){
-            log.info("!!error!!");
-            log.info(e.getMessage());
+            log.info("fcm error::" + e.getMessage());
             e.printStackTrace();
         }
     }
