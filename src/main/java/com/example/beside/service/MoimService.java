@@ -394,7 +394,7 @@ public class MoimService {
         int total = 0;
 
         VoteMoimTimeDto moimTimeInfo = new VoteMoimTimeDto();
-        moimTimeInfo.setMoim_id(voteUserInfoList.get(0).getMoim_id());
+        moimTimeInfo.setMoim_id(dateInfoList.get(0).getId());
         moimTimeInfo.setSelected_date(selected_date);
 
         // 시간
