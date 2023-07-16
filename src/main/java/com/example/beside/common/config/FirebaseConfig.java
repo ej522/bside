@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.FileInputStream;
 import java.util.List;
 
 @Configuration
@@ -33,9 +32,7 @@ public class FirebaseConfig {
                 FirebaseOptions options = new FirebaseOptions.Builder()
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount.getInputStream()))
                         .build();
-                log.info("======init start======");
                 firebaseApp = FirebaseApp.initializeApp(options);
-                log.info("======init end=====");
 
             }
         }catch (Exception e){

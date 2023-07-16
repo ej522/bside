@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.beside.common.config.Loggable;
 import com.example.beside.common.response.Response;
 import com.example.beside.domain.AppInfo;
 import com.example.beside.service.AppInfoService;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Loggable
 @Tag(name = "App Info", description = "앱 정보 API")
 @RequiredArgsConstructor
 @RequestMapping("/api/appInfo")

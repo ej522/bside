@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
+import com.example.beside.common.config.Loggable;
 import com.example.beside.common.response.*;
 import com.example.beside.common.response.ResponseDetail.DeepLinkMoimResponse;
 import com.example.beside.common.response.ResponseDetail.InvitedMoimResponse;
@@ -23,6 +24,9 @@ import com.example.beside.dto.*;
 import com.example.beside.service.FcmPushService;
 import com.example.beside.service.UserService;
 import com.example.beside.util.Common;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,15 +44,18 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+@Loggable
 @Tag(name = "Moim", description = "모임 API")
 @RequiredArgsConstructor
 @RequestMapping("/api/moim")
 @RestController
 public class MoimController {
+    private final Logger logger = LoggerFactory.getLogger(MoimController.class);
 
     private final MoimService moimService;
     private final FcmPushService fcmPushService;
     private final UserService userService;
+
 
     @Operation(tags = { "Moim" }, summary = "시간 투표 결과 조회")
     @ApiResponses(value = {
@@ -238,8 +245,8 @@ public class MoimController {
                         String result = fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), Common.getPushTitle(type),
                                 Common.getPushContent(msgUserInfo.getName(), user_.getName(), null, type),
                                 encrptedMoimInfo, type);
-
-                        System.out.println("result="+result);
+                        
+                        logger.error("push alarm 에러: " + result);
 
                         if(result.equals(AlarmInfo.SUCCESS.name())) {
                             //성공시

@@ -1,11 +1,13 @@
 package com.example.beside.api.alarm;
 
 import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
+import com.example.beside.common.config.Loggable;
 import com.example.beside.common.response.Response;
 import com.example.beside.common.response.ResponseDetail.AlarmInfoResponse;
 import com.example.beside.domain.User;
 import com.example.beside.dto.AlarmDto;
 import com.example.beside.service.FcmPushService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+@Loggable
 @Tag(name = "Fcm Alarm Info", description = "알림 정보")
 @RequiredArgsConstructor
 @RequestMapping("/api/alarm")
@@ -27,6 +31,7 @@ import java.util.List;
 public class AlarmController {
     private final FcmPushService fcmPushService;
 
+    
     @Operation(tags = { "Fcm Alarm Info" }, summary = "알람 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "알람이 조회되었습니다.", content = @Content(schema = @Schema(implementation = AlarmInfoResponse.class))),

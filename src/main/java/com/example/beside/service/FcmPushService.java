@@ -8,10 +8,6 @@ import com.example.beside.domain.User;
 import com.example.beside.dto.AlarmDto;
 import com.example.beside.repository.FcmPushRepository;
 import com.example.beside.util.Common;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

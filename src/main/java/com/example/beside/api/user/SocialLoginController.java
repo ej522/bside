@@ -2,6 +2,7 @@ package com.example.beside.api.user;
 
 import com.example.beside.common.Exception.ExceptionDetail.SocialLoginException;
 import com.example.beside.common.Exception.ExceptionDetail.UserNotExistException;
+import com.example.beside.common.config.Loggable;
 import com.example.beside.common.response.Response;
 import com.example.beside.common.response.ResponseDetail.LoginResponse;
 import com.example.beside.domain.User;
@@ -9,6 +10,7 @@ import com.example.beside.dto.UserDto;
 import com.example.beside.dto.UserTokenDto;
 import com.example.beside.service.SocialLoginService;
 import com.example.beside.util.JwtProvider;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,9 +30,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
+@Loggable
 @RequiredArgsConstructor
-@RestController
 @RequestMapping("/api/social")
+@RestController
 public class SocialLoginController {
 
     private final SocialLoginService socialLoginService;
