@@ -7,6 +7,7 @@ import com.example.beside.common.Exception.ExceptionDetail.PasswordException;
 import com.example.beside.common.Exception.ExceptionDetail.PasswordNotCorrectException;
 import com.example.beside.common.Exception.ExceptionDetail.UserNotExistException;
 import com.example.beside.common.Exception.ExceptionDetail.UserValidateNickName;
+import com.example.beside.common.config.Loggable;
 import com.example.beside.common.response.Response;
 import com.example.beside.common.response.ResponseDetail.AllUsersResponse;
 import com.example.beside.common.response.ResponseDetail.BooleanResponse;
@@ -45,6 +46,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+@Loggable
 @Tag(name = "User", description = "유저 API")
 @RequiredArgsConstructor
 @RequestMapping("/api/users")

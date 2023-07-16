@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.beside.common.Exception.ExceptionDetail.NoResultListException;
+import com.example.beside.common.config.Loggable;
 import com.example.beside.common.response.*;
 import com.example.beside.common.response.ResponseDetail.DeepLinkMoimResponse;
 import com.example.beside.common.response.ResponseDetail.InvitedMoimResponse;
@@ -23,6 +24,7 @@ import com.example.beside.dto.*;
 import com.example.beside.service.FcmPushService;
 import com.example.beside.service.UserService;
 import com.example.beside.util.Common;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +42,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+@Loggable
 @Tag(name = "Moim", description = "모임 API")
 @RequiredArgsConstructor
 @RequestMapping("/api/moim")
