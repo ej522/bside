@@ -7,7 +7,6 @@ import java.util.List;
 
 import com.example.beside.domain.*;
 import com.example.beside.dto.*;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Repository;
 
 import com.example.beside.util.Encrypt;
 import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
