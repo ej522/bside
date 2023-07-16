@@ -25,6 +25,8 @@ import com.example.beside.service.FcmPushService;
 import com.example.beside.service.UserService;
 import com.example.beside.util.Common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,10 +50,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/moim")
 @RestController
 public class MoimController {
+    private final Logger logger = LoggerFactory.getLogger(MoimController.class);
 
     private final MoimService moimService;
     private final FcmPushService fcmPushService;
     private final UserService userService;
+
 
     @Operation(tags = { "Moim" }, summary = "시간 투표 결과 조회")
     @ApiResponses(value = {
@@ -241,8 +245,8 @@ public class MoimController {
                         String result = fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), Common.getPushTitle(type),
                                 Common.getPushContent(msgUserInfo.getName(), user_.getName(), null, type),
                                 encrptedMoimInfo, type);
-
-                        System.out.println("result="+result);
+                        
+                        logger.error("push alarm 에러: " + result);
 
                         if(result.equals(AlarmInfo.SUCCESS.name())) {
                             //성공시
