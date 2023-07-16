@@ -3,6 +3,7 @@ package com.example.beside.common.config;
 import java.util.Arrays;
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
@@ -29,21 +30,40 @@ public class LogAspect {
     public void loggableClass() {
     }
 
+    // API
     @Before("loggableClass() && execution(* *(..))")
     public void logBeforeMethod(JoinPoint joinPoint) throws Throwable {
         Logger logger = LoggerFactory.getLogger(joinPoint.getTarget().getClass());
         Object[] args = joinPoint.getArgs();
 
-        // HttpServletRequest 가져오기
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
-
-        String jwt = request.getHeader("Authorization").split(" ")[1];
-        Object user_id = jwtprovider.validJwtToken(jwt).get("user_id");
         
         logger.info("===================================================");
         logger.info("API 요청: " + joinPoint.getSignature().toShortString());
         logger.info("메서드 인자: {}", Arrays.toString(args));
-        logger.info("유저 id:  {}", user_id);
+        logger_info_user_id(logger, request);
+    }
+
+    private void logger_info_user_id(Logger logger, HttpServletRequest request) {
+        if (request.getHeader("Authorization") != null){
+            String jwt = request.getHeader("Authorization").split(" ")[1];
+            Object user_id = jwtprovider.validJwtToken(jwt).get("user_id");
+            logger.info("유저 id:  {}", user_id);
+        }
+    }
+
+
+    // Exception 
+    @AfterThrowing(pointcut = "loggableClass() && execution(* *(..))", throwing = "ex")
+    public void logAfterThrowing(JoinPoint joinPoint, Throwable ex) {
+        Logger logger = LoggerFactory.getLogger(joinPoint.getTarget().getClass());
+        Object[] args = joinPoint.getArgs();
+
+        logger.info("===================================================");
+        logger.info("API 요청: " + joinPoint.getSignature().toShortString());
+        logger.info("메서드 인자: {}", Arrays.toString(args));
+        logger.error("예외 타입: " + ex.getClass().getSimpleName());
+        logger.error("예외 발생: " + ex.getMessage());
     }
 }
