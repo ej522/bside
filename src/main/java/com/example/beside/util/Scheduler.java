@@ -200,7 +200,7 @@ public class Scheduler {
             if(user.getFcm()!=null) {
                 String result = fcmPushService.sendFcmPushNotification(user.getFcm(), Common.getPushTitle(type),
                         Common.getPushContent(null, null, moim.getMoim_name(), type),
-                        encrptedInfo, type);
+                        encrptedInfo, "MOIM_RESULT");
 
                 if(result.equals(AlarmInfo.SUCCESS.name())) {
                     fcmPushService.saveAlarmData(null, user, moim, type, AlarmInfo.SUCCESS.name(), null);

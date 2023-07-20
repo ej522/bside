@@ -34,7 +34,10 @@ public class AlarmDto {
     @Schema(description = "모임 아이디", example = "1")
     private long moim_id;
 
-    public AlarmDto(Alarm alarm, String title, String content) {
+    @Schema(description = "이미지", example = "https://moim.life/icon/moim_accept.png")
+    private String alarm_img_url;
+
+    public AlarmDto(Alarm alarm, String title, String content, String alarm_img_url) {
         this.push_id = alarm.getId();
         this.alarm_time = alarm.getAlarm_time();
         this.title = title;
@@ -42,5 +45,6 @@ public class AlarmDto {
         this.status = alarm.getStatus();
         this.user_id = alarm.getReceive_id();
         this.moim_id = alarm.getMoim_id();
+        this.alarm_img_url = alarm_img_url;
     }
 }
