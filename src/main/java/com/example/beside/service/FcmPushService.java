@@ -99,10 +99,10 @@ public class FcmPushService {
     }
 
     //알람 조회
-    public List<AlarmDto> getAlarmTypeList(User user, String type) throws NoResultListException {
+    public AlarmDto getAlarmTypeList(User user, String type) throws NoResultListException {
         List<Alarm> alarmList = fcmPushRepository.getAlarmListByType(user.getId(), type);
 
-        List<AlarmDto> alarmInfoList = new ArrayList<>();
+        List<AlarmDto.AlarmInfoDto> alarmInfoList = new ArrayList<>();
 
         if(alarmList.size()==0) {
             throw new NoResultListException("알람 목록이 없습니다.");
@@ -119,13 +119,17 @@ public class FcmPushService {
                 else if(alarm.getType().equals(AlarmInfo.CONFIRM.name()))
                     img_url = "https://moim.life/icon/moim_alarm.png";
 
-                AlarmDto alarmInfo = new AlarmDto(alarm, title, content, img_url);
+                AlarmDto.AlarmInfoDto alarmInfo = new AlarmDto.AlarmInfoDto(alarm, title, content, img_url);
 
                 alarmInfoList.add(alarmInfo);
             }
         }
 
-        return  alarmInfoList;
+        AlarmDto alarmDto = new AlarmDto();
+        alarmDto.setAlarmInfoList(alarmInfoList);
+        alarmDto.setAlarm_cnt(alarmInfoList.size());
+
+        return  alarmDto;
     }
 
     //알람 상태 변경

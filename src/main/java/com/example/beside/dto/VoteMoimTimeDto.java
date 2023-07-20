@@ -48,18 +48,4 @@ public class VoteMoimTimeDto {
         private List<SimpleUserDto> userInfo;
     }
 
-//    @Data
-//    public static class TimeUserInfo {
-//        @NotEmpty
-//        @Schema(description = "유저ID", example = "1")
-//        private Long user_id;
-//
-//        @NotEmpty
-//        @Schema(description = "유저 닉네임", example = "닉네임")
-//        private String nickname;
-//
-//        @Schema(description = "유저 프로필", example = "https://moim.life/profile/green.jpg")
-//        private String profile;
-//    }
-
 }
