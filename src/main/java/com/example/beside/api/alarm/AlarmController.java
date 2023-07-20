@@ -35,14 +35,14 @@ public class AlarmController {
     @Operation(tags = { "Fcm Alarm Info" }, summary = "알람 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "알람이 조회되었습니다.", content = @Content(schema = @Schema(implementation = AlarmInfoResponse.class))),
-            @ApiResponse(responseCode = "400", description = "알람 목록이 없습니다.")
+            @ApiResponse(responseCode = "404", description = "알람 목록이 없습니다.")
     })
-    @GetMapping("/v1/list/{type}")
-    public Response<List<AlarmDto>> getAlarmTypeList(HttpServletRequest token,
+    @GetMapping("/v1/list")
+    public Response<AlarmDto> getAlarmTypeList(HttpServletRequest token,
                                                      @RequestParam(name = "type", required = false) String type) throws NoResultListException {
         User user = (User) token.getAttribute("user");
 
-        List<AlarmDto> alarmList = fcmPushService.getAlarmTypeList(user, type);
+        AlarmDto alarmList = fcmPushService.getAlarmTypeList(user, type);
 
         return AlarmInfoResponse.success(200, "알람이 조회되었습니다.", alarmList);
     }
