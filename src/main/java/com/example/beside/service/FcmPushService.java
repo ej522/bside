@@ -92,8 +92,16 @@ public class FcmPushService {
             for(Alarm alarm : alarmList) {
                 String title = Common.getPushTitle(alarm.getType());
                 String content = Common.getPushContent(alarm.getReceive_name(), alarm.getSend_name(), alarm.getMoim_name(), alarm.getType());
+                String img_url = "";
 
-                AlarmDto alarmInfo = new AlarmDto(alarm, title, content);
+                if(alarm.getType().equals(AlarmInfo.ACCEPT.name()))
+                    img_url = "https://moim.life/icon/moim_accept.png";
+                else if(alarm.getType().equals(AlarmInfo.INVITE.name()))
+                    img_url = "https://moim.life/icon/moim_invite.png";
+                else if(alarm.getType().equals(AlarmInfo.CONFIRM.name()))
+                    img_url = "https://moim.life/icon/moim_alarm.png";
+
+                AlarmDto alarmInfo = new AlarmDto(alarm, title, content, img_url);
 
                 alarmInfoList.add(alarmInfo);
             }

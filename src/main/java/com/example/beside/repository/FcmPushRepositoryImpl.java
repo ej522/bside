@@ -52,8 +52,11 @@ public class FcmPushRepositoryImpl implements FcmPushRepository{
     }
 
     private BooleanExpression typeEq(String type, QAlarm qAlarm) {
+        BooleanExpression result = type == null ? null :
+                type.equals(AlarmInfo.CONFIRM.name()) ? qAlarm.type.eq(AlarmInfo.CONFIRM.name()) :
+                        qAlarm.type.eq(AlarmInfo.ACCEPT.name()).or(qAlarm.type.eq(AlarmInfo.INVITE.name())) ;
 
-        return type == null ? null : qAlarm.type.eq(type);
+        return result;
     }
 
 }
