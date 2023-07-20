@@ -206,8 +206,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                                                 qMoim.moim_name.as("moim_name"),
                                                 qMoim.created_time.as("created_time"),
                                                 qMoim.dead_line_hour.as("dead_line_hour")))
-                                .from(qMoim).innerJoin(qMoimMember)
-                                .on(qMoim.id.eq(qMoimMember.moim.id))
+                                .from(qMoim)
                                 .where(qMoim.user.id.eq(user_id)
                                                 .and(qMoim.fixed_date.isNull()));
 
