@@ -115,17 +115,19 @@ public class MoimController {
 
         MoimParticipateInfoDto participateMoim = moimService.participateInvitedMoim(user_, request.getMoimId());
 
-        Moim moim = moimService.getMoimInfoWithMoimId(request.getMoimId());
-
         User hostInfo = userService.chkPushAgree(participateMoim.getMoim_leader_id());
 
         if(hostInfo!=null) {
             if(hostInfo.getFcm()!=null) {
                 String type = AlarmInfo.ACCEPT.name();
 
-                String result = fcmPushService.sendFcmPushNotification(hostInfo.getFcm(), Common.getPushTitle(type),
+                Moim moim = new Moim();
+                moim.setId(participateMoim.getMoim_id());
+                moim.setMoim_name(participateMoim.getMoim_name());
+
+                String result = fcmPushService.sendFcmMoimIdNotification(hostInfo.getFcm(), Common.getPushTitle(type),
                         Common.getPushContent(hostInfo.getName(), user_.getName(), moim.getMoim_name(), type),
-                        moim.getEncrypted_id(), type);
+                        moim.getId(), type);
 
                 if(result.equals(AlarmInfo.SUCCESS.name())) {
                     fcmPushService.saveAlarmData(user_, hostInfo, moim, type, AlarmInfo.SUCCESS.name(), null);
@@ -163,9 +165,9 @@ public class MoimController {
 
                 String type = AlarmInfo.ACCEPT.name();
 
-                String result = fcmPushService.sendFcmPushNotification(hostInfo.getFcm(), Common.getPushTitle(type),
+                String result = fcmPushService.sendFcmMoimIdNotification(hostInfo.getFcm(), Common.getPushTitle(type),
                         Common.getPushContent(hostInfo.getName(), user_.getName(), moim.getMoim_name(), type),
-                        encrptedInfo, type);
+                        moim.getId(), type);
 
                 if(result.equals(AlarmInfo.SUCCESS.name())) {
                     fcmPushService.saveAlarmData(user_, hostInfo, moim, type, AlarmInfo.SUCCESS.name(), null);

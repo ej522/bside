@@ -198,9 +198,9 @@ public class Scheduler {
     private void sendFixMoimMessage(User user, Moim moim, String encrptedInfo, String type) throws FirebaseMessagingException {
         if(user != null) {
             if(user.getFcm()!=null) {
-                String result = fcmPushService.sendFcmPushNotification(user.getFcm(), Common.getPushTitle(type),
+                String result = fcmPushService.sendFcmMoimIdNotification(user.getFcm(), Common.getPushTitle(type),
                         Common.getPushContent(null, null, moim.getMoim_name(), type),
-                        encrptedInfo, "MOIM_RESULT");
+                        moim.getId(), "MOIM_RESULT");
 
                 if(result.equals(AlarmInfo.SUCCESS.name())) {
                     fcmPushService.saveAlarmData(null, user, moim, type, AlarmInfo.SUCCESS.name(), null);

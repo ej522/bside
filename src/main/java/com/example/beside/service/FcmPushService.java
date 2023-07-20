@@ -45,6 +45,24 @@ public class FcmPushService {
         }
     }
 
+    public String sendFcmMoimIdNotification(String fcmToken, String title, String body, long moim_id, String type) {
+        try {
+            Message message = Message.builder()
+                    .setNotification(Notification.builder().setTitle(title).setBody(body).build())
+                    .setToken(fcmToken)
+                    .putData("moim_id", String.valueOf(moim_id))
+                    .putData("linkTo", type)
+                    .build();
+
+            FirebaseMessaging.getInstance().send(message);
+
+            return AlarmInfo.SUCCESS.name();
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+
+    }
+
     //알람 저장
     @Transactional
     public void saveAlarmData(User sendUser, User receiveUser, Moim moim, String type, String status, String error_msg) {
