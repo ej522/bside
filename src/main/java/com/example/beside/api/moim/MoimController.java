@@ -244,7 +244,7 @@ public class MoimController {
                     if (msgUserInfo.getFcm() != null) {
                         String result = fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), Common.getPushTitle(type),
                                 Common.getPushContent(msgUserInfo.getName(), user_.getName(), null, type),
-                                encrptedMoimInfo, type);
+                                encrptedMoimInfo, "INVITE_ACCEPT");
                         
                         logger.error("push alarm 에러: " + result);
 
