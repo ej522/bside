@@ -2,9 +2,13 @@ package com.example.beside.util;
 
 import com.example.beside.domain.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Header;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -37,17 +41,26 @@ public class JwtProvider {
     }
 
     // 유효성확인
-    public Claims validJwtToken(String authorizationHeader) {
+    public Claims validJwtToken(String authorizationHeader)  {
+        try{
+            Claims claims = Jwts.parser()
+                    .setSigningKey(secret_key)
+                    .parseClaimsJws(authorizationHeader)
+                    .getBody();
 
-        Claims claims = Jwts.parser()
-                .setSigningKey(secret_key)
-                .parseClaimsJws(authorizationHeader)
-                .getBody();
-
-        if (redisTemplate.opsForValue().get("jwt:" + claims.get("user_id")) == null) {
-            throw new RuntimeException("로그아웃한 아이디입니다.");
+            if (redisTemplate.opsForValue().get("jwt:" + claims.get("user_id")) == null) {
+                throw new RuntimeException("로그아웃한 아이디입니다.");
+            }
+            return claims;
         }
-
-        return claims;
+        catch (ExpiredJwtException ex){
+            throw new JwtException("만료된 토큰입니다");
+        }
+        catch (SecurityException ex){
+            throw new JwtException("만료된 토큰입니다");
+        }
+        catch (UnsupportedJwtException ex){
+            throw new JwtException("지원되지 않는 토큰입니다");
+        }
     }
 }

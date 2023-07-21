@@ -39,7 +39,7 @@ public class LogAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
         
-        logger.info("===================================================");
+        logger.info("==========================");
         logger.info("API 요청: " + joinPoint.getSignature().toShortString());
         logger.info("메서드 인자: {}", Arrays.toString(args));
         logger_info_user_id(logger, request);
