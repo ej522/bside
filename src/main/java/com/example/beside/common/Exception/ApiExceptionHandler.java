@@ -77,8 +77,14 @@ public class ApiExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException ex) {
         List<String> errors = new ArrayList<>();
+        ApiError apiError = new ApiError(null, null, errors);
         errors.add(ex.getMessage());
-        ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Runtime Error", errors);
+
+        if (ex.getClass().getSimpleName().equals("JwtException"))
+            apiError = new ApiError(HttpStatus.UNAUTHORIZED, "Invalid Jwt", errors);
+        else
+            apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Runtime Error", errors);
+            
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
 
@@ -172,5 +178,4 @@ public class ApiExceptionHandler {
 
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
-
 }
