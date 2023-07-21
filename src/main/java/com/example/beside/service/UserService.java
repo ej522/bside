@@ -165,6 +165,12 @@ public class UserService {
         userRepository.updatePassword(user);
     }
 
+    @Transactional
+    public void logout(User user) {
+        user.setFcm(null);
+        userRepository.updateFcmToken(user);
+    }
+
     public Boolean validateCurrentPassword(Long user_id, String validatedPsw) {
         User userInfo = userRepository.findUserById(user_id);
 
