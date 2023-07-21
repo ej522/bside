@@ -367,6 +367,7 @@ public class UserController {
     public Response<Void> logout(HttpServletRequest token) {
         User user = (User) token.getAttribute("user");
         redisTemplate.delete("jwt:" + user.getId());
+        userService.logout(user);
         return Response.success(200, "로그아웃 되었습니다.", null);
     }
 
