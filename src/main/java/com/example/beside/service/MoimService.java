@@ -689,11 +689,12 @@ public class MoimService {
 
         LocalDateTime deadline = Common.calculateDeadLineTime(moimInfo.getCreated_time(), moimInfo.getDead_line_hour());
 
-        MoimDto summInfo = new MoimDto();
-        summInfo.setHost_name(moimInfo.getHost_name());
-        summInfo.setDead_line_time(deadline);
+        MoimDto sumInfo = new MoimDto();
+        sumInfo.setHost_name(moimInfo.getHost_name());
+        sumInfo.setDead_line_time(deadline);
+        sumInfo.setMoim_name(moimInfo.getMoim_name());
 
-        return summInfo;
+        return sumInfo;
     }
 
     private List<VoteMoimTimeDto.TimeVoteInfo> setVoteTimeInfo(List<VoteMoimTimeDto.TimeVoteInfo> timeList, VoteMoimTimeDto.TimeVoteInfo timeVoteInfo,
