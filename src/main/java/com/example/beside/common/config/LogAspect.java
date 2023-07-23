@@ -46,7 +46,6 @@ public class LogAspect {
     }
 
     // Exception 
-    @Transactional
     @AfterThrowing(pointcut = "loggableClass() && execution(* *(..))", throwing = "ex")
     public synchronized void logAfterThrowing(JoinPoint joinPoint, Throwable ex) {
         Logger logger = LoggerFactory.getLogger(joinPoint.getTarget().getClass());
