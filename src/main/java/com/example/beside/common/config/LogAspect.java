@@ -1,6 +1,5 @@
 package com.example.beside.common.config;
 
-import java.util.Arrays;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -46,7 +45,7 @@ public class LogAspect {
         
         logger.info("==========================");
         logger.info("API 요청: " + request.getRequestURI());
-        logger.info("메서드 인자: {}", Arrays.toString(args));
+        logger.info("메서드 인자: {}", args[0].toString());
         logger_info_user_id(logger, request);
     }
 
@@ -62,7 +61,7 @@ public class LogAspect {
         
         logger.info("==========================");
         logger.info("API 요청: " + request.getRequestURI());
-        logger.info("메서드 인자: {}", Arrays.toString(args));
+        logger.info("메서드 인자: {}", args[0].toString());
         logger.error("예외 타입: " + ex.getClass().getSimpleName());
         logger.error("예외 발생: " + ex.getMessage());
         logger_info_user_id(logger, request);
