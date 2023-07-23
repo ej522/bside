@@ -35,13 +35,13 @@ public class Scheduler {
     private final FcmPushService fcmPushService;
 
     // 초, 분, 시, 일, 월, 주 순서
-    @Scheduled(cron = "*/15 * * * * *")
+    @Scheduled(cron = "0 * * * * *")
     public void fixMoimSchedulering() throws FirebaseMessagingException {
-        // 일정이 확정되지 않은 모임 조회
+        // 일정이 확정되지 않은 모임 + 1명이라도 참여 수락한 모임 조회
         List<Moim> notFixedScheduleMoims = moimRepository.getNotFixedMoims();
 
         for (var moim : notFixedScheduleMoims) {
-            // 모임 정보 조회
+            // 누군가 투표한 모임 정보 조회 
             List<MoimOveralScheduleDto> moimInfo = moimRepository.getMoimScheduleInfo(moim.getId());
 
             if(moimInfo.size()==0) continue;
