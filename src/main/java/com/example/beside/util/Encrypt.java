@@ -26,13 +26,17 @@ public class Encrypt {
         Cipher cipher = Cipher.getInstance(transformation);
         cipher.init(Cipher.ENCRYPT_MODE, key);
         byte[] encryptedBytes = cipher.doFinal(plainText.getBytes());
-        return Base64.getEncoder().encodeToString(encryptedBytes);
+        String base64Encoded = Base64.getEncoder().encodeToString(encryptedBytes);
+        // url '+' 문자 이슈 처리
+        return  base64Encoded.replace("+", "-");
     }
 
     public String decrypt(String encryptedText) throws Exception {
         SecretKeySpec key = new SecretKeySpec(secret_key.getBytes(StandardCharsets.UTF_8), algorithm);
         Cipher cipher = Cipher.getInstance(transformation);
         cipher.init(Cipher.DECRYPT_MODE, key);
+        // url '+' 문자 이슈 처리
+        encryptedText= encryptedText.replace("-","+");
         byte[] encryptedBytes = Base64.getDecoder().decode(encryptedText);
         byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
         return new String(decryptedBytes);
