@@ -429,6 +429,12 @@ public class MoimRepositoryImpl implements MoimRepository {
                 moim.setNobody_schedule_selected(false);
                 em.persist(moim);
 
+                // 중복 등록 방지
+                boolean isDuplicate = moim.getMoim_member()
+                                        .stream().anyMatch(mm -> mm.getUser_id() == moimMember.getUser_id());
+                if (isDuplicate)
+                    return 0;
+
                 for (var tt : moimTimeInfos) {
                         tt.setMoim_member(moimMember);
                         tt.setMoim_id(moim.getId());

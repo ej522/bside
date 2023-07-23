@@ -30,7 +30,7 @@ public class Moim {
     @OneToMany(mappedBy = "moim", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<MoimDate> moim_date = new ArrayList<>();
 
-    @Column(length = 20)
+    @Column(length = 100)
     private String moim_name;
 
     @Column(length = 15)
