@@ -32,7 +32,7 @@ public class LogAspect {
 
     // API
     @Before("loggableClass() && execution(* *(..))")
-    public void logBeforeMethod(JoinPoint joinPoint) throws Throwable {
+    public synchronized void logBeforeMethod(JoinPoint joinPoint) throws Throwable {
         Logger logger = LoggerFactory.getLogger(joinPoint.getTarget().getClass());
         Object[] args = joinPoint.getArgs();
 
@@ -42,19 +42,13 @@ public class LogAspect {
         logger.info("==========================");
         logger.info("API 요청: " + request.getRequestURI());
         logger.info("메서드 인자: {}", args[0].toString());
-        
-        // 유저 id
-        if (request.getHeader("Authorization") != null){
-            String jwt = request.getHeader("Authorization").split(" ")[1];
-            Object user_id = jwtprovider.validJwtToken(jwt).get("user_id");
-            logger.info("유저 id:  {}", user_id);
-        }
+        logger_info_user_id(logger, request);
     }
 
     // Exception 
     @Transactional
     @AfterThrowing(pointcut = "loggableClass() && execution(* *(..))", throwing = "ex")
-    public void logAfterThrowing(JoinPoint joinPoint, Throwable ex) {
+    public synchronized void logAfterThrowing(JoinPoint joinPoint, Throwable ex) {
         Logger logger = LoggerFactory.getLogger(joinPoint.getTarget().getClass());
         Object[] args = joinPoint.getArgs();
         
@@ -66,8 +60,10 @@ public class LogAspect {
         logger.info("메서드 인자: {}", args[0].toString());
         logger.error("예외 타입: " + ex.getClass().getSimpleName());
         logger.error("예외 발생: " + ex.getMessage());
+        logger_info_user_id(logger, request);
+    }
 
-        // 유저 id
+    private void logger_info_user_id(Logger logger, HttpServletRequest request) {
         if (request.getHeader("Authorization") != null){
             String jwt = request.getHeader("Authorization").split(" ")[1];
             Object user_id = jwtprovider.validJwtToken(jwt).get("user_id");
