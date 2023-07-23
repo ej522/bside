@@ -15,7 +15,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.example.beside.util.JwtProvider;
 
-import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
@@ -26,9 +25,6 @@ public class LogAspect {
     @Autowired
     private JwtProvider jwtprovider;
 
-    @Autowired
-    private EntityManager em;
-    
     // Loggable 어노테이션이 클래스에 적용되어 있는 경우에만
     @Pointcut("@within(Loggable)")
     public void loggableClass() {
@@ -45,8 +41,8 @@ public class LogAspect {
         
         logger.info("==========================");
         logger.info("API 요청: " + request.getRequestURI());
-        logger.info("메서드 인자: {}", args[0].toString());
         logger_info_user_id(logger, request);
+        logger.info("메서드 인자: {}", args[0].toString());
     }
 
     // Exception 
@@ -61,10 +57,10 @@ public class LogAspect {
         
         logger.info("==========================");
         logger.info("API 요청: " + request.getRequestURI());
+        logger_info_user_id(logger, request);
         logger.info("메서드 인자: {}", args[0].toString());
         logger.error("예외 타입: " + ex.getClass().getSimpleName());
         logger.error("예외 발생: " + ex.getMessage());
-        logger_info_user_id(logger, request);
     }
 
     private void logger_info_user_id(Logger logger, HttpServletRequest request) {
