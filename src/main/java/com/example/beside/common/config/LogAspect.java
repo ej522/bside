@@ -16,7 +16,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.example.beside.util.JwtProvider;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
 
 
 @Aspect
@@ -39,7 +38,7 @@ public class LogAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
         
-        logger.info("==========================");
+        logger.info("=======================");
         logger.info("API 요청: " + request.getRequestURI());
         logger.info("메서드 인자: {}", args[0].toString());
         logger_info_user_id(logger, request);
@@ -54,7 +53,7 @@ public class LogAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
         
-        logger.info("==========================");
+        logger.info("======== ERROR ========");
         logger.info("API 요청: " + request.getRequestURI());
         logger.info("메서드 인자: {}", args[0].toString());
         logger.error("예외 타입: " + ex.getClass().getSimpleName());
