@@ -3,6 +3,7 @@ package com.example.beside.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.beside.common.Exception.ExceptionDetail.MoimParticipateException;
 import com.example.beside.domain.*;
 import com.example.beside.dto.*;
 
@@ -16,7 +17,7 @@ public interface MoimRepository {
 
     long makeFriend(Long friend_id, Long moim_id, User user);
 
-    long saveSchedule(MoimMember moimMember, List<MoimMemberTime> moimTimeInfos);
+    long saveSchedule(MoimMember moimMember, List<MoimMemberTime> moimTimeInfos) throws MoimParticipateException;
 
     void fixMoimDate(Moim moim, LocalDateTime date, int time);
 

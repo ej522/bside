@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.beside.common.Exception.ExceptionDetail.MoimParticipateException;
 import com.example.beside.domain.*;
 import com.example.beside.dto.*;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -420,10 +421,11 @@ public class MoimRepositoryImpl implements MoimRepository {
 
         /**
          * Schedule
+         * @throws MoimParticipateException
          */
 
         @Override
-        public long saveSchedule(MoimMember moimMember, List<MoimMemberTime> moimTimeInfos) {
+        public long saveSchedule(MoimMember moimMember, List<MoimMemberTime> moimTimeInfos) throws MoimParticipateException {
 
                 Moim moim = moimMember.getMoim();
                 moim.setNobody_schedule_selected(false);
@@ -433,7 +435,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                 boolean isDuplicate = moim.getMoim_member()
                                         .stream().anyMatch(mm -> mm.getUser_id() == moimMember.getUser_id());
                 if (isDuplicate)
-                    return 0;
+                    throw new MoimParticipateException("이미 참여하고 있습니다");
 
                 for (var tt : moimTimeInfos) {
                         tt.setMoim_member(moimMember);

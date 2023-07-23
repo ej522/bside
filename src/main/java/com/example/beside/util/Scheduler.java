@@ -35,7 +35,7 @@ public class Scheduler {
     private final FcmPushService fcmPushService;
 
     // 초, 분, 시, 일, 월, 주 순서
-    @Scheduled(cron = "0 */15 * * * *")
+    @Scheduled(cron = "*/15 * * * * *")
     public void fixMoimSchedulering() throws FirebaseMessagingException {
         // 일정이 확정되지 않은 모임 조회
         List<Moim> notFixedScheduleMoims = moimRepository.getNotFixedMoims();

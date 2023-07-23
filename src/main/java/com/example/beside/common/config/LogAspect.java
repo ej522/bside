@@ -60,7 +60,7 @@ public class LogAspect {
         Logger logger = LoggerFactory.getLogger(joinPoint.getTarget().getClass());
         Object[] args = joinPoint.getArgs();
 
-        logger.info("===================================================");
+        logger.info("==========================");
         logger.info("API 요청: " + joinPoint.getSignature().toShortString());
         logger.info("메서드 인자: {}", Arrays.toString(args));
         logger.error("예외 타입: " + ex.getClass().getSimpleName());
