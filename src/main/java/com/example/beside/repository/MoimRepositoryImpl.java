@@ -430,12 +430,15 @@ public class MoimRepositoryImpl implements MoimRepository {
                 Moim moim = moimMember.getMoim();
                 moim.setNobody_schedule_selected(false);
                 em.persist(moim);
-
+                
                 // 중복 등록 방지
-                boolean isDuplicate = moim.getMoim_member()
-                                        .stream().anyMatch(mm -> mm.getUser_id() == moimMember.getUser_id());
-                if (isDuplicate)
-                    throw new MoimParticipateException("이미 참여하고 있습니다");
+                List<MoimMember> moim_member = moim.getMoim_member();
+                boolean isDuplicate = moim_member.stream().anyMatch(tt -> tt.getMoim_member_time().stream()
+                        .anyMatch(mmt -> moimMember.getUser_id() == mmt.getMoim_member().getUser_id()));
+
+                if (isDuplicate) {
+                        throw new MoimParticipateException("이미 참여하고 있습니다");
+                }
 
                 for (var tt : moimTimeInfos) {
                         tt.setMoim_member(moimMember);
