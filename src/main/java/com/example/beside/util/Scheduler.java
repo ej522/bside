@@ -37,7 +37,7 @@ public class Scheduler {
     // 초, 분, 시, 일, 월, 주 순서
     @Scheduled(cron = "0 * * * * *")
     public void fixMoimSchedulering() throws FirebaseMessagingException {
-        // 일정이 확정되지 않은 모임 + 1명이라도 참여 수락한 모임 조회
+        // 일정이 확정되지 않은 모임
         List<Moim> notFixedScheduleMoims = moimRepository.getNotFixedMoims();
 
         for (var moim : notFixedScheduleMoims) {
