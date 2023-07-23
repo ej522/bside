@@ -45,7 +45,7 @@ public class LogAspect {
         HttpServletRequest request = attributes.getRequest();
         
         logger.info("==========================");
-        logger.info("API 요청: " + joinPoint.getSignature().toShortString());
+        logger.info("API 요청: " + request.getRequestURI());
         logger.info("메서드 인자: {}", Arrays.toString(args));
         logger_info_user_id(logger, request);
     }
@@ -61,7 +61,7 @@ public class LogAspect {
         HttpServletRequest request = attributes.getRequest();
         
         logger.info("==========================");
-        logger.info("API 요청: " + joinPoint.getSignature().toShortString());
+        logger.info("API 요청: " + request.getRequestURI());
         logger.info("메서드 인자: {}", Arrays.toString(args));
         logger.error("예외 타입: " + ex.getClass().getSimpleName());
         logger.error("예외 발생: " + ex.getMessage());
@@ -72,7 +72,6 @@ public class LogAspect {
         if (request.getHeader("Authorization") != null){
             String jwt = request.getHeader("Authorization").split(" ")[1];
             Object user_id = jwtprovider.validJwtToken(jwt).get("user_id");
-            logger.info("jwt :  {}", jwt);
             logger.info("유저 id:  {}", user_id);
         }
     }
