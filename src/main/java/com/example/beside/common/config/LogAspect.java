@@ -1,9 +1,6 @@
 package com.example.beside.common.config;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -17,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.example.beside.domain.ServerLog;
 import com.example.beside.util.JwtProvider;
 
 import jakarta.persistence.EntityManager;
