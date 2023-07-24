@@ -34,13 +34,14 @@ public class LogAspect {
     public synchronized void logBeforeMethod(JoinPoint joinPoint) throws Throwable {
         Logger logger = LoggerFactory.getLogger(joinPoint.getTarget().getClass());
         Object[] args = joinPoint.getArgs();
+        var inputParms= args.length == 0 ? args.toString() : args[0].toString();
 
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
         
         logger.info("=======================");
         logger.info("API 요청: " + request.getRequestURI());
-        logger.info("메서드 인자: {}", args[0].toString());
+        logger.info("메서드 인자: {}", inputParms);
         logger_info_user_id(logger, request);
     }
 
@@ -49,13 +50,14 @@ public class LogAspect {
     public synchronized void logAfterThrowing(JoinPoint joinPoint, Throwable ex) {
         Logger logger = LoggerFactory.getLogger(joinPoint.getTarget().getClass());
         Object[] args = joinPoint.getArgs();
+        var inputParms= args.length == 0 ? args.toString() : args[0].toString();
         
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
         
         logger.info("======== ERROR ========");
         logger.info("API 요청: " + request.getRequestURI());
-        logger.info("메서드 인자: {}", args[0].toString());
+        logger.info("메서드 인자: {}", inputParms);
         logger.error("예외 타입: " + ex.getClass().getSimpleName());
         logger.error("예외 발생: " + ex.getMessage());
         logger_info_user_id(logger, request);
