@@ -127,7 +127,7 @@ public class MoimController {
 
                 String result = fcmPushService.sendFcmMoimIdNotification(hostInfo.getFcm(), Common.getPushTitle(type),
                         Common.getPushContent(hostInfo.getName(), user_.getName(), moim.getMoim_name(), type),
-                        moim.getId(), type);
+                        moim.getId(), "MOIM_VOTE_PREVIEW");
 
                 if(result.equals(AlarmInfo.SUCCESS.name())) {
                     fcmPushService.saveAlarmData(user_, hostInfo, moim, type, AlarmInfo.SUCCESS.name(), null);
@@ -167,7 +167,7 @@ public class MoimController {
 
                 String result = fcmPushService.sendFcmMoimIdNotification(hostInfo.getFcm(), Common.getPushTitle(type),
                         Common.getPushContent(hostInfo.getName(), user_.getName(), moim.getMoim_name(), type),
-                        moim.getId(), type);
+                        moim.getId(), "MOIM_VOTE_PREVIEW");
 
                 if(result.equals(AlarmInfo.SUCCESS.name())) {
                     fcmPushService.saveAlarmData(user_, hostInfo, moim, type, AlarmInfo.SUCCESS.name(), null);
@@ -246,7 +246,7 @@ public class MoimController {
                     if (msgUserInfo.getFcm() != null) {
                         String result = fcmPushService.sendFcmPushNotification(msgUserInfo.getFcm(), Common.getPushTitle(type),
                                 Common.getPushContent(msgUserInfo.getName(), user_.getName(), null, type),
-                                encrptedMoimInfo, "INVITE_ACCEPT");
+                                encrptedMoimInfo, "INVITE_ACCEPT", moim.getMoim_name());
                         
                         logger.error("push alarm 에러: " + result);
 

@@ -28,13 +28,14 @@ public class FcmPushService {
 
     private final FcmPushRepository fcmPushRepository;
 
-    public String sendFcmPushNotification(String fcmToken, String title, String body, String encrptedInfo, String type) throws FirebaseMessagingException {
+    public String sendFcmPushNotification(String fcmToken, String title, String body, String encrptedInfo, String type, String moim_name) throws FirebaseMessagingException {
         try {
             Message message = Message.builder()
                     .setNotification(Notification.builder().setTitle(title).setBody(body).build())
                     .setToken(fcmToken)
                     .putData("encrptedInfo", encrptedInfo)
                     .putData("linkTo", type)
+                    .putData("moim_name", moim_name)
                     .build();
 
             FirebaseMessaging.getInstance().send(message);
