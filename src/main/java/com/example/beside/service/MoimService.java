@@ -70,15 +70,17 @@ public class MoimService {
         moimRepository.makeFriend(moim.getUser().getId(), moimId, user);
 
         // 모임 멤버 추가
-        moimRepository.makeMoimMember(user, moim);
+        MoimMember memberInfo = moimRepository.getMoimMemberByMemberId(moimId, user.getId());
+        if (memberInfo != null)
+            moimRepository.updateMemberAccept(user.getId(), moimId);
+        else
+            moimRepository.makeMoimMember(user, moim);
 
         // 모임 종합 정보 조회
         List<MoimOveralDateDto> moimOveralInfo = moimRepository.getMoimOveralInfo(moimId, null);
 
         // 데이터 결과 가공
-        MoimParticipateInfoDto result = new MoimParticipateInfoDto(moimOveralInfo);
-
-        return result;
+       return new MoimParticipateInfoDto(moimOveralInfo);
     }
 
     // #region [초대받은 모임 참여]
