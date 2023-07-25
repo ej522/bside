@@ -76,13 +76,14 @@ public class MoimController {
     @Operation(tags = { "Moim" }, summary = "모임 주최자가 등록한 모임 일정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "주최자가 등록한 모임일정이 조회되었습니다.", content = @Content(schema = @Schema(implementation = MoimListResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 모임이거나 확인이 필요합니다.")
     })
     @GetMapping(value = "/v1/host-moim-info")
     public Response<MoimParticipateInfoDto> getHostSelectMoimDate(HttpServletRequest token,
             @RequestParam(name = "moim_id") @NotNull Long moim_id) throws Exception {
         User user = (User) token.getAttribute("user");
 
-        MoimParticipateInfoDto moimInfo = moimService.getHostSelectMoimDate(user, moim_id);
+        MoimParticipateInfoDto moimInfo = moimService.getHostSelectMoimDate(moim_id);
 
         return MoimParticipateResponse.success(200, "주최자가 등록한 모임일정이 조회되었습니다.", moimInfo);
     }
@@ -300,9 +301,10 @@ public class MoimController {
     @Operation(tags = { "Moim" }, summary = "투표중인 모임 목록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "투표중인 모임 목록이 조회 되었습니다.", content = @Content(schema = @Schema(implementation = VotingMoimResponse.class))),
+            @ApiResponse(responseCode = "404", description = "투표중인 모임 목록이 없습니다.")
     })
     @GetMapping(value = "/v1/list-voting")
-    public Response<List<VotingMoimDto>> getVotingMoimList(HttpServletRequest token) {
+    public Response<List<VotingMoimDto>> getVotingMoimList(HttpServletRequest token) throws NoResultListException {
         User user = (User) token.getAttribute("user");
 
         List<VotingMoimDto> votingMoimList = moimService.getVotingMoimList(user.getId());

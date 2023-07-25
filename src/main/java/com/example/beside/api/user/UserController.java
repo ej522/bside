@@ -364,7 +364,7 @@ public class UserController {
     @GetMapping("/v1/my-friend")
     public Response<FriendDto> getMyfriendList(HttpServletRequest token) throws NoResultListException {
         User user = (User) token.getAttribute("user");
-        // List<FriendDto> friendDtoList = userService.findFriendByUserId(user);
+
         FriendDto friendDto = userService.findFriendByUserId(user);
 
         return MyFriendResponse.success(200, "친구 목록이 조회되었습니다.", friendDto);

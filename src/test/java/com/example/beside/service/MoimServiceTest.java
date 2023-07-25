@@ -543,7 +543,7 @@ public class MoimServiceTest {
         moimService.participateDeepLink(saveUser2, encryptedId);
 
         // when
-        MoimParticipateInfoDto moimInfo = moimService.getHostSelectMoimDate(saveUser2, moimId);
+        MoimParticipateInfoDto moimInfo = moimService.getHostSelectMoimDate(moimId);
 
         // then
         assertTrue(moimInfo.getMoim_leader_id().equals(saveUser1.getId()));

@@ -265,13 +265,17 @@ public class MoimService {
     // #endregion
 
     // #region [투표중인 모임 조회]
-    public List<VotingMoimDto> getVotingMoimList(Long user_id) {
+    public List<VotingMoimDto> getVotingMoimList(Long user_id) throws NoResultListException {
         List<VotingMoimDto> findVotingMoimHistory = moimRepository.findVotingMoimHistory(user_id);
         LocalDateTime now = LocalDateTime.now();
 
         List<VotingMoimDto> onGoingMoimDto = findVotingMoimHistory.stream()
                 .filter(moimDto -> moimDto.getDead_line_time().isAfter(now))
                 .collect(Collectors.toList());
+
+        if(onGoingMoimDto.size()<1) {
+            throw new NoResultListException("투표중인 모임 목록이 없습니다.");
+        }
 
         return onGoingMoimDto;
     }
@@ -281,7 +285,7 @@ public class MoimService {
     public List<InvitedMoimListDto> getInvitedMoimList(Long user_id) throws NoResultListException {
         List<InvitedMoimListDto> invitedMoimList = moimRepository.getInvitedMoimList(user_id);
         if (invitedMoimList.size() == 0)
-            throw new NoResultListException("초대 받은 모임이 없습니다");
+            throw new NoResultListException("");
 
         return invitedMoimList;
     }
@@ -291,13 +295,16 @@ public class MoimService {
         return moimRepository.getMoimInfo(moimId);
     }
 
-    public Moim getMoimInfoWithEncrypedMoimId(String encryptInfo) throws NumberFormatException, Exception {
+    public Moim getMoimInfoWithEncrypedMoimId(String encryptInfo) throws Exception {
         Long moimId = Long.parseLong(encrypt.decrypt(encryptInfo));
         return moimRepository.getMoimInfo(moimId);
     }
 
-    public MoimParticipateInfoDto getHostSelectMoimDate(User user, Long moimId) throws Exception {
+    public MoimParticipateInfoDto getHostSelectMoimDate(Long moimId) throws NoResultListException {
         List<MoimOveralDateDto> moimInfo = moimRepository.getMoimOveralInfo(moimId, null);
+        if(moimInfo.size()<1) {
+            throw new NoResultListException("존재하지 않는 모임이거나 확인이 필요합니다.");
+        }
 
         MoimParticipateInfoDto result = new MoimParticipateInfoDto(moimInfo);
 
