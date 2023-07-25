@@ -110,7 +110,7 @@ public class MoimService {
         if (moim.getCreated_time().plusHours(moim.getDead_line_hour()).isBefore(LocalDateTime.now()))
             throw new MoimParticipateException("데드라인 시간이 지난 모임입니다.");
 
-        if (moimRepository.getMoimMembers(moimId).size() >= 10)
+        if (moimRepository.getMoimMembers(moimId).size() > 10)
             throw new MoimParticipateException("모임은 최대 10명 까지 가능합니다.");
 
         if (moimRepository.alreadyJoinedMoim(moimId, user.getId()))
@@ -599,17 +599,13 @@ public class MoimService {
     public List<MoimDto> getMoimFutureList(Long user_id) throws NoResultListException {
         List<MoimDto> moimList = moimRepository.findMyMoimFutureList(user_id);
 
-        if (moimList.isEmpty()) {
+        if (moimList.isEmpty()) 
             throw new NoResultListException("예정 모임 목록이 없습니다.");
-        }
 
         for (MoimDto moim : moimList) {
             int cnt = moimRepository.findMemberCount(moim.getMoim_id());
-
-            // 주최자도 더해줌
-            cnt += 1;
-
-            moim.setMemeber_cnt(cnt);
+            // 주최자 +1 
+            moim.setMemeber_cnt(cnt+1);
         }
 
         return moimList;
