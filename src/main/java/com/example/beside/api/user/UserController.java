@@ -270,6 +270,14 @@ public class UserController {
         profileList.add(img);
         img = "https://moim.life/profile/char5.png";
         profileList.add(img);
+        img = "https://moim.life/profile/char6.png";
+        profileList.add(img);
+        img = "https://moim.life/profile/char7.png";
+        profileList.add(img);
+        img = "https://moim.life/profile/char8.png";
+        profileList.add(img);
+        img = "https://moim.life/profile/char9.png";
+        profileList.add(img);
 
         return Response.success(200, "프로필 이미지가 조회 되었습니다.", profileList);
     }
