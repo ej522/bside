@@ -606,17 +606,13 @@ public class MoimService {
     public List<MoimDto> getMoimFutureList(Long user_id) throws NoResultListException {
         List<MoimDto> moimList = moimRepository.findMyMoimFutureList(user_id);
 
-        if (moimList.isEmpty()) {
+        if (moimList.isEmpty()) 
             throw new NoResultListException("예정 모임 목록이 없습니다.");
-        }
 
         for (MoimDto moim : moimList) {
             int cnt = moimRepository.findMemberCount(moim.getMoim_id());
-
-            // 주최자도 더해줌
-            cnt += 1;
-
-            moim.setMemeber_cnt(cnt);
+            // 주최자 +1 
+            moim.setMemeber_cnt(cnt+1);
         }
 
         return moimList;

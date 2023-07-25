@@ -2,6 +2,7 @@ package com.example.beside.common.config;
 
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -55,9 +56,9 @@ public class LogAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
         
-        logger.info("======== ERROR ========");
-        logger.info("API 요청: " + request.getRequestURI());
-        logger.info("메서드 인자: {}", inputParms);
+        logger.error("=======================");
+        logger.error("API 요청: " + request.getRequestURI());
+        logger.error("메서드 인자: {}", inputParms);
         logger.error("예외 타입: " + ex.getClass().getSimpleName());
         logger.error("예외 발생: " + ex.getMessage());
         logger_info_user_id(logger, request);
