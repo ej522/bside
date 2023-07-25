@@ -110,7 +110,7 @@ public class MoimService {
         if (moim.getCreated_time().plusHours(moim.getDead_line_hour()).isBefore(LocalDateTime.now()))
             throw new MoimParticipateException("데드라인 시간이 지난 모임입니다.");
 
-        if (moimRepository.getMoimMembers(moimId).size() > 10)
+        if (moimRepository.getMoimMembers(moimId).size() >= 10)
             throw new MoimParticipateException("모임은 최대 10명 까지 가능합니다.");
 
         if (moimRepository.alreadyJoinedMoim(moimId, user.getId()))
