@@ -574,10 +574,7 @@ public class MoimRepositoryImpl implements MoimRepository {
                 QMoimMember qMoimMember = QMoimMember.moimMember;
                 QUser qUser = QUser.user;
 
-                LocalDateTime today = LocalDateTime.now();
-
-                String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
+                LocalDateTime currentTime = LocalDateTime.now();
                 List<MoimDto> result = queryFactory.select(
                                 Projections.fields(MoimDto.class,
                                                 qMoim.id.as("moim_id"),
@@ -590,12 +587,10 @@ public class MoimRepositoryImpl implements MoimRepository {
                                 .leftJoin(qMoimMember).on(qMoim.id.eq(qMoimMember.moim.id))
                                 .leftJoin(qUser).on(qUser.id.eq(qMoim.user.id))
                                 .where(((qMoim.user.id.eq(userId).and(qMoim.history_view_yn.eq(true)))
-                                                .or((qMoimMember.user_id.eq(userId)
-                                                                .and(qMoimMember.history_view_yn.eq(true)))))
-                                                .and(qMoim.fixed_date.goe(formattedDate))
-                                                .and(qMoim.fixed_date.isNotNull())
-                                                .and(qMoim.fixed_time.isNotNull())
-                                                .and(qMoimMember.is_accept.eq(true)))
+                                        .or((qMoimMember.user_id.eq(userId).and(qMoimMember.history_view_yn.eq(true)))))
+                                .and(qMoimMember.is_accept.eq(true))
+                                .and(qMoim.fixed_date.isNotNull())
+                                .and(qMoim.fixed_date.concat(" ").concat(qMoim.fixed_time).gt(currentTime.toString())))
                                 .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc())
                                 .fetch();
 
