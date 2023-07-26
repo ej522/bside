@@ -8,9 +8,10 @@ public class PasswordConverter implements AttributeConverter<String, String> {
 
     @Override
     public String convertToDatabaseColumn(String attribute) {
-        if(attribute==null) return null;
+        if (attribute == null)
+            return null;
         try {
-            return Aes256Utils.encrypt(attribute);
+            return Encrypt.getHashingPassword(attribute);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -19,9 +20,19 @@ public class PasswordConverter implements AttributeConverter<String, String> {
     @Override
     public String convertToEntityAttribute(String dbData) {
         try {
-            return Aes256Utils.decrypt(dbData);
+            return dbData;
         } catch (Exception e) {
             return dbData;
+        }
+    }
+
+    public static String hashPassword(String attribute) {
+        if (attribute == null)
+            return null;
+        try {
+            return Encrypt.getHashingPassword(attribute);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

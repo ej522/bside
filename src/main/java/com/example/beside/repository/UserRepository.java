@@ -1,28 +1,41 @@
 package com.example.beside.repository;
 
+import java.util.List;
+import java.util.Optional;
 
 import com.example.beside.domain.User;
-import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import com.example.beside.dto.FriendDto;
 
-import java.util.List;
+public interface UserRepository {
+    // CREATE
+    User saveUser(User user);
 
-@Repository
-@RequiredArgsConstructor
-public class UserRepository {
-    private final EntityManager em;
+    // READ
+    User findUserById(Long id);
 
-    public void saveUser(User user){
-        em.persist(user);
-    }
+    Optional<User> findUserByEmail(String email);
 
-    public User findUserById(Long id){
-        return em.find(User.class, id);
-    }
+    Optional<User> findUserByEmailAndSocialType(String email, String social_type);
 
-    public List<User> findUserAll(){
-        return em.createQuery("SELECT u FROM User u" , User.class).getResultList();
-    }
+    Optional<User> findUserNickname(String nickName);
 
+    List<FriendDto.FriendInfo> findFriendByUserId(Long user_id);
+
+    List<User> findUserAll();
+
+    // UPDATE
+    User updateFcmToken(User user);
+
+    User updateNickname(User user);
+
+    User updatePassword(User user);
+
+    User updateProfileImage(User user);
+
+    User UpdateAlarmState(User user);
+
+    // DELETE
+    void deleteUser(User user);
+
+    //List<FriendDto.FriendInfo> test(Long user_id);
 }
