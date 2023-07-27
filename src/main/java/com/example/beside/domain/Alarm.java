@@ -37,4 +37,8 @@ public class Alarm {
 
     private String error_msg;
 
+    private String title;
+
+    private String content;
+
 }

@@ -6,6 +6,7 @@ import com.example.beside.domain.AlarmInfo;
 import com.example.beside.domain.Moim;
 import com.example.beside.domain.User;
 import com.example.beside.dto.AlarmDto;
+import com.example.beside.dto.UserDto;
 import com.example.beside.repository.FcmPushRepository;
 import com.example.beside.repository.UserRepository;
 import com.example.beside.util.Common;
@@ -70,7 +71,8 @@ public class FcmPushService {
 
     //알람 저장
     @Transactional
-    public void saveAlarmData(User sendUser, User receiveUser, Moim moim, String type, String status, String error_msg) {
+    public void saveAlarmData(User sendUser, User receiveUser, Moim moim, String type, String status,
+                              String error_msg, String title, String content) {
         Alarm alarmInfo = new Alarm();
 
         //모임관련 정보
@@ -99,22 +101,25 @@ public class FcmPushService {
         //에러 발생시 메세지
         alarmInfo.setError_msg(error_msg);
 
+        //알림 메시지
+        alarmInfo.setTitle(title);
+        alarmInfo.setContent(content);
+
         fcmPushRepository.insertAlarm(alarmInfo);
 
     }
 
-    //알람 조회
+    //알림 조회
     public AlarmDto getAlarmTypeList(User user, String type) throws NoResultListException {
         List<Alarm> alarmList = fcmPushRepository.getAlarmListByType(user.getId(), type);
 
         List<AlarmDto.AlarmInfoDto> alarmInfoList = new ArrayList<>();
 
         if(alarmList.size()==0) {
-            throw new NoResultListException("알람 목록이 없습니다.");
+            throw new NoResultListException("알림 목록이 없습니다.");
         } else {
+
             for(Alarm alarm : alarmList) {
-                String title = Common.getPushTitle(alarm.getType());
-                String content = Common.getPushContent(alarm.getReceive_name(), alarm.getSend_name(), alarm.getMoim_name(), alarm.getType());
                 String img_url = "";
 
                 if(alarm.getType().equals(AlarmInfo.ACCEPT.name()))
@@ -124,7 +129,7 @@ public class FcmPushService {
                 else if(alarm.getType().equals(AlarmInfo.CONFIRM.name()))
                     img_url = "https://moim.life/icon/moim_alarm.png";
 
-                AlarmDto.AlarmInfoDto alarmInfo = new AlarmDto.AlarmInfoDto(alarm, title, content, img_url);
+                AlarmDto.AlarmInfoDto alarmInfo = new AlarmDto.AlarmInfoDto(alarm, img_url);
 
                 alarmInfoList.add(alarmInfo);
             }
@@ -145,23 +150,24 @@ public class FcmPushService {
 
     @Transactional
     public void chkAlarmAgreeAndSend(User sender, long receive_id, long moim_id, String moim_name, String save_type, String fcm_type) {
-        User receiver = chkPushAgree(receive_id);
+        User receiver = userRepository.findUserById(receive_id);
 
-        if(receiver!=null) {
+        if(receiver.getPush_alarm()) {
             if(receiver.getFcm()!=null) {
 
                 Moim moim = new Moim();
                 moim.setId(moim_id);
                 moim.setMoim_name(moim_name);
 
-                String result = sendFcmMoimIdNotification(receiver.getFcm(), Common.getPushTitle(save_type),
-                        Common.getPushContent(receiver.getName(), sender.getName(), moim.getMoim_name(), save_type),
-                        moim.getId(), fcm_type);
+                String title = Common.getPushTitle(save_type);
+                String content = Common.getPushContent(receiver.getName(), sender.getName(), moim.getMoim_name(), save_type);
+
+                String result = sendFcmMoimIdNotification(receiver.getFcm(), title, content, moim.getId(), fcm_type);
 
                 if(result.equals(AlarmInfo.SUCCESS.name())) {
-                    saveAlarmData(sender, receiver, moim, save_type, AlarmInfo.SUCCESS.name(), null);
+                    saveAlarmData(sender, receiver, moim, save_type, AlarmInfo.SUCCESS.name(), null, title, content);
                 } else {
-                    saveAlarmData(sender, receiver, moim, save_type, AlarmInfo.ERROR.name(), result);
+                    saveAlarmData(sender, receiver, moim, save_type, AlarmInfo.ERROR.name(), result, title, content);
                 }
             }
         }
@@ -170,38 +176,28 @@ public class FcmPushService {
 
     @Transactional
     public void chkAlarmAgreeAndSend(User sender, long receive_id, String encrptedInfo, String moim_name, String save_type, String fcm_type) throws Exception {
-        User receiver = chkPushAgree(receive_id);
+        User receiver = userRepository.findUserById(receive_id);
 
         Moim moim = new Moim();
         moim.setId(Long.parseLong(encrypt.decrypt(encrptedInfo)));
         moim.setMoim_name(moim_name);
 
-        if (receiver != null) {
+        if (receiver.getPush_alarm()) {
             if (receiver.getFcm() != null) {
+                String title = Common.getPushTitle(save_type);
+                String content = Common.getPushContent(receiver.getName(), sender.getName(), null, save_type);
 
-                String result = sendFcmPushNotification(receiver.getFcm(), Common.getPushTitle(save_type),
-                        Common.getPushContent(receiver.getName(), sender.getName(), null, save_type),
-                        encrptedInfo, fcm_type, moim.getMoim_name());
+                String result = sendFcmPushNotification(receiver.getFcm(), title, content, encrptedInfo, fcm_type, moim.getMoim_name());
 
                 if(result.equals(AlarmInfo.SUCCESS.name())) {
                     //성공시
-                    saveAlarmData(sender, receiver, moim, save_type, AlarmInfo.SUCCESS.name(), null);
+                    saveAlarmData(sender, receiver, moim, save_type, AlarmInfo.SUCCESS.name(), null, title, content);
                 } else {
                     //실패시
-                    saveAlarmData(sender, receiver, moim, save_type, AlarmInfo.ERROR.name(), result);
+                    saveAlarmData(sender, receiver, moim, save_type, AlarmInfo.ERROR.name(), result, title, content);
                 }
             }
         }
-    }
-
-    private User chkPushAgree(Long user_id) {
-        User userInfo = userRepository.findUserById(user_id);
-
-        if(!userInfo.getPush_alarm()) {
-            return null;
-        }
-
-        return userInfo;
     }
 
 }
