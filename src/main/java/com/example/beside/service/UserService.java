@@ -200,13 +200,4 @@ public class UserService {
         return friendDto;
     }
 
-    public User chkPushAgree(Long user_id) {
-        User userInfo = userRepository.findUserById(user_id);
-
-        if(!userInfo.getPush_alarm()) {
-            return null;
-        }
-
-        return userInfo;
-    }
 }

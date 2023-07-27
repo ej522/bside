@@ -31,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 public class Scheduler {
 
     private final MoimRepositoryImpl moimRepository;
-    private final UserService userService;
     private final FcmPushService fcmPushService;
 
     // 초, 분, 시, 일, 월, 주 순서
@@ -67,17 +66,16 @@ public class Scheduler {
 
             moimRepository.fixMoimDate(moim, fixedDate, fixedTime);
 
-            String type = AlarmInfo.CONFIRM.name();
+            String save_type = AlarmInfo.CONFIRM.name();
+            String fcm_type = "MOIM_RESULT";
 
             //주최자
-            User host = userService.chkPushAgree(moim.getUser().getId());
-            sendFixMoimMessage(host, moim, moim.getEncrypted_id(), type);
+            fcmPushService.chkAlarmAgreeAndSend(null, moim.getUser().getId(), moim.getId(), moim.getMoim_name(), save_type, fcm_type);
 
             //참여자
             List<MoimMember> moimMemberList = moim.getMoim_member();
             for(MoimMember moimMember : moimMemberList) {
-                User guest = userService.chkPushAgree(moimMember.getUser_id());
-                sendFixMoimMessage(guest, moim, moim.getEncrypted_id(), type);
+                fcmPushService.chkAlarmAgreeAndSend(null, moimMember.getUser_id(), moim.getId(), moim.getMoim_name(), save_type, fcm_type);
             }
         }
 
@@ -193,22 +191,6 @@ public class Scheduler {
             }
         }
         return maxSelectedTime.get(0);
-    }
-
-    private void sendFixMoimMessage(User user, Moim moim, String encrptedInfo, String type) throws FirebaseMessagingException {
-        if(user != null) {
-            if(user.getFcm()!=null) {
-                String result = fcmPushService.sendFcmMoimIdNotification(user.getFcm(), Common.getPushTitle(type),
-                        Common.getPushContent(null, null, moim.getMoim_name(), type),
-                        moim.getId(), "MOIM_RESULT");
-
-                if(result.equals(AlarmInfo.SUCCESS.name())) {
-                    fcmPushService.saveAlarmData(null, user, moim, type, AlarmInfo.SUCCESS.name(), null);
-                } else {
-                    fcmPushService.saveAlarmData(null, user, moim, type, AlarmInfo.ERROR.name(), result);
-                }
-            }
-        }
     }
 
 }

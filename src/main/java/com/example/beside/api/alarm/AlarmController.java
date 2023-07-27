@@ -32,10 +32,10 @@ public class AlarmController {
     private final FcmPushService fcmPushService;
 
     
-    @Operation(tags = { "Fcm Alarm Info" }, summary = "알람 조회")
+    @Operation(tags = { "Fcm Alarm Info" }, summary = "알림 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "알람이 조회되었습니다.", content = @Content(schema = @Schema(implementation = AlarmInfoResponse.class))),
-            @ApiResponse(responseCode = "404", description = "알람 목록이 없습니다.")
+            @ApiResponse(responseCode = "200", description = "알림 조회되었습니다.", content = @Content(schema = @Schema(implementation = AlarmInfoResponse.class))),
+            @ApiResponse(responseCode = "404", description = "알림 목록이 없습니다.")
     })
     @GetMapping("/v1/list")
     public Response<AlarmDto> getAlarmTypeList(HttpServletRequest token,
@@ -44,13 +44,12 @@ public class AlarmController {
 
         AlarmDto alarmList = fcmPushService.getAlarmTypeList(user, type);
 
-        return AlarmInfoResponse.success(200, "알람이 조회되었습니다.", alarmList);
+        return AlarmInfoResponse.success(200, "알림 조회되었습니다.", alarmList);
     }
 
-    @Operation(tags = { "Fcm Alarm Info" }, summary = "알람 상태 수정")
+    @Operation(tags = { "Fcm Alarm Info" }, summary = "알림 상태 수정")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "알람 상태가 수정되었습니다."),
-            @ApiResponse(responseCode = "400", description = "알람 목록이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "알림 상태가 수정되었습니다.")
     })
     @PostMapping("v1/update-status")
     public Response<?> updateAlarmStatus(HttpServletRequest token, @RequestBody AlarmRequest request) throws NoResultListException {
@@ -58,7 +57,7 @@ public class AlarmController {
 
         fcmPushService.updateAlarmStatus(request.alarm_id, user, request.status);
 
-        return AlarmInfoResponse.success(200, "알람 상태가 수정되었습니다.", null);
+        return AlarmInfoResponse.success(200, "알림 상태가 수정되었습니다.", null);
     }
 
     @Data
@@ -68,7 +67,7 @@ public class AlarmController {
         private String status;
 
         @NotNull
-        @Schema(description = "알람 아이디", example = "1")
+        @Schema(description = "알림 아이디", example = "1")
         private Long alarm_id;
     }
 }
