@@ -7,7 +7,9 @@ import com.example.beside.domain.Moim;
 import com.example.beside.domain.User;
 import com.example.beside.dto.AlarmDto;
 import com.example.beside.repository.FcmPushRepository;
+import com.example.beside.repository.UserRepository;
 import com.example.beside.util.Common;
+import com.example.beside.util.Encrypt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ import java.util.List;
 public class FcmPushService {
 
     private final FcmPushRepository fcmPushRepository;
+    private final UserRepository userRepository;
+    private final Encrypt encrypt;
 
     public String sendFcmPushNotification(String fcmToken, String title, String body, String encrptedInfo, String type, String moim_name) throws FirebaseMessagingException {
         try {
@@ -138,4 +142,66 @@ public class FcmPushService {
     public void updateAlarmStatus(long alarm_id, User user, String status) throws NoResultListException {
         fcmPushRepository.updateAlarmStatus(alarm_id, user.getId(), status);
     }
+
+    @Transactional
+    public void chkAlarmAgreeAndSend(User sender, long receive_id, long moim_id, String moim_name, String save_type, String fcm_type) {
+        User receiver = chkPushAgree(receive_id);
+
+        if(receiver!=null) {
+            if(receiver.getFcm()!=null) {
+
+                Moim moim = new Moim();
+                moim.setId(moim_id);
+                moim.setMoim_name(moim_name);
+
+                String result = sendFcmMoimIdNotification(receiver.getFcm(), Common.getPushTitle(save_type),
+                        Common.getPushContent(receiver.getName(), sender.getName(), moim.getMoim_name(), save_type),
+                        moim.getId(), fcm_type);
+
+                if(result.equals(AlarmInfo.SUCCESS.name())) {
+                    saveAlarmData(sender, receiver, moim, save_type, AlarmInfo.SUCCESS.name(), null);
+                } else {
+                    saveAlarmData(sender, receiver, moim, save_type, AlarmInfo.ERROR.name(), result);
+                }
+            }
+        }
+
+    }
+
+    @Transactional
+    public void chkAlarmAgreeAndSend(User sender, long receive_id, String encrptedInfo, String moim_name, String save_type, String fcm_type) throws Exception {
+        User receiver = chkPushAgree(receive_id);
+
+        Moim moim = new Moim();
+        moim.setId(Long.parseLong(encrypt.decrypt(encrptedInfo)));
+        moim.setMoim_name(moim_name);
+
+        if (receiver != null) {
+            if (receiver.getFcm() != null) {
+
+                String result = sendFcmPushNotification(receiver.getFcm(), Common.getPushTitle(save_type),
+                        Common.getPushContent(receiver.getName(), sender.getName(), null, save_type),
+                        encrptedInfo, fcm_type, moim.getMoim_name());
+
+                if(result.equals(AlarmInfo.SUCCESS.name())) {
+                    //성공시
+                    saveAlarmData(sender, receiver, moim, save_type, AlarmInfo.SUCCESS.name(), null);
+                } else {
+                    //실패시
+                    saveAlarmData(sender, receiver, moim, save_type, AlarmInfo.ERROR.name(), result);
+                }
+            }
+        }
+    }
+
+    private User chkPushAgree(Long user_id) {
+        User userInfo = userRepository.findUserById(user_id);
+
+        if(!userInfo.getPush_alarm()) {
+            return null;
+        }
+
+        return userInfo;
+    }
+
 }
