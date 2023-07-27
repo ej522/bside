@@ -36,9 +36,6 @@ public class SchedulerTest {
     private UserRepositoryImpl userRepository;
 
     @Autowired
-    private  UserService userService;
-
-    @Autowired
     private FcmPushService fcmPushService;
 
     private User user;
@@ -114,7 +111,7 @@ public class SchedulerTest {
         var moimMember = moimRepository.getMoimMemberByMemberId(moimId, findUser2.getId());
         // 상세 모임 일정 등록
         moimRepository.saveSchedule(moimMember, normalMoimMemberTime);
-        Scheduler scheduler = new Scheduler(moimRepository, userService, fcmPushService);
+        Scheduler scheduler = new Scheduler(moimRepository, fcmPushService);
 
         // when
         scheduler.fixMoimSchedulering();
@@ -138,7 +135,7 @@ public class SchedulerTest {
         // 모임 생성
         long moimId = moimRepository.makeMoim(findUser, newMoim, moimdate1);
 
-        Scheduler scheduler = new Scheduler(moimRepository, userService, fcmPushService);
+        Scheduler scheduler = new Scheduler(moimRepository, fcmPushService);
 
         // when
         scheduler.deleteNotFixedMoim();
