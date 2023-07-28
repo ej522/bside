@@ -169,7 +169,8 @@ public class MoimRepositoryImpl implements MoimRepository {
                                                 .and(qMoim.fixed_date.isNotNull())
                                                 .and(qMoim.fixed_time.isNotNull())
                                                 .and(qMoimMember.is_accept.eq(true)))
-                                .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.desc())
+                                .groupBy(qMoim.id, qMoim.moim_name, qUser.profile_image, qMoim.fixed_date, qMoim.fixed_time, qMoim.user.id)
+                                .orderBy(qMoim.fixed_date.desc(), qMoim.fixed_time.castToNum(Integer.class).desc())
                                 .fetch();
 
                 return result;
