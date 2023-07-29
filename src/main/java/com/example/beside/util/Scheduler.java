@@ -15,7 +15,6 @@ import com.example.beside.domain.AlarmInfo;
 import com.example.beside.domain.MoimMember;
 import com.example.beside.domain.User;
 import com.example.beside.service.FcmPushService;
-import com.example.beside.service.UserService;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Component;
 import com.example.beside.domain.Moim;
 import com.example.beside.dto.MoimOveralScheduleDto;
 import com.example.beside.repository.MoimRepositoryImpl;
+import com.example.beside.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class Scheduler {
 
+    private final UserRepository userRepository;
     private final MoimRepositoryImpl moimRepository;
     private final FcmPushService fcmPushService;
 
@@ -66,6 +67,10 @@ public class Scheduler {
 
             moimRepository.fixMoimDate(moim, fixedDate, fixedTime);
 
+            // 모임 멤버간 모두 친구 등록
+            List<MoimMember> moimMembers = moimRepository.getMoimMembers(moim.getId());
+            makeFriendEachOther(moim, moimMembers);
+
             String save_type = AlarmInfo.CONFIRM.name();
             String fcm_type = "MOIM_RESULT";
 
@@ -79,6 +84,16 @@ public class Scheduler {
             }
         }
 
+    }
+
+    private void makeFriendEachOther(Moim moim, List<MoimMember> moimMembers) {
+        for(int i=0; i< moimMembers.size() -1; i++){
+            User user1 = userRepository.findUserById(moimMembers.get(i).getUser_id());
+            for(int j= i+1; j<moimMembers.size()-1; j++){
+                MoimMember user2 = moimMembers.get(j);
+                moimRepository.makeFriend(user2.getId(), moim.getId(),user1);
+            }
+        }
     }
 
     @Scheduled(cron = "0 0 1 * * *")
