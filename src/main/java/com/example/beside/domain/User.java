@@ -3,8 +3,10 @@ package com.example.beside.domain;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import jakarta.persistence.*;
-import lombok.Getter;
 import lombok.*;
 
 @Entity
@@ -19,9 +21,11 @@ public class User {
     private Long id;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Moim> moim;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Friend> friend;
 
     @Column(length = 10)

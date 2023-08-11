@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -25,9 +27,11 @@ public class Moim {
     private User user;
 
     @OneToMany(mappedBy = "moim", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<MoimMember> moim_member = new ArrayList<>();
 
     @OneToMany(mappedBy = "moim", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<MoimDate> moim_date = new ArrayList<>();
 
     @Column(length = 100)
