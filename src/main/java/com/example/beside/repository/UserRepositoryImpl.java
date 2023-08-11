@@ -41,12 +41,12 @@ public class UserRepositoryImpl implements UserRepository {
         // 모임 삭제
         List<Moim> moimList = queryFactory.selectFrom(qMoim).where(qMoim.user.eq(user)).fetch();
         for (var moim : moimList) {
-            // 모임날짜 삭제
-            queryFactory.delete(qMoimDate).where(qMoimDate.moim.eq(moim)).execute();
-            // 모임멤버 삭제
-            queryFactory.delete(qMoimMember).where(qMoimMember.moim.eq(moim)).execute();
             // 모임멤버 시간 삭제
             queryFactory.delete(qMoimMemberTime).where(qMoimMemberTime.moim_id.eq(moim.getId())).execute();
+            // 모임멤버 삭제
+            queryFactory.delete(qMoimMember).where(qMoimMember.moim.eq(moim)).execute();
+            // 모임날짜 삭제
+            queryFactory.delete(qMoimDate).where(qMoimDate.moim.eq(moim)).execute();
             // 모임 삭제
             queryFactory.delete(qMoim).where(qMoim.eq(moim)).execute();
         }

@@ -22,11 +22,6 @@ import com.example.beside.domain.*;
 import com.example.beside.dto.*;
 
 import com.example.beside.service.FcmPushService;
-import com.example.beside.service.UserService;
-import com.example.beside.util.Common;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
