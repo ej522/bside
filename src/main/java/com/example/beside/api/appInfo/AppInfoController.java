@@ -43,7 +43,7 @@ public class AppInfoController {
     }
 
     @Operation(tags = { "App Info" }, summary = "앱 버전 정보")
-    @PutMapping("/v1/get-version/{os_type}")
+    @PutMapping("/v1/update-version/{os_type}")
     public Response<String> updateAppVersionInfo(
         @PathVariable(name = "os_type") String os_type,
         @RequestParam(name ="version" ,required = true) String version
