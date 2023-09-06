@@ -5,7 +5,7 @@ import com.example.beside.common.Exception.ExceptionDetail.UserNotExistException
 import com.example.beside.domain.LoginType;
 import com.example.beside.domain.User;
 import com.example.beside.dto.KakaoLoginInfoDto;
-import com.example.beside.repository.UserRepositoryImpl;
+import com.example.beside.repository.UserRepository;
 import com.example.beside.util.JwtProvider;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +41,7 @@ import io.jsonwebtoken.Jwts;
 public class SocialLoginService {
     private final JwtProvider jwtProvider;
 
-    private final UserRepositoryImpl userRepository;
+    private final UserRepository userRepository;
 
     @Value("${spring.kakao.admin}")
     private String APP_ADMIN_KEY;

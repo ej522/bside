@@ -34,7 +34,7 @@ public class User {
     @Column(length = 10)
     private String name;
 
-    @Column(length = 30)
+    @Column(length = 100)
     private String email;
 
     private String fcm;
