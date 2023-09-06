@@ -1,7 +1,10 @@
 package com.example.beside.api.appInfo;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.beside.common.config.Loggable;
@@ -22,12 +25,32 @@ public class AppInfoController {
     private final AppInfoService appInfoService;
 
     @Operation(tags = { "App Info" }, summary = "앱 버전 정보")
-    @GetMapping("/v1/get-version")
-    public Response<String> getAppVersionInfo() {
+    @GetMapping("/v1/get-version/{os_type}")
+    public Response<String> getAppVersionInfo(@PathVariable(name = "os_type") String os_type) {
         AppInfo appTermInfo = appInfoService.getAppTermInfo();
-        String version = appTermInfo.getVersion();
+        String version ="";
+
+        if (os_type.equalsIgnoreCase("android"))
+            version = appTermInfo.getAndriod_version();
+
+        else if(os_type.equalsIgnoreCase("ios"))
+            version = appTermInfo.getIos_version();
+        
+        else 
+            version ="os_type not exist";
 
         return Response.success(200, "앱 버전을 정상 조회했습니다 ", version);
+    }
+
+    @Operation(tags = { "App Info" }, summary = "앱 버전 정보")
+    @PutMapping("/v1/get-version/{os_type}")
+    public Response<String> updateAppVersionInfo(
+        @PathVariable(name = "os_type") String os_type,
+        @RequestParam(name ="version" ,required = true) String version
+    ) {
+
+        appInfoService.updateAppVersionInfo(os_type, version);
+        return Response.success(200, "앱 버전을 변경했습니다 ", version);
     }
 
     @Operation(tags = { "App Info" }, summary = "약관 정보")

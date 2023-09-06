@@ -18,18 +18,20 @@ public class AppInfoService {
     private final RedisTemplate<String, String> redisTemplate;
 
     public AppInfo getAppTermInfo() {
-        String version = redisTemplate.opsForValue().get("version");
+        String ios_version = redisTemplate.opsForValue().get("ios_version");
+        String android_version = redisTemplate.opsForValue().get("android_version");
         String terms = redisTemplate.opsForValue().get("terms");
         String privacy_policy = redisTemplate.opsForValue().get("privacy_policy");
         String marketing_info = redisTemplate.opsForValue().get("marketing_info");
         String withdraw_terms = redisTemplate.opsForValue().get("withdraw_terms");
 
-        if (terms == null || version == null || privacy_policy == null
-                || marketing_info == null || withdraw_terms == null) {
+        if (terms == null || ios_version == null  || android_version == null || 
+            privacy_policy == null|| marketing_info == null || withdraw_terms == null) {
             AppInfo appTermInfo = appInfoRepository.getAppTermInfo();
 
             ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-            valueOperations.set("version", appTermInfo.getVersion());
+            valueOperations.set("ios_version", appTermInfo.getIos_version());
+            valueOperations.set("android_version", appTermInfo.getAndriod_version());
             valueOperations.set("terms", appTermInfo.getTerms());
             valueOperations.set("privacy_policy", appTermInfo.getPrivacy_policy());
             valueOperations.set("marketing_info", appTermInfo.getMarketing_info());
@@ -37,15 +39,30 @@ public class AppInfoService {
 
             return appTermInfo;
         } else
-            return new AppInfo(version, terms, privacy_policy, marketing_info, withdraw_terms);
+            return new AppInfo(ios_version,android_version, terms, privacy_policy, marketing_info, withdraw_terms);
 
+    }
+
+    public void updateAppVersionInfo(String os_type, String version){
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+
+        if (os_type.equalsIgnoreCase("ios")){
+            appInfoRepository.updateIosVersion(version);
+            valueOperations.set("ios_version", version);
+        }
+            
+        else if (os_type.equalsIgnoreCase("android")){
+            appInfoRepository.updateAndroidVersion(version);
+            valueOperations.set("android_version", version);
+        }
     }
 
     public void saveAppTermInfo(AppInfo appInfo) {
         appInfoRepository.saveAppTermInfo(appInfo);
 
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        valueOperations.set("version", appInfo.getVersion());
+        valueOperations.set("ios_version", appInfo.getIos_version());
+        valueOperations.set("android_version", appInfo.getAndriod_version());
         valueOperations.set("terms", appInfo.getTerms());
         valueOperations.set("privacy_policy", appInfo.getPrivacy_policy());
         valueOperations.set("marketing_info", appInfo.getMarketing_info());
