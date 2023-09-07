@@ -21,7 +21,9 @@ public class AppInfo {
     @Column(name = "app_info_id")
     private long id;
 
-    private String version;
+    private String ios_version;
+
+    private String andriod_version;
 
     @Column(columnDefinition = "TEXT")
     private String terms;
@@ -35,13 +37,22 @@ public class AppInfo {
     @Column(columnDefinition = "TEXT")
     private String withdraw_terms;
 
-    public AppInfo(String version, String terms,
+    public AppInfo(String ios_versiong, String android_version, String terms,
             String privacy_policy, String marketing_info,
             String withdraw_terms) {
-        this.version = version;
+        this.ios_version = ios_versiong;
+        this.andriod_version = android_version;
         this.terms = terms;
         this.privacy_policy = privacy_policy;
         this.marketing_info = marketing_info;
         this.withdraw_terms = withdraw_terms;
+    }
+
+    public void updateAndroidVersion(String version){
+        this.andriod_version = version;
+    }
+
+    public void updateIosVersion(String version){
+        this.ios_version = version;
     }
 }

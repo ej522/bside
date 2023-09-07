@@ -23,7 +23,7 @@ public class AppInfoRepositoryImpl implements AppInfoRepository {
         QAppInfo qAppInfo = QAppInfo.appInfo;
 
         AppInfo result = queryFactory.select(qAppInfo)
-                .from(qAppInfo).orderBy(qAppInfo.version.desc()).fetchFirst();
+                .from(qAppInfo).fetchFirst();
 
         return result;
     }
@@ -35,4 +35,15 @@ public class AppInfoRepositoryImpl implements AppInfoRepository {
         em.flush();
     }
 
+    @Override
+    public void updateIosVersion(String version) {
+        AppInfo appInfo = em.find(AppInfo.class,1);
+        appInfo.updateIosVersion(version);
+    }
+
+    @Override
+    public void updateAndroidVersion(String version) {
+        AppInfo appInfo = em.find(AppInfo.class, 1);
+        appInfo.updateAndroidVersion(version);
+    }
 }
