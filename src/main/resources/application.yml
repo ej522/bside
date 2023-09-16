@@ -1,16 +1,15 @@
 server:
-  port: 8081
+  port: 
 spring:
   datasource:
-    url: jdbc:postgresql://110.8.21.243:25432/postgres
+    url: 
     username:
     password:
-    driver-class-name: org.postgresql.Driver
+    driver-class-name: 
 
   jpa:
     hibernate:
-#      ddl-auto: validate # DB 에 DDL 무시
-      ddl-auto: update  # DB 에 DDL 적용
+      ddl-auto: 
     properties:
       hibernate:
         show_sql: true
@@ -18,5 +17,5 @@ spring:
 
 logging:
   level:
-    org.hibernate.SQL: debug
-    org.hibernate.type: trace
+    org.hibernate.SQL: 
+    org.hibernate.type: 
