@@ -18,6 +18,22 @@
 <img width="100%" alt="image" src="https://github.com/ej522/bside/assets/19955904/58f9568e-3b7c-4ef1-9677-f2e5026ff6b6">
 <br/>
 <br/>
+
+## Introduce 
+
+![image](https://github.com/ej522/bside/assets/19955904/44849ac6-ffd0-4337-9006-fc9b8436904b)
+<div align="center"> [예시화면1] </div>  <br/>
+
+![image](https://github.com/ej522/bside/assets/19955904/5554bdd4-fb5d-4a36-a2e5-bbd14824dbed)
+
+<div align="center"> [예시화면2] </div> <br/>
+
+![image](https://github.com/ej522/bside/assets/19955904/0a97642c-b5b8-4771-8867-f52bf9fbfda8)
+
+<div align="center"> [예시화면3] </div> 
+
+
+<br/>
 <h2 align="center">📚 Tech Stack 📚</h2>
 <p align="center">
   <img src="https://img.shields.io/badge/Java-007396?style=flat-square&logo=Java&logoColor=white"/></a>&nbsp
@@ -45,3 +61,7 @@
 ## DB Modeling
 
 <img width="100%" alt="image" src="https://github.com/ej522/bside/assets/19955904/8c2485c3-f36d-4620-adad-7b1a072acc57">
+
+## 회고 
+![image](https://github.com/ej522/bside/assets/19955904/e7e241ce-1dbe-443d-acd8-cf039c2b1224)
+
